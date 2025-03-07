@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { Search } from 'lucide-react'
 
 interface Snippet {
@@ -58,7 +58,7 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
   return (
     <div className="flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-dark-primary min-h-screen p-6 flex flex-col">
+      <aside className="w-64 bg-dark-secondary min-h-screen p-6 flex flex-col">
         <div className="flex items-center space-x-2 mb-8">
           <h1 className="text-2xl font-bold text-light-gray">LOGO</h1>
         </div>

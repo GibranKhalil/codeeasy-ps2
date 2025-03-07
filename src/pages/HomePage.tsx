@@ -1,8 +1,7 @@
-import React from 'react'
-import HeroSection from '../components/HeroSection'
-import EngineSection from '../components/EngineSection'
-import CommunitySection from '../components/CommunitySection'
-import ContributeSection from '../components/ContributeSection'
+import HeroSection from '../ui/components/HeroSection'
+import EngineSection from '../ui/components/EngineSection'
+import CommunitySection from '../ui/components/CommunitySection'
+import ContributeSection from '../ui/components/ContributeSection'
 
 const HomePage = () => {
   return (

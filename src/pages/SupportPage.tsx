@@ -1,5 +1,3 @@
-import React from 'react'
-
 const SupportPage = () => {
   return (
     <div className="flex-1 p-8">
