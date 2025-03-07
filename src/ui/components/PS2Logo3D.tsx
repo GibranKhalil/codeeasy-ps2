@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader, OrbitControls } from 'three-stdlib';
+import { GLTFLoader } from 'three-stdlib';
 
 const PS2Logo3DModel = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -9,26 +9,38 @@ const PS2Logo3DModel = () => {
     const currentMountRef = mountRef.current;
 
     if (currentMountRef) {
+      // Configuração básica da cena
       const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111111); // Fundo escuro para contrastar com o modelo
+      
       const camera = new THREE.PerspectiveCamera(75, currentMountRef.offsetWidth / currentMountRef.offsetHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(currentMountRef.offsetWidth, currentMountRef.offsetHeight);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; // Melhora o contraste
+      renderer.toneMappingExposure = 1.5; // Controla a exposição
       currentMountRef.appendChild(renderer.domElement);
 
-      const ambientLight = new THREE.AmbientLight(0xffffff, 10);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1);
       scene.add(ambientLight);
 
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-      directionalLight.position.set(5, 0, 5).normalize();
-      scene.add(directionalLight);
+      const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+      mainLight.position.set(0, 0, 5);
+      scene.add(mainLight);
 
-      const pointLight = new THREE.PointLight(0xffffff, 2, 100);
-      pointLight.position.set(0, 5, 0);
-      scene.add(pointLight);
+      const rimLight = new THREE.DirectionalLight(0xffffff, 1);
+      rimLight.position.set(5, 5, -5);
+      scene.add(rimLight);
+
+      const fillLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      fillLight.position.set(0, -5, 0);
+      scene.add(fillLight);
+
+      const modelGroup = new THREE.Group();
+      scene.add(modelGroup);
 
       const loader = new GLTFLoader();
       loader.load('/3dModels/playstation_2_logo.glb', (glb) => {
-        scene.add(glb.scene);
+        modelGroup.add(glb.scene);
         glb.scene.scale.set(0.007, 0.007, 0.007);
         glb.scene.position.set(0, 0, 0);
 
@@ -36,9 +48,10 @@ const PS2Logo3DModel = () => {
           if (object && object instanceof THREE.Mesh) {
             object.material = new THREE.MeshStandardMaterial({
               color: color,
-              metalness: 1,
-              roughness: 0.2,
-              envMapIntensity: 1,
+              metalness: 0.8,
+              roughness: 0.1,
+              envMapIntensity: 1.2,
+              emissive: new THREE.Color(color).multiplyScalar(0.1)
             });
           }
         };
@@ -54,27 +67,33 @@ const PS2Logo3DModel = () => {
         applyMetallicMaterial(logo7, 0xFFD60A);
         applyMetallicMaterial(logo8, 0x197CAE);
         applyMetallicMaterial(logo9, 0xFFFFFF);
+        
       });
-
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.25;
-      controls.screenSpacePanning = false;
-      controls.maxPolarAngle = Math.PI / 2;
 
       camera.position.z = 5;
 
       const animate = () => {
         requestAnimationFrame(animate);
 
-        controls.update();
-        scene.rotation.y += 0.01;
+        modelGroup.rotation.y += 0.01;
 
         renderer.render(scene, camera);
       };
       animate();
 
+      // Event listener para redimensionamento
+      const handleResize = () => {
+        if (currentMountRef) {
+          camera.aspect = currentMountRef.offsetWidth / currentMountRef.offsetHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(currentMountRef.offsetWidth, currentMountRef.offsetHeight);
+        }
+      };
+
+      window.addEventListener('resize', handleResize);
+
       return () => {
+        window.removeEventListener('resize', handleResize);
         currentMountRef?.removeChild(renderer.domElement);
       };
     }

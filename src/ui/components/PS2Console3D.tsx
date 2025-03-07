@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { GLTFLoader, OrbitControls } from 'three-stdlib';
+import { GLTFLoader } from 'three-stdlib';
 
 const PS2Console3DModel = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -36,18 +36,10 @@ const PS2Console3DModel = () => {
       });
       
 
-      const controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.25;
-      controls.screenSpacePanning = false;
-      controls.maxPolarAngle = Math.PI / 2;
-
       camera.position.z = 5;
 
       const animate = () => {
         requestAnimationFrame(animate);
-
-        controls.update();
         scene.rotation.y += 0.01;
 
         renderer.render(scene, camera);

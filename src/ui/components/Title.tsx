@@ -6,6 +6,7 @@ interface TitleProps {
     description?: string | React.ReactNode;
     titleHasMainPageTitle?: boolean;
     align?: "left" | "center" | "right";
+    className?: HTMLDivElement['className']
 }
 
 const commonClasses = {
@@ -19,6 +20,7 @@ export const Title = ({
     aditionalTitle,
     description,
     titleHasMainPageTitle = false,
+    className,
     align = "left",
 }: TitleProps) => {
     const alignmentClasses = {
@@ -28,7 +30,7 @@ export const Title = ({
     };
 
     return (
-        <hgroup className={alignmentClasses[align]}>
+        <hgroup className={`${alignmentClasses[align]} ${className}`}>
             {aditionalTitle && (
                 typeof aditionalTitle === "string" ? (
                     titleHasMainPageTitle 

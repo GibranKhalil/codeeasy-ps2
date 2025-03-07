@@ -1,63 +1,58 @@
 
 import { Link } from 'react-router-dom'
 import PS2Console3DModel from '../PS2Console3D'
+import { Title } from '../Title'
+import { Button } from '../Button'
+import { CommunitySectionCard } from './CommunitySectionCard'
 
 const CommunitySection = () => {
   const communities = [
     {
       name: 'PS2DEV',
       description: 'Discord para dúvidas sobre o PS2 em geral.',
-      image: 'https://raw.githubusercontent.com/pscommunity2023/assets/main/ps2dev-logo.png'
+      image: '/images/discord/ps2dev.png'
     },
     {
       name: 'Cuphead PS2',
       description: 'Discord para dúvidas sobre o CupHead para PS2.',
-      image: 'https://raw.githubusercontent.com/pscommunity2023/assets/main/cuphead-logo.png'
+      image: '/images/discord/cuphead.png'
     },
     {
       name: 'Athena PS2 System',
-      description: 'Discord para dúvidas sobre o AthenaFW.',
-      image: 'https://raw.githubusercontent.com/pscommunity2023/assets/main/athena-logo.png'
+      description: 'Discord para dúvidas sobre o AthenaENV.',
+      image: '/images/discord/athena.png'
     }
   ]
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <p className="text-primary mb-4">Colaboração entre Comunidades para Código de Qualidade</p>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         <div>
-          <h2 className="text-4xl font-bold text-light-gray mb-8">
-            Seu Código, Revisado<br />
-            Por quem Conhece o<br />
-            Console
-          </h2>
+          <Title 
+            aditionalTitle="Colaboração entre Comunidades para Código de Qualidade" 
+            title="Seu Código, Revisado Por quem Conhece o Console"
+            description="Membros de todas as comunidades de desenvolvimento de jogos para PS2 contribuem diariamente com a revisão e publicação de snippets aqui" />
           <Link
             to="/snippets"
-            className="inline-block bg-primary text-light-gray px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Ver Snippets
+            <Button className='mt-2'>
+              Ver Snippets
+            </Button>
           </Link>
           <div className="flex-shrink-0 w-fit">
           <PS2Console3DModel />
           </div>
         </div>
         
-        <div className="grid grid-cols-1 gap-6">
-          {communities.map((community) => (
-            <div key={community.name} className="bg-dark-secondary p-6 rounded-lg">
-              <div className="flex items-center space-x-4">
-                <img src={community.image} alt={community.name} className="w-12 h-12 rounded-full" />
-                <div>
-                  <h3 className="text-light-gray font-semibold">{community.name}</h3>
-                  <p className="text-neutral-gray text-sm">{community.description}</p>
-                </div>
-                <button className="ml-auto bg-primary text-light-gray px-4 py-2 rounded hover:bg-blue-700 transition-colors">
-                  Acessar Canal
-                </button>
-              </div>
-            </div>
+        <ul className="flex flex-wrap gap-4 h-full">
+          {communities.map((community, index) => (
+            <li className={`${
+              index === 0 ? "w-full" : "w-full md:w-[calc(50%-8px)]"
+            }`} key={index}>
+              <CommunitySectionCard {...community} />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   )
