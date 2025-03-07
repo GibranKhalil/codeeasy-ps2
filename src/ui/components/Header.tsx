@@ -1,4 +1,3 @@
-import { Hexagon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
@@ -8,19 +7,18 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Hexagon className="h-8 w-8 text-light-gray" />
               <span className="ml-2 text-light-gray font-bold text-xl">LOGO</span>
             </Link>
           </div>
           
           <div className="flex space-x-8">
-            <Link to="/" className="text-light-gray hover:text-primary-blue transition-colors">
+            <Link to="/" className="text-light-gray hover:text-primary transition-colors">
               Início
             </Link>
-            <Link to="/colecao" className="text-light-gray hover:text-primary-blue transition-colors">
+            <Link to="/colecao" className="text-light-gray hover:text-primary transition-colors">
               Coleção
             </Link>
-            <Link to="/suporte" className="text-light-gray hover:text-primary-blue transition-colors">
+            <Link to="/suporte" className="text-light-gray hover:text-primary transition-colors">
               Suporte
             </Link>
           </div>

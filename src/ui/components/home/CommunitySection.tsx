@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom'
+import PS2Console3DModel from '../PS2Console3D'
 
 const CommunitySection = () => {
   const communities = [
@@ -22,7 +23,7 @@ const CommunitySection = () => {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <p className="text-primary-blue mb-4">Colaboração entre Comunidades para Código de Qualidade</p>
+      <p className="text-primary mb-4">Colaboração entre Comunidades para Código de Qualidade</p>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-4xl font-bold text-light-gray mb-8">
@@ -32,10 +33,13 @@ const CommunitySection = () => {
           </h2>
           <Link
             to="/snippets"
-            className="inline-block bg-primary-blue text-light-gray px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block bg-primary text-light-gray px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Ver Snippets
           </Link>
+          <div className="flex-shrink-0 w-fit">
+          <PS2Console3DModel />
+          </div>
         </div>
         
         <div className="grid grid-cols-1 gap-6">
@@ -47,7 +51,7 @@ const CommunitySection = () => {
                   <h3 className="text-light-gray font-semibold">{community.name}</h3>
                   <p className="text-neutral-gray text-sm">{community.description}</p>
                 </div>
-                <button className="ml-auto bg-primary-blue text-light-gray px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                <button className="ml-auto bg-primary text-light-gray px-4 py-2 rounded hover:bg-blue-700 transition-colors">
                   Acessar Canal
                 </button>
               </div>

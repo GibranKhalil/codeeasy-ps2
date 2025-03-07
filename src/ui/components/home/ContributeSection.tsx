@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const ContributeSection = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <p className="text-primary-blue text-center mb-4">Compartilhe Seu Conhecimento com a Comunidade</p>
+      <p className="text-primary text-center mb-4">Compartilhe Seu Conhecimento com a Comunidade</p>
       <h2 className="text-4xl font-bold text-light-gray text-center mb-8">
         Contribua e Ajude a<br />
         Enriquecer a Plataforma
@@ -18,7 +18,7 @@ const ContributeSection = () => {
       <div className="text-center">
         <Link
           to="/contribuir"
-          className="inline-block bg-primary-blue text-light-gray px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-block bg-primary text-light-gray px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Contribuir
         </Link>

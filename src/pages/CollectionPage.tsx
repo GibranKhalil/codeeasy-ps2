@@ -62,11 +62,11 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
         <div className="flex items-center space-x-2 mb-8">
           <h1 className="text-2xl font-bold text-light-gray">LOGO</h1>
         </div>
-        <button className="bg-primary-blue text-light-gray px-4 py-2 rounded-lg mb-8">
+        <button className="bg-primary text-light-gray px-4 py-2 rounded-lg mb-8">
           Contribuir
         </button>
         <div className="mt-auto">
-          <button className="flex items-center text-light-gray hover:text-primary-blue transition-colors">
+          <button className="flex items-center text-light-gray hover:text-primary transition-colors">
             <span>Suporte</span>
           </button>
         </div>
@@ -81,7 +81,7 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
             <input
               type="text"
               placeholder="Pesquise aqui..."
-              className="w-full bg-dark-secondary text-light-gray pl-10 pr-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary-blue"
+              className="w-full bg-dark-secondary text-light-gray pl-10 pr-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -93,7 +93,7 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
               <select
                 value={engineFilter}
                 onChange={(e) => setEngineFilter(e.target.value)}
-                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary-blue"
+                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary"
               >
                 <option>Todas</option>
                 <option>TyrA</option>
@@ -106,7 +106,7 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
               <select
                 value={gameStyleFilter}
                 onChange={(e) => setGameStyleFilter(e.target.value)}
-                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary-blue"
+                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary"
               >
                 <option>Todos</option>
                 <option>2D</option>
@@ -119,7 +119,7 @@ export class LearningMeterService extends CreateService {LearningMeterOwner} {
               <select
                 value={gameTypeFilter}
                 onChange={(e) => setGameTypeFilter(e.target.value)}
-                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary-blue"
+                className="bg-dark-secondary text-light-gray px-4 py-2 rounded-lg border border-dark-gray focus:outline-none focus:border-primary"
               >
                 <option>Todos</option>
                 <option>Plataforma</option>
