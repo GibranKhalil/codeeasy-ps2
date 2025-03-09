@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-scroll::-webkit-scrollbar {
+    @apply w-[6px]
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    @apply rounded-md bg-dark-secondary-30
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    @apply bg-dark-secondary;
+}

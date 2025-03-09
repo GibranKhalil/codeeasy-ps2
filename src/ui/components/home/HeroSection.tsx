@@ -5,7 +5,7 @@ import PS2Logo3DModel from '../PS2Logo3D'
 
 const HeroSection = () => {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24 py-20">
       <div className="flex items-center justify-between w-full space-x-8">
         <div className="max-w-2xl">
           <Title

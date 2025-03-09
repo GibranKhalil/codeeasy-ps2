@@ -21,7 +21,7 @@ const EngineSection = () => {
   ]
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24 py-20">
       <header className='w-full flex justify-center'>
       <div className='w-9/12'>
       <Title

@@ -9,7 +9,7 @@ const Footer = () => {
 
   return (
 <footer className="bg-dark-secondary py-16">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24">
     
     <div className="flex flex-wrap gap-12 justify-between">
       <div className="flex-1 min-w-[250px] max-w-[400px]">

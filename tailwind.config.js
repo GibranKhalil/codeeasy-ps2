@@ -12,6 +12,7 @@ export default {
         'primary': '#3461E5',
         'primary-20': 'rgba(52, 97, 229, 0.2)',
         'dark-secondary': '#1E1E1E',
+        'dark-secondary-30': 'rgba(30, 30, 30, 0.3)',
         'neutral-gray': '#B2B3BD',
         'dark-gray': '#393A40',
       },
