@@ -6,6 +6,11 @@ interface HowToUseSteps{
     description: string
 }
 
+interface CanUseWith{
+    link: string,
+    name: string
+}
+
 export interface Snippet{
     id: number,
     pid: string, //**md5(title+id=${id}) */
@@ -19,4 +24,5 @@ export interface Snippet{
     how_to_use_steps: HowToUseSteps[],
     engine?: string,
     tags: string[]
+    can_use_with?: CanUseWith[] 
 }

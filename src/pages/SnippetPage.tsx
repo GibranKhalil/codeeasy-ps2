@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { Avatar } from "../ui/components/Avatar"
 import { Button } from "../ui/components/Button"
 import CodeViewer from "../ui/components/CodeViewer"
@@ -7,36 +7,37 @@ import snippets from '../data/snippets.json' with { type: 'json' }
 import { Snippet } from "../@types/collection"
 
 export default function SnippetPage() {
-    const {pid} = useParams()
+    const { pid } = useParams()
+    const navigateTo = useNavigate()
 
-    const [code,setCode] = useState<string>('')
+    const [code, setCode] = useState<string>('')
     const [snippet, setSnippet] = useState<Snippet>()
 
     const fetchCode = useCallback(async () => {
         try {
             const snippet = snippets.filter((snippet) => snippet.pid === pid)[0]
             setSnippet(snippet)
-            
+
             const url = snippet.link
             const response = await fetch(url);
-            
+
             if (!response.ok) {
                 throw new Error(`Erro ao buscar o código: ${response.status} ${response.statusText}`);
             }
-    
+
             const code = await response.text();
             setCode(code)
         } catch (error) {
             console.error("Erro ao buscar código:", error);
         }
     }, [pid]);
-    
+
 
     useEffect(() => {
         fetchCode()
     })
 
-    if(!snippet){
+    if (!snippet) {
         return <p>Não encontrado</p>
     }
 
@@ -52,6 +53,19 @@ export default function SnippetPage() {
                     </header>
                     <p className="text-xs leading-5 text-neutral-gray">{snippet.description}</p>
                 </article>
+                {snippet.can_use_with && snippet.can_use_with.length > 0 &&
+                    <article className="bg-dark-secondary p-4 rounded-md h-full max-h-[300px]">
+                        <header className="mb-2">
+                            <h3 className="font-semibold text-sm">Funciona bem com:</h3>
+                        </header>
+                        <ul>
+                            {snippet.can_use_with.map((link, index) => (
+                                <li className="flex gap-2 items-center" key={index}>
+                                    <p onClick={() => navigateTo(`${link.link}`)} className="text-sm leading-5 text-light-gray hover:text-primary transition underline cursor-pointer">{link.name}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </article>}
             </section>
             <section className="min-h-full flex flex-col gap-4">
                 <article className="bg-dark-secondary p-4 rounded-md">
@@ -79,7 +93,7 @@ export default function SnippetPage() {
                         </ol>
                     </div>
                 </article>
-                {snippet.modifiers.length > 0 && 
+                {snippet.modifiers.length > 0 &&
                     <article className="bg-dark-secondary p-4 rounded-md">
                         <header className="mb-2">
                             <h3 className="font-semibold text-sm">Colaboradores</h3>
