@@ -1,18 +1,21 @@
-import  { useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { SnippetCard } from '../ui/components/collectionPage/snippetCard'
-
-// interface Snippet {
-//   title: string
-//   author: string
-//   code: string
-// }
+import snippets from '../data/snippets.json' with { type: 'json' }
+import type { Snippet } from '../@types/collection'
+import { TextUtils } from '../utils/TextUtils'
 
 const CollectionPage = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [engineFilter, setEngineFilter] = useState('Todas')
   const [gameStyleFilter, setGameStyleFilter] = useState('Todos')
   const [gameTypeFilter, setGameTypeFilter] = useState('Todos')
+  const [snippetCollection, setSnippetCollection] = useState<Snippet[]>([])
+
+
+  useEffect(() => {
+    setSnippetCollection(snippets)
+  }, [])
 
   return (
     <div className="flex">
@@ -86,7 +89,9 @@ const CollectionPage = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <SnippetCard />
+          {snippetCollection.map((snippet,index) => (
+            <SnippetCard description={TextUtils.truncatedText(snippet.description, 255)} pid={snippet.pid} title={snippet.title} engine={snippet.engine} last_modifier={snippet.last_modifier} last_update={snippet.last_update} key={index} />
+          ))}
         </div>
       </main>
     </div>

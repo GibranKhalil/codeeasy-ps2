@@ -1,14 +1,24 @@
+import { useParams } from "react-router-dom"
 import { Avatar } from "../ui/components/Avatar"
 import { Button } from "../ui/components/Button"
 import CodeViewer from "../ui/components/CodeViewer"
 import { useCallback, useEffect, useState } from "react"
+import snippets from '../data/snippets.json' with { type: 'json' }
+import { Snippet } from "../@types/collection"
 
 export default function SnippetPage() {
+    const {pid} = useParams()
+
     const [code,setCode] = useState<string>('')
+    const [snippet, setSnippet] = useState<Snippet>()
 
     const fetchCode = useCallback(async () => {
         try {
-            const response = await fetch('https://raw.githubusercontent.com/GibranKhalil/plataform-game-ps2/main/src/models/behaviors/ControllableEntity/index.js');
+            const snippet = snippets.filter((snippet) => snippet.pid === pid)[0]
+            setSnippet(snippet)
+            
+            const url = snippet.link
+            const response = await fetch(url);
             
             if (!response.ok) {
                 throw new Error(`Erro ao buscar o código: ${response.status} ${response.statusText}`);
@@ -19,12 +29,16 @@ export default function SnippetPage() {
         } catch (error) {
             console.error("Erro ao buscar código:", error);
         }
-    }, []);
+    }, [pid]);
     
 
     useEffect(() => {
         fetchCode()
     })
+
+    if(!snippet){
+        return <p>Não encontrado</p>
+    }
 
     return (
         <main className="text-neutral-50 lg:px-24 py-9 grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
@@ -36,9 +50,7 @@ export default function SnippetPage() {
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Descrição</h3>
                     </header>
-                    <p className="text-xs leading-5 text-neutral-gray">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
+                    <p className="text-xs leading-5 text-neutral-gray">{snippet.description}</p>
                 </article>
             </section>
             <section className="min-h-full flex flex-col gap-4">
@@ -46,29 +58,41 @@ export default function SnippetPage() {
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Último Modificador</h3>
                     </header>
-                    <Avatar name="Gibran Khalil" date="12/02/2025" imgSize="max-w-12" displayName img="https://github.com/gibranKhalil.png" />
+                    <Avatar name={snippet.last_modifier.name} date={snippet.last_update} imgSize="max-w-12" displayName img={`${snippet.last_modifier.github}.png`} />
                 </article>
                 <article className="bg-dark-secondary p-4 rounded-md">
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Como Usar</h3>
                     </header>
-                    <p className="text-xs leading-5 text-neutral-gray">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </p>
+                    <div>
+                        <p className="text-xs leading-5 text-neutral-gray">{snippet.how_to_use_description}</p>
+                        <ol className="mt-2">
+                            {snippet.how_to_use_steps.map((step, index) => (
+                                <li key={index} className="mb-2">
+                                    <div className="flex gap-1 text-sm text-light-gray mb-1">
+                                        <p>{step.step}{")"}</p>
+                                        <p>{step.title}</p>
+                                    </div>
+                                    <p className="text-neutral-gray text-xs">{step.description}</p>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
                 </article>
-                <article className="bg-dark-secondary p-4 rounded-md">
-                    <header className="mb-2">
-                        <h3 className="font-semibold text-sm">Colaboradores</h3>
-                    </header>
-                    <ul className="flex gap-2">
-                        <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
-                        <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
-                        <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
-                        <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
-                        <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
-                    </ul>
-                </article>
+                {snippet.modifiers.length > 0 && 
+                    <article className="bg-dark-secondary p-4 rounded-md">
+                        <header className="mb-2">
+                            <h3 className="font-semibold text-sm">Colaboradores</h3>
+                        </header>
+                        <ul className="flex gap-2">
+                            <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
+                            <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
+                            <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
+                            <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
+                            <li><Avatar img="https://github.com/user1.png" name="Usuário" /></li>
+                        </ul>
+                    </article>
+                }
                 <article className="bg-dark-secondary p-4 rounded-md flex justify-end">
                     <Button className="py-[8px]">
                         Modificar

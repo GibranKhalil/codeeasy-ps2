@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "pid": "cf2cf0a483f57b5c196c144bd42717a0",
+        "title": "Entidade básica",
+        "description": "A classe `Entity` serve como a base para todas as entidades dentro de um jogo ou aplicação interativa. Ela define uma estrutura comum para elementos que possuem uma posição no espaço, com coordenadas X e Y. No entanto, essa classe por si só não implementa funcionalidades específicas, pois é projetada para ser estendida por subclasses que definirão comportamentos próprios. Os métodos `update()` e `draw()` são abstratos, ou seja, devem ser implementados pelas subclasses conforme necessário. O método `update()` será responsável por atualizar o estado da entidade, como movimentação ou lógica específica, enquanto o método `draw()` lidará com a renderização da entidade na tela. Caso esses métodos não sejam sobrescritos, a classe lançará um erro para garantir que a entidade seja corretamente configurada antes do uso. Essa abordagem garante que todas as entidades compartilhem uma estrutura consistente, enquanto permite a flexibilidade de personalização em subclasses mais específicas.",
+        "link": "https://raw.githubusercontent.com/GibranKhalil/codeeasy-ps2-backend/main/athena/gibranKhalil/Entity/index.js",
+        "last_update": "10/03/2025",
+        "last_modifier": {
+            "name": "Gibran Khalil",
+            "github": "https://github.com/GibranKhalil"
+        },
+        "modifiers": [],
+        "how_to_use_description": "A classe Entity funciona como uma estrutura base para representar qualquer objeto que tenha uma posição no espaço dentro de um jogo ou aplicação. No entanto, ela sozinha não faz nada por conta própria; você precisa criar uma nova classe baseada nela para que possa ser útil.",
+        "how_to_use_steps": [
+            {
+                "step": 1,
+                "title": "Criando uma nova entidade",
+                "description": "Para usar essa classe, você deve criar uma nova classe que herde (extends) de Entity. Isso significa que a nova classe terá acesso à posição X e Y definidas na Entity e poderá adicionar comportamentos próprios."
+            },
+            {
+                "step": 2,
+                "title": "Implementando os métodos obrigatórios",
+                "description": "A classe Entity exige que você defina os métodos update() e draw() na sua nova classe. O método update() serve para atualizar a lógica da entidade, como movimentação ou mudanças no estado. Já o método draw() é usado para desenhar ou exibir a entidade na tela. Se você não definir esses métodos na sua subclasse e tentar utilizá-los, o código lançará um erro, avisando que eles devem ser implementados."
+            },
+            {
+                "step": 3,
+                "title": "Definindo a posição inicial",
+                "description": "Quando você cria uma entidade baseada nessa classe, pode informar a posição inicial dela através dos valores X e Y. Caso não informe, a posição padrão será (0,0)."
+            }
+        ],
+        "engine": "AthenaENV",
+        "tags": ["AthenaENV", "PS2", "Entity", "Entidade"]
+    }
+]
