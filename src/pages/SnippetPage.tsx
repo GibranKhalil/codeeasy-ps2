@@ -83,7 +83,7 @@ export default function SnippetPage() {
     return (
         <main className="text-neutral-50 lg:px-24 py-9 grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
             <section className="min-h-full flex flex-col gap-4">
-                <article id="codeViewer" className="custom-scroll bg-dark-secondary-30 border-dark-gray border h-4/5 max-h-[500px] rounded-xl flex flex-col overflow-hidden">
+                <article id="codeViewer" className={`bg-dark-secondary-30 h-4/5 max-h-[500px] ${!isFullScreen && 'rounded-xl border-dark-gray border'} flex flex-col overflow-hidden`}>
                     <div className="flex justify-end p-4 bg-dark-secondary-30 border-b border-dark-gray sticky top-0">
                         <ul className="flex gap-2">
                             <li onClick={() => copyCode(code)} className="text-neutral-gray cursor-pointer hover:text-white transition-colors">
@@ -94,12 +94,12 @@ export default function SnippetPage() {
                             </li>
                         </ul>
                     </div>
-                    <div className="h-full overflow-hidden py-4 px-2">
+                    <div className="h-full overflow-hidden pt-2 px-2">
                         <CodeViewer
                             customStyle={{
                                 height: '100%',
                                 width: '100%',
-                                overflow: 'auto'
+                                overflow: 'auto',
                             }}
                             language="javascript"
                             code={code}
@@ -166,9 +166,9 @@ export default function SnippetPage() {
                         </ul>
                     </article>
                 }
-                    <Button>
-                        Modificar
-                    </Button>
+                <Button>
+                    Modificar
+                </Button>
             </section>
         </main>
     )
