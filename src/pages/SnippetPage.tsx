@@ -44,7 +44,7 @@ export default function SnippetPage() {
     return (
         <main className="text-neutral-50 lg:px-24 py-9 grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
             <section className="min-h-full flex flex-col gap-4">
-                <article className="custom-scroll bg-dark-secondary-30 border-dark-gray border h-full max-h-[400px] rounded-xl p-4">
+                <article className="custom-scroll bg-dark-secondary-30 border-dark-gray border h-full max-h-[400px] rounded-xl p-4 overflow-y-auto">
                     <CodeViewer language="javascript" code={code} />
                 </article>
                 <article className="bg-dark-secondary p-4 rounded-md h-full max-h-[300px]">
