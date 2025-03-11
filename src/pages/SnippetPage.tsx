@@ -81,7 +81,7 @@ export default function SnippetPage() {
     }
 
     return (
-        <main className="text-neutral-50 lg:px-24 py-9 grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
+        <main className="text-neutral-50 lg:px-24 py-9 mx-auto grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
             <section className="min-h-full flex flex-col gap-4">
                 <article id="codeViewer" className={`bg-dark-secondary-30 h-4/5 max-h-[500px] ${!isFullScreen && 'rounded-xl border-dark-gray border'} flex flex-col overflow-hidden`}>
                     <div className="flex justify-end p-4 bg-dark-secondary-30 border-b border-dark-gray sticky top-0">

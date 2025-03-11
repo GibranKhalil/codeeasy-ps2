@@ -5,7 +5,7 @@ import ContributeSection from '../ui/components/home/ContributeSection'
 
 const HomePage = () => {
   return (
-    <main className="flex-1">
+    <main className="flex-1 mx-auto">
       <HeroSection />
       <EngineSection />
       <CommunitySection />
