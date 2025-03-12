@@ -87,10 +87,14 @@ const CollectionPage = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {snippetCollection.map((snippet, index) => (
-            <SnippetCard description={TextUtils.truncatedText(snippet.description, 255)} pid={snippet.pid} title={snippet.title} engine={snippet.engine} last_modifier={snippet.last_modifier} last_update={snippet.last_update} key={index} />
-          ))}
+        <div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {snippetCollection.map((snippet, index) => (
+              <li key={index}>
+                <SnippetCard likes={0} views={0} description={TextUtils.truncatedText(snippet.description, 255)} pid={snippet.pid} title={snippet.title} engine={snippet.engine} last_modifier={snippet.last_modifier} last_update={snippet.last_update} key={index} />
+              </li>
+            ))}
+          </ul>
         </div>
       </main>
     </div>

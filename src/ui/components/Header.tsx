@@ -18,9 +18,6 @@ const Header = () => {
             <Link to="/collection" className="text-dark-12 hover:text-primary-9--dark transition-colors">
               Coleção
             </Link>
-            <Link to="/collection" className="text-dark-12 hover:text-primary-9--dark transition-colors">
-              Suporte
-            </Link>
           </div>
         </div>
       </nav>

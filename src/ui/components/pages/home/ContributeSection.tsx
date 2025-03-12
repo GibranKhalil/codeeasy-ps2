@@ -20,7 +20,7 @@ const ContributeSection = () => {
       </header>
       <div className="text-center flex justify-center">
         <Link
-          to="/contribuir"
+          to="/collection"
         >
           <Button variant='contained' color='primary'>
             Contribuir

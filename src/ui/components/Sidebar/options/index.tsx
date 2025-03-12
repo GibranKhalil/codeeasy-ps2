@@ -1,5 +1,6 @@
-import { ReactElement } from "react";
-import { Trophy, Gamepad2, HeartHandshake, Blocks, Boxes } from "lucide-react";
+import { ReactElement, useMemo } from "react";
+import { Boxes } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface SidebarSubOption {
   label: string;
@@ -15,37 +16,44 @@ interface SidebarOptions {
   subOptions?: SidebarSubOption[];
 }
 
-const sidebarOptions: SidebarOptions[] = [
-  {
-    label: "Coleção",
-    icon: <Boxes size={18} />,
-    active: false,
-    redirect: "/collection"
-  },
-  {
-    label: "Ranking",
-    icon: <Trophy size={18} />,
-    active: false,
-    redirect: "/ranking",
-  },
-  {
-    label: "Jogos",
-    icon: <Gamepad2 size={18} />,
-    active: false,
-    redirect: "/games",
-  },
-  {
-    label: "Tutoriais",
-    icon: <Blocks size={18} />,
-    active: false,
-    redirect: "/tutorials",
-  },
-  {
-    label: "Doações",
-    icon: <HeartHandshake size={18} />,
-    active: false,
-    redirect: "/donations"
-  },
-];
+const SidebarOptions = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-export default sidebarOptions;
+  const sidebarOptions: SidebarOptions[] = useMemo(() => [
+    {
+      label: "Coleção",
+      icon: <Boxes size={18} />,
+      active: currentPath === "/collection",
+      redirect: "/collection"
+    }
+    // {
+    //   label: "Ranking",
+    //   icon: <Trophy size={18} />,
+    //   active: currentPath === "/ranking",
+    //   redirect: "/ranking",
+    // },
+    // {
+    //   label: "Jogos",
+    //   icon: <Gamepad2 size={18} />,
+    //   active: currentPath === "/games",
+    //   redirect: "/games",
+    // },
+    // {
+    //   label: "Tutoriais",
+    //   icon: <Blocks size={18} />,
+    //   active: currentPath === "/tutorials",
+    //   redirect: "/tutorials",
+    // },
+    // {
+    //   label: "Doações",
+    //   icon: <HeartHandshake size={18} />,
+    //   active: currentPath === "/donations",
+    //   redirect: "/donations"
+    // },
+  ], [currentPath]);
+
+  return sidebarOptions;
+};
+
+export default SidebarOptions;

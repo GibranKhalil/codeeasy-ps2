@@ -24,5 +24,7 @@ export interface Snippet{
     how_to_use_steps: HowToUseSteps[],
     engine?: string,
     tags: string[]
-    can_use_with?: CanUseWith[] 
+    can_use_with?: CanUseWith[]
+    views?: number
+    likes?: number
 }
