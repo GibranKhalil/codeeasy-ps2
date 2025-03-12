@@ -9,15 +9,13 @@ const PS2Logo3DModel = () => {
     const currentMountRef = mountRef.current;
 
     if (currentMountRef) {
-      // Configuração básica da cena
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x111111); // Fundo escuro para contrastar com o modelo
-      
+
       const camera = new THREE.PerspectiveCamera(75, currentMountRef.offsetWidth / currentMountRef.offsetHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setSize(currentMountRef.offsetWidth, currentMountRef.offsetHeight);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping; // Melhora o contraste
-      renderer.toneMappingExposure = 1.5; // Controla a exposição
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.5;
       currentMountRef.appendChild(renderer.domElement);
 
       const ambientLight = new THREE.AmbientLight(0xffffff, 1);
@@ -67,7 +65,7 @@ const PS2Logo3DModel = () => {
         applyMetallicMaterial(logo7, 0xFFD60A);
         applyMetallicMaterial(logo8, 0x197CAE);
         applyMetallicMaterial(logo9, 0xFFFFFF);
-        
+
       });
 
       camera.position.z = 5;

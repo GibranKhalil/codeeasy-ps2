@@ -10,9 +10,9 @@ interface TitleProps {
 }
 
 const commonClasses = {
-    primaryText: "text-primary mb-4",
-    mainTitle: "text-5xl font-bold text-light-gray mb-6",
-    descriptionText: "text-neutral-gray mb-8",
+    primaryText: "text-primary-9--dark mb-4",
+    mainTitle: "text-5xl font-bold text-dark-12 mb-6",
+    descriptionText: "text-dark-11 mb-8",
 };
 
 export const Title = ({
@@ -33,8 +33,8 @@ export const Title = ({
         <hgroup className={`${alignmentClasses[align]} ${className}`}>
             {aditionalTitle && (
                 typeof aditionalTitle === "string" ? (
-                    titleHasMainPageTitle 
-                        ? <h3 className={commonClasses.primaryText}>{aditionalTitle}</h3> 
+                    titleHasMainPageTitle
+                        ? <h3 className={commonClasses.primaryText}>{aditionalTitle}</h3>
                         : <h4 className={commonClasses.primaryText}>{aditionalTitle}</h4>
                 ) : (
                     aditionalTitle
@@ -42,8 +42,8 @@ export const Title = ({
             )}
 
             {typeof title === "string" ? (
-                titleHasMainPageTitle 
-                    ? <h1 className={commonClasses.mainTitle}>{title}</h1> 
+                titleHasMainPageTitle
+                    ? <h1 className={commonClasses.mainTitle}>{title}</h1>
                     : <h2 className={commonClasses.mainTitle}>{title}</h2>
             ) : (
                 title
@@ -51,8 +51,8 @@ export const Title = ({
 
             {description && (
                 typeof description === "string" ? (
-                    titleHasMainPageTitle 
-                        ? <h2 className={commonClasses.descriptionText}>{description}</h2> 
+                    titleHasMainPageTitle
+                        ? <h2 className={commonClasses.descriptionText}>{description}</h2>
                         : <h3 className={commonClasses.descriptionText}>{description}</h3>
                 ) : (
                     description

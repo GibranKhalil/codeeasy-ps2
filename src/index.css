@@ -7,9 +7,9 @@
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    @apply rounded-md bg-dark-secondary-30
+    @apply rounded-md bg-dark-3
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-    @apply bg-dark-secondary;
+    @apply bg-dark-2;
 }

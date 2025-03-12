@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { Title } from '../Title'
-import { Button } from '../Button'
-import PS2Logo3DModel from '../PS2Logo3D'
+import { Title } from '../../Title'
+import { Button } from '../../Button/Button'
+import PS2Logo3DModel from '../../PS2Logo3D'
 
 const HeroSection = () => {
   return (
@@ -14,11 +14,11 @@ const HeroSection = () => {
             aditionalTitle='Inspire, Contribua, Evolua'
             description='Seja parte de uma comunidade de desenvolvedores dedicados a criar os melhores jogos PS2. Compartilhe, edite e aprenda com snippets de código úteis para cada cenário.'
           />
-          <Link to="/colecao">
-            <Button>Comece Agora</Button>
+          <Link to="/collection">
+            <Button color='primary' variant='contained'>Comece Agora</Button>
           </Link>
         </div>
-        
+
         <div className="flex-shrink-0 w-fit">
           <PS2Logo3DModel />
         </div>

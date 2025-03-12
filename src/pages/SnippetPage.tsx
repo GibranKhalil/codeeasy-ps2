@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom"
 import { Avatar } from "../ui/components/Avatar"
-import { Button } from "../ui/components/Button"
+import { Button } from "../ui/components/Button/Button"
 import CodeViewer from "../ui/components/CodeViewer"
 import { useCallback, useEffect, useState } from "react"
 import snippets from '../data/snippets.json' with { type: 'json' }
@@ -83,13 +83,13 @@ export default function SnippetPage() {
     return (
         <main className="text-neutral-50 lg:px-24 py-9 mx-auto grid grid-cols-[minmax(600px,1.4fr)_minmax(300px,1fr)] gap-4 items-stretch">
             <section className="min-h-full flex flex-col gap-4">
-                <article id="codeViewer" className={`bg-dark-secondary-30 h-4/5 max-h-[500px] ${!isFullScreen && 'rounded-xl border-dark-gray border'} flex flex-col overflow-hidden`}>
-                    <div className="flex justify-end p-4 bg-dark-secondary-30 border-b border-dark-gray sticky top-0">
+                <article id="codeViewer" className={`bg-dark-2 h-4/5 max-h-[500px] ${!isFullScreen && 'rounded-xl border-dark-6 border'} flex flex-col overflow-hidden`}>
+                    <div className="flex justify-end p-4 bg-dark-3 border-b border-dark-6 sticky top-0">
                         <ul className="flex gap-2">
-                            <li onClick={() => copyCode(code)} className="text-neutral-gray cursor-pointer hover:text-white transition-colors">
+                            <li onClick={() => copyCode(code)} className="text-dark-11 cursor-pointer hover:text-white transition-colors">
                                 <Copy size={18} />
                             </li>
-                            <li onClick={() => toggleFullscreen()} className="text-neutral-gray cursor-pointer hover:text-white transition-colors">
+                            <li onClick={() => toggleFullscreen()} className="text-dark-11 cursor-pointer hover:text-white transition-colors">
                                 {!isFullScreen ? <Maximize size={18} /> : <Minimize size={18} />}
                             </li>
                         </ul>
@@ -106,54 +106,54 @@ export default function SnippetPage() {
                         />
                     </div>
                 </article>
-                <article className="bg-dark-secondary p-4 rounded-md h-[10%] min-h-fit">
+                <article className="bg-dark-2 p-4 rounded-md h-[10%] min-h-fit">
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Descrição</h3>
                     </header>
-                    <p className="text-xs leading-5 text-neutral-gray">{snippet.description}</p>
+                    <p className="text-xs leading-5 text-dark-11">{snippet.description}</p>
                 </article>
                 {snippet.can_use_with && snippet.can_use_with.length > 0 &&
-                    <article className="bg-dark-secondary p-4 rounded-md h-[10%] min-h-fit">
+                    <article className="bg-dark-2 p-4 rounded-md h-[10%] min-h-fit">
                         <header className="mb-2">
                             <h3 className="font-semibold text-sm">Funciona bem com:</h3>
                         </header>
                         <ul>
                             {snippet.can_use_with.map((link, index) => (
                                 <li className="flex gap-2 items-center" key={index}>
-                                    <p onClick={() => navigateTo(`${link.link}`)} className="text-sm leading-5 text-light-gray hover:text-primary transition underline cursor-pointer">{link.name}</p>
+                                    <p onClick={() => navigateTo(`${link.link}`)} className="text-sm leading-5 text-dark-12 hover:text-primary-9--dark transition underline cursor-pointer">{link.name}</p>
                                 </li>
                             ))}
                         </ul>
                     </article>}
             </section>
             <section className="min-h-full flex flex-col gap-4">
-                <article className="bg-dark-secondary p-4 rounded-md">
+                <article className="bg-dark-2 p-4 rounded-md">
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Último Modificador</h3>
                     </header>
                     <Avatar name={snippet.last_modifier.name} date={snippet.last_update} imgSize="max-w-12" displayName img={`${snippet.last_modifier.github}.png`} />
                 </article>
-                <article className="bg-dark-secondary p-4 rounded-md">
+                <article className="bg-dark-2 p-4 rounded-md">
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Como Usar</h3>
                     </header>
                     <div>
-                        <p className="text-xs leading-5 text-neutral-gray">{snippet.how_to_use_description}</p>
+                        <p className="text-xs leading-5 text-dark-11">{snippet.how_to_use_description}</p>
                         <ol className="mt-2">
                             {snippet.how_to_use_steps.map((step, index) => (
                                 <li key={index} className="mb-2">
-                                    <div className="flex gap-1 text-sm text-light-gray mb-1">
+                                    <div className="flex gap-1 text-sm text-dark-12 mb-1">
                                         <p>{step.step}{")"}</p>
                                         <p>{step.title}</p>
                                     </div>
-                                    <p className="text-neutral-gray text-xs">{step.description}</p>
+                                    <p className="text-dark-11 text-xs">{step.description}</p>
                                 </li>
                             ))}
                         </ol>
                     </div>
                 </article>
                 {snippet.modifiers.length > 0 &&
-                    <article className="bg-dark-secondary p-4 rounded-md">
+                    <article className="bg-dark-2 p-4 rounded-md">
                         <header className="mb-2">
                             <h3 className="font-semibold text-sm">Colaboradores</h3>
                         </header>
@@ -166,7 +166,7 @@ export default function SnippetPage() {
                         </ul>
                     </article>
                 }
-                <Button>
+                <Button variant="contained" color="primary">
                     Modificar
                 </Button>
             </section>
