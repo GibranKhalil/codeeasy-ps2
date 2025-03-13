@@ -11,8 +11,8 @@ interface TitleProps {
 
 const commonClasses = {
     primaryText: "text-primary-9--dark mb-4",
-    mainTitle: "text-5xl font-bold text-dark-12 mb-6",
-    descriptionText: "text-dark-11 mb-8",
+    mainTitle: "text-5xl font-bold text-dark-12 mb-6 leading-[3.5rem]",
+    descriptionText: "text-dark-11 mb-8 font-regular text-md",
 };
 
 export const Title = ({

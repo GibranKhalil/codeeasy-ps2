@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useParams } from "react-router-dom"
-import { Avatar } from "../ui/components/Avatar"
+import Avatar from "../ui/components/Avatar"
 import { Button } from "../ui/components/Button/Button"
 import CodeViewer from "../ui/components/CodeViewer"
 import { useCallback, useEffect, useState } from "react"
@@ -10,6 +10,7 @@ import { Copy, Eye, Heart, Maximize, Minimize } from "lucide-react"
 import { InteractionCard } from "../ui/components/Interactions"
 import { TabComponent } from "../ui/components/Tabs"
 import { SnippetCard } from "../ui/components/pages/collection/snippetCard"
+import Spinner from "../ui/components/Spinner"
 
 export default function SnippetPage() {
     const { pid } = useParams()
@@ -18,9 +19,12 @@ export default function SnippetPage() {
     const [snippet, setSnippet] = useState<Snippet>()
 
     const [isFullScreen, setFullScreen] = useState<boolean>(false)
+    const [isLoading, setLoading] = useState<boolean>(true)
 
     const fetchCode = useCallback(async () => {
         try {
+            setLoading(true)
+            console.log("executando")
             const snippet = snippets.filter((snippet) => snippet.pid === pid)[0]
             setSnippet(snippet)
 
@@ -35,6 +39,9 @@ export default function SnippetPage() {
             setCode(code)
         } catch (error) {
             console.error("Erro ao buscar código:", error);
+        }
+        finally {
+            setLoading(false)
         }
     }, [pid]);
 
@@ -75,10 +82,14 @@ export default function SnippetPage() {
 
     useEffect(() => {
         fetchCode()
-    })
+    }, [fetchCode])
 
     if (!snippet) {
         return <p>Não encontrado</p>
+    }
+
+    if (isLoading) {
+        return <main className="h-screen w-full absolute inset-0 z-[100] bg-dark-1 items-center justify-center flex"><Spinner /></main>
     }
 
     const tabs = [
@@ -91,15 +102,15 @@ export default function SnippetPage() {
             id: 'tab2',
             label: 'Como Usar',
             content: (<div>
-                <p className="text-sm leading-5 text-dark-11">{snippet.how_to_use_description}</p>
-                <ol className="mt-2">
+                <p className="text-sm leading-6 text-dark-11">{snippet.how_to_use_description}</p>
+                <ol className="mt-6 flex flex-col gap-4">
                     {snippet.how_to_use_steps.map((step, index) => (
-                        <li key={index} className="mb-2">
+                        <li key={index}>
                             <div className="flex gap-1 text-sm font-medium text-dark-12 mb-1">
                                 <p>{step.step}{")"}</p>
                                 <p>{step.title}</p>
                             </div>
-                            <p className="text-dark-11 text-xs">{step.description}</p>
+                            <p className="text-dark-11 text-xs leading-5">{step.description}</p>
                         </li>
                     ))}
                 </ol>
@@ -110,7 +121,7 @@ export default function SnippetPage() {
 
     return (
         <main className="text-dark-12 lg:px-6 py-9 flex gap-4 h-fit">
-            <section className="w-[75%] min-h-full flex flex-col gap-4">
+            <section className="w-[70%] min-h-full flex flex-col gap-4">
                 <div className="flex flex-col gap-4">
                     <article id="codeViewer" className={`bg-dark-1 h-4/5 max-h-[500px] ${!isFullScreen && 'rounded-md border-dark-6 border'} flex flex-col overflow-hidden`}>
                         <div className="flex justify-end p-4 bg-dark-2 border-b border-dark-6 sticky top-0">
@@ -159,7 +170,7 @@ export default function SnippetPage() {
                     <TabComponent tabs={tabs} />
                 </div>
             </section>
-            <section className="min-h-full w-[25%] flex flex-col gap-4">
+            <section className="min-h-full w-[30%] flex flex-col gap-4">
                 <article className="bg-dark-2 p-4 rounded-md border border-dark-6">
                     <header className="mb-2">
                         <h3 className="font-semibold text-sm">Último Modificador</h3>
@@ -186,12 +197,7 @@ export default function SnippetPage() {
                         <ul className="flex flex-col gap-4">
                             {snippet.can_use_with.map((link, index) => (
                                 <li className="flex gap-2 items-center" key={index}>
-                                    <SnippetCard pid="" description="" last_modifier={link.last_modifier} last_update={link.last_update} title={link.title} engine={link.engine} views={20} likes={20} />
-                                </li>
-                            ))}
-                            {snippet.can_use_with.map((link, index) => (
-                                <li className="flex gap-2 items-center" key={index}>
-                                    <SnippetCard pid="" description="" last_modifier={link.last_modifier} last_update={link.last_update} title={link.title} engine={link.engine} views={20} likes={20} />
+                                    <SnippetCard smallerView pid={link.pid} description={link.description} last_modifier={link.last_modifier} last_update={link.last_update} title={link.title} engine={link.engine} views={20} likes={20} />
                                 </li>
                             ))}
                         </ul>

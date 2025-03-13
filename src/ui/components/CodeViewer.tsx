@@ -14,15 +14,15 @@ const CodeViewer = ({ language, code, customStyle }: CodeViewerProps) => {
       language={language}
     >
       {({ style, tokens, getLineProps, getTokenProps }) => (
-        <pre style={{
+        <pre translate="no" style={{
           ...style, ...customStyle, scrollbarWidth: "thin",
           scrollbarColor: "#222326 #19191b", background: 'transparent'
-        }} className="overflow-y-auto">
+        }} className="overflow-y-auto notranslate">
           {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })}>
+            <div translate="no" key={i} {...getLineProps({ line })}>
               <span className="mr-4 select-none">{i + 1}</span>
               {line.map((token, key) => (
-                <span key={key} {...getTokenProps({ token })} />
+                <span translate="no" key={key} {...getTokenProps({ token })} />
               ))}
             </div>
           ))}

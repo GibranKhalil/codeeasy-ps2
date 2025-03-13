@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
+import { HeaderProps } from './@types/props'
 
-const Header = () => {
+const Header = ({ margin = '24' }: HeaderProps) => {
   return (
     <header className="w-full bg-dark-2 sticky top-0 z-50">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24 w-full">
+      <nav className={`px-4 sm:px-6 lg:px-${margin} w-full`}>
         <div className="flex items-center justify-between h-16 w-full">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">

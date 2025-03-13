@@ -34,4 +34,5 @@ export interface Snippet{
     can_use_with?: CanUseWith[]
     views?: number
     likes?: number
+    creator: Modifier
 }

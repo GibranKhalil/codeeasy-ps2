@@ -45,28 +45,41 @@ export const Button = ({
     };
 
     const getButtonClasses = () => {
-        const baseClasses = "relative overflow-hidden cursor-pointer px-6 py-3 border-none rounded text-sm font-medium transition-all duration-300 flex items-center justify-center";
+        const baseClasses = "relative overflow-hidden cursor-pointer border-none font-medium transition-all duration-300 flex items-center justify-center";
         const disabledClasses = disabled ? "bg-gray-300 cursor-not-allowed" : "";
 
         let colorClasses = "bg-gray-50 hover:bg-gray-100 text-gray-800";
+        let sizeClasses = "px-6 py-3 rounded-md text-sm";
 
-        if (variant === "icon" && color === "none") {
-            colorClasses = "bg-gray-50 hover:bg-gray-100 text-gray-900 p-1";
-        } else if (color === "primary") {
-            colorClasses = variant === "contained"
-                ? "bg-primary-9--dark hover:bg-primary-10--dark text-white"
-                : "bg-gray-50 hover:bg-gray-100 text-primary-9--dark";
-        } else if (color === "cancel") {
-            colorClasses = variant === "contained"
-                ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-gray-50 hover:bg-gray-100 text-red-500 font-semibold";
-        } else if (color === "submit") {
-            colorClasses = variant === "contained"
-                ? "bg-green-600 hover:bg-green-700 text-white"
-                : "bg-gray-50 hover:bg-gray-100 text-green-600";
+        if (variant === "icon") {
+            sizeClasses = "w-12 h-8 aspect-square rounded-full p-2";
+
+            if (color === "none") {
+                colorClasses = "bg-dark-3 hover:bg-dark-4 text-dark-12";
+            } else if (color === "primary") {
+                colorClasses = "bg-primary-9--dark hover:bg-primary-10--dark text-dark-12";
+            } else if (color === "cancel") {
+                colorClasses = "bg-red-500 hover:bg-red-600 text-white";
+            } else if (color === "submit") {
+                colorClasses = "bg-green-600 hover:bg-green-700 text-white";
+            }
+        } else {
+            if (color === "primary") {
+                colorClasses = variant === "contained"
+                    ? "bg-primary-9--dark hover:bg-primary-10--dark text-dark-12"
+                    : "bg-gray-50 hover:bg-gray-100 text-primary-9--dark";
+            } else if (color === "cancel") {
+                colorClasses = variant === "contained"
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-gray-50 hover:bg-gray-100 text-red-500 font-semibold";
+            } else if (color === "submit") {
+                colorClasses = variant === "contained"
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-gray-50 hover:bg-gray-100 text-green-600";
+            }
         }
 
-        return `${baseClasses} ${colorClasses} ${disabledClasses} ${className}`;
+        return `${baseClasses} ${colorClasses} ${sizeClasses} ${disabledClasses} ${className || ""}`;
     };
 
     return (

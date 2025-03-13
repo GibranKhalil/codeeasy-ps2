@@ -1,5 +1,5 @@
 import { ReactElement, useMemo } from "react";
-import { Boxes, Code, Folder, Trophy } from "lucide-react";
+import { Boxes, Code, Folder } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 interface SidebarSubOption {

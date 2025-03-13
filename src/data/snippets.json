@@ -35,7 +35,11 @@
             "PS2",
             "Entity",
             "Entidade"
-        ]
+        ],
+        "creator": {
+            "name": "Gibran Khalil",
+            "github": "https://github.com/gibrankhalil"
+        }
     },
     {
         "id": 2,
@@ -91,7 +95,11 @@
                 },
                 "engine": "AthenaENV"
             }
-        ]
+        ],
+        "creator": {
+            "name": "Gibran Khalil",
+            "github": "https://github.com/gibrankhalil"
+        }
     },
     {
         "id": 3,
@@ -134,7 +142,11 @@
             "PS2",
             "Animation",
             "Gerenciador de Animação"
-        ]
+        ],
+        "creator": {
+            "name": "Gibran Khalil",
+            "github": "https://github.com/gibrankhalil"
+        }
     },
     {
         "id": 4,
@@ -197,6 +209,10 @@
                 },
                 "engine": "AthenaENV"
             }
-        ]
+        ],
+        "creator": {
+            "name": "Gibran Khalil",
+            "github": "https://github.com/gibrankhalil"
+        }
     }
 ]

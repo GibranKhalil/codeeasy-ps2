@@ -1,11 +1,11 @@
 import { ReactElement } from "react";
 import Header from "../../components/Header";
 
-export default function OnlyHeaderLayout({children}: {children: ReactElement}){
-    return(
+export default function OnlyHeaderLayout({ children }: { children: ReactElement }) {
+    return (
         <>
-        <Header />
-        {children}
+            <Header margin="6" />
+            {children}
         </>
     )
 }

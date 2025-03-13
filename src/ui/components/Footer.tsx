@@ -8,8 +8,8 @@ const Footer = () => {
   }
 
   return (
-    <footer className="bg-dark-2 py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-24">
+    <footer className="bg-dark-2 py-16 w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-24">
 
         <div className="flex flex-wrap gap-12 justify-between">
           <div className="flex-1 min-w-[250px] max-w-[400px]">
