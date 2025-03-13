@@ -16,7 +16,7 @@ const CodeViewer = ({ language, code, customStyle }: CodeViewerProps) => {
       {({ style, tokens, getLineProps, getTokenProps }) => (
         <pre style={{
           ...style, ...customStyle, scrollbarWidth: "thin",
-          scrollbarColor: "#393A40 #1E1E1E", background: 'transparent'
+          scrollbarColor: "#222326 #19191b", background: 'transparent'
         }} className="overflow-y-auto">
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })}>

@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-.custom-scroll::-webkit-scrollbar {
-    @apply w-[6px]
+.custom-scroll::-webkit-scrollbar , body::-webkit-scrollbar {
+    @apply w-[8px];
 }
 
-.custom-scroll::-webkit-scrollbar-thumb {
-    @apply rounded-md bg-dark-3
+.custom-scroll::-webkit-scrollbar-thumb , body::-webkit-scrollbar-thumb {
+    @apply rounded-md bg-dark-3 cursor-pointer;
 }
 
-.custom-scroll::-webkit-scrollbar-track {
+.custom-scroll::-webkit-scrollbar-track , body::-webkit-scrollbar-track {
     @apply bg-dark-2;
 }

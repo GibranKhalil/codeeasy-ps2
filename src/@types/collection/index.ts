@@ -7,8 +7,15 @@ interface HowToUseSteps{
 }
 
 interface CanUseWith{
-    link: string,
-    name: string
+    pid: string,
+    title: string,
+    description: string
+    last_update: string,
+    last_modifier: {
+        name: string,
+        github: string
+    },
+    engine: string
 }
 
 export interface Snippet{

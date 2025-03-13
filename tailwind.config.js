@@ -35,6 +35,7 @@ export default {
       },
       animation: {
         'ripple': 'ripple 1s ease-out forwards',
+        'tab-indicator': 'tab-indicator 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards'
       },
       keyframes: {
         ripple: {
@@ -43,6 +44,10 @@ export default {
             opacity: '0',
           },
         },
+        'tab-indicator': {
+					'0%': { transform: 'translateX(var(--tab-indicator-from, 0)) scaleX(0)' },
+					'100%': { transform: 'translateX(var(--tab-indicator-to, 0)) scaleX(1)' }
+				}
       }
     },
   },

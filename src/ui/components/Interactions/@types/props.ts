@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
+import { ComponentProps, ReactElement } from "react";
 
-export interface InteractionCardProps {
+export interface InteractionCardProps extends ComponentProps<"article"> {
     icon: ReactElement,
-    value: number
+    value: number,
 }

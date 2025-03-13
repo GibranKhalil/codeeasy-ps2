@@ -36,7 +36,7 @@
             "Entity",
             "Entidade"
         ]
-    },    
+    },
     {
         "id": 2,
         "pid": "cf84740c113c668948a70856d3b29b15",
@@ -81,8 +81,15 @@
         ],
         "can_use_with": [
             {
-                "name": "Gerenciador de Animação: SpriteSheet",
-                "link": "/snippet/64dbaa1b617f97134d834b48a1418706"
+                "pid": "64dbaa1b617f97134d834b48a1418706",
+                "title": "Gerenciador de Animações: SpriteSheets",
+                "description": "Gerencia e controla as animações. Ela permite adicionar múltiplas animações, alternar entre elas, e atualizar os quadros da animação com base no tempo decorrido. Ideal para situações onde você precisa gerenciar várias animações simultaneamente, como personagens com diferentes estados ou efeitos animados em um jogo.",
+                "last_update": "10/03/2025",
+                "last_modifier": {
+                    "name": "Gibran Khalil",
+                    "github": "https://github.com/GibranKhalil"
+                },
+                "engine": "AthenaENV"
             }
         ]
     },
@@ -127,12 +134,6 @@
             "PS2",
             "Animation",
             "Gerenciador de Animação"
-        ],
-        "can_use_with": [
-            {
-                "name": "Animação: SpriteSheet",
-                "link": "/snippet/cf84740c113c668948a70856d3b29b15"
-            }
         ]
     },
     {
@@ -186,14 +187,16 @@
         ],
         "can_use_with": [
             {
-                "name": "Gerenciador de Animação: SpriteSheet",
-                "link": "/snippet/64dbaa1b617f97134d834b48a1418706"
-            },
-            {
-                "name": "Entidade básica",
-                "link": "/snippet/cf2cf0a483f57b5c196c144bd42717a0"
+                "pid": "64dbaa1b617f97134d834b48a1418706",
+                "title": "Gerenciador de Animações: SpriteSheets",
+                "description": "Gerencia e controla as animações. Ela permite adicionar múltiplas animações, alternar entre elas, e atualizar os quadros da animação com base no tempo decorrido. Ideal para situações onde você precisa gerenciar várias animações simultaneamente, como personagens com diferentes estados ou efeitos animados em um jogo.",
+                "last_update": "10/03/2025",
+                "last_modifier": {
+                    "name": "Gibran Khalil",
+                    "github": "https://github.com/GibranKhalil"
+                },
+                "engine": "AthenaENV"
             }
         ]
-    }   
-    
+    }
 ]

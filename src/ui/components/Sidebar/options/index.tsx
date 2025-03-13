@@ -42,13 +42,13 @@ const SidebarOptions = () => {
         },
 
       ]
-    },
-    {
-      label: "Ranking",
-      icon: <Trophy size={18} />,
-      active: currentPath === "/ranking",
-      redirect: "/ranking",
-    },
+    }
+    // {
+    //   label: "Ranking",
+    //   icon: <Trophy size={18} />,
+    //   active: currentPath === "/ranking",
+    //   redirect: "/ranking",
+    // },
     // {
     //   label: "Jogos",
     //   icon: <Gamepad2 size={18} />,

@@ -27,8 +27,8 @@ export const SnippetCard = ({ title, description, likes, views, last_update, las
         </div>
 
         <div className="flex items-center space-x-4 mt-2 h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 overflow-hidden">
-          <InteractionCard icon={<Eye className="text-dark-12" size={16} fillRule="evenodd" />} value={Number(views)} />
-          <InteractionCard icon={<Heart fill="#d63941" className="text-accent-red-10" size={16} fillRule="evenodd" />} value={Number(likes)} />
+          <InteractionCard icon={<Eye className="text-dark-12" size={16} />} value={Number(views)} />
+          <InteractionCard icon={<Heart className="text-dark-12" size={16} />} value={Number(likes)} />
         </div>
       </footer>
     </article>
