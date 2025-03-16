@@ -52,13 +52,13 @@ export default function FeaturedContentTabs({
     <section className="w-full py-12 md:py-16 bg-muted/30">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center mb-8 text-center">
-          <Badge className="mb-4" variant="outline">
+          <Badge className="mb-4">
             <Star className="h-3.5 w-3.5 mr-1.5" />
             Featured Content
           </Badge>
-          <h2 className="text-3xl font-bold tracking-tight">Explore PS2 Homebrew Resources</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Explore os Conteúdos de PS2 Homebrew</h2>
           <p className="mt-2 text-muted-foreground max-w-[700px]">
-            Discover code snippets, tutorials, games, and more from our community of PS2 homebrew developers.
+            Procure códigos, tutoriais, jogos, e mais de nossa comunidade de desenvolvedores PS2 homebrew.
           </p>
         </div>
 
@@ -67,18 +67,18 @@ export default function FeaturedContentTabs({
             <TabsList className="grid w-full max-w-md grid-cols-3">
               <TabsTrigger value="snippets" className="flex items-center gap-1.5">
                 <Code className="h-4 w-4" />
-                <span className="hidden sm:inline">Code Snippets</span>
-                <span className="sm:hidden">Code</span>
+                <span className="hidden sm:inline">Códigos</span>
+                <span className="sm:hidden">Códigos</span>
               </TabsTrigger>
               <TabsTrigger value="tutorials" className="flex items-center gap-1.5">
                 <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Tutorials</span>
-                <span className="sm:hidden">Learn</span>
+                <span className="hidden sm:inline">Tutoriais</span>
+                <span className="sm:hidden">Aprenda</span>
               </TabsTrigger>
               <TabsTrigger value="games" className="flex items-center gap-1.5">
                 <Gamepad2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Games</span>
-                <span className="sm:hidden">Play</span>
+                <span className="hidden sm:inline">Jogos</span>
+                <span className="sm:hidden">Jogue</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -103,7 +103,7 @@ export default function FeaturedContentTabs({
                         </CardContent>
                       </Card>
                     ))
-                  : recentSnippets.map((snippet) => (
+                  : recentSnippets.map((snippet, index) => (
                     <motion.div key={snippet.id} variants={cardVariants}>
                       <SnippetCard snippet={snippet} />
                     </motion.div>
@@ -112,7 +112,7 @@ export default function FeaturedContentTabs({
               <div className="flex justify-center mt-8">
                 <Button asChild>
                   <Link href="/snippets">
-                    View All Snippets
+                    Ver Todos Snippets
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -139,8 +139,8 @@ export default function FeaturedContentTabs({
                         </CardContent>
                       </Card>
                     ))
-                  : featuredTutorials.map((tutorial) => (
-                    <motion.div key={tutorial.id} variants={cardVariants}>
+                  : featuredTutorials.map((tutorial, index) => (
+                    <motion.div key={index} variants={cardVariants}>
                       <Card className="overflow-hidden h-full flex flex-col cursor-pointer transition-all hover:shadow-md">
                         <Link href={`/tutorials/${tutorial.slug}`} className="h-full flex flex-col">
                           <div className="relative h-40 w-full">
@@ -182,7 +182,7 @@ export default function FeaturedContentTabs({
               <div className="flex justify-center mt-8">
                 <Button asChild>
                   <Link href="/tutorials">
-                    Explore All Tutorials
+                    Explorar Tutoriais
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -209,8 +209,8 @@ export default function FeaturedContentTabs({
                         </CardContent>
                       </Card>
                     ))
-                  : featuredGames.map((game) => (
-                    <motion.div key={game.id} variants={cardVariants}>
+                  : featuredGames.map((game, index) => (
+                    <motion.div key={index} variants={cardVariants}>
                       <Card className="overflow-hidden h-full flex flex-col cursor-pointer transition-all hover:shadow-md">
                         <Link href={`/games/${game.slug}`} className="h-full flex flex-col">
                           <div className="relative h-40 w-full">
@@ -253,7 +253,7 @@ export default function FeaturedContentTabs({
               <div className="flex justify-center mt-8">
                 <Button asChild>
                   <Link href="/games">
-                    Browse All Games
+                    Ver Todos Jogos
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
