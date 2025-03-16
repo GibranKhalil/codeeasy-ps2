@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTheme } from "next-themes"
+import { Moon, Sun, Menu, Github, LogOut, User } from "lucide-react"
+import { useUser } from "@/lib/use-user"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet"
 import { Button } from "@/components/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
-import { Moon, Sun, Menu, Globe, Github, LogOut, User } from "lucide-react"
-import { useUser } from "@/lib/use-user"
 
 export default function Navbar() {
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const { user, loading } = useUser()
 
@@ -37,12 +39,34 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between gap-2">
-        <div className="flex items-center gap-2 flex-1">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <nav className="flex flex-col gap-4 mt-8">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`text-lg ${pathname === item.href ? "font-medium text-primary" : "text-muted-foreground"
+                      }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
 
           <Link href="/" className="flex items-center gap-2">
-            <span style={{ marginRight: '48px' }} className="font-bold text-xl mr-6">PS2 Hub</span>
+            <span className="font-bold text-xl">PS2 Hub</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 ml-6">
@@ -60,25 +84,10 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Globe className="h-5 w-5" />
-                <span className="sr-only">Toggle language</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLanguage("en")}>English {language === "en" && "✓"}</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage("pt")}>
-                Português {language === "pt" && "✓"}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             <span className="sr-only">Toggle theme</span>
-          </Button> */}
+          </Button>
 
           {!loading && (
             <>
@@ -120,3 +129,4 @@ export default function Navbar() {
     </header>
   )
 }
+
