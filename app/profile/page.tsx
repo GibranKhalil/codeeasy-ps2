@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { format } from "date-fns"
-import { useLanguage } from "@/components/language-provider"
+
 import { Button } from "@/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"

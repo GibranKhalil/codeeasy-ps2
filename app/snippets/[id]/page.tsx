@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
-import { useLanguage } from "@/components/language-provider"
+
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"

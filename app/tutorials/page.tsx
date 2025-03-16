@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
-import { useLanguage } from "@/components/language-provider"
+
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Badge } from "@/components/badge"
 import { Input } from "@/components/input"

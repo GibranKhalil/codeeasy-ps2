@@ -7,7 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { useLanguage } from "@/components/language-provider"
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Button } from "@/components/button"
 import { Input } from "@/components/input"
