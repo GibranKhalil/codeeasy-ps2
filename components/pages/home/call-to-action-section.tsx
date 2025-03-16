@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { Heart, Github } from "lucide-react"
-import { Badge } from "../badge"
-import { Button } from "../button"
+import { Badge } from "../../badge"
+import { Button } from "../../button"
 
 export default function CallToActionSection() {
   return (

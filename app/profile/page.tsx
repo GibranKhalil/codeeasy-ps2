@@ -19,7 +19,7 @@ import { Separator } from "@/components/separator"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@/lib/use-user"
 import { mockSnippets, mockProfiles, mockTutorials, mockGames } from "@/lib/mock-data"
-import SnippetCard from "@/ui/components/snippetCard"
+import SnippetCard from "@/components/snippetCard"
 import {
   Save,
   User,

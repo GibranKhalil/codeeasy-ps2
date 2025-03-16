@@ -3,9 +3,9 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Code, BookOpen, Github, Sparkles, ChevronRight } from "lucide-react"
-import { Badge } from "../badge"
-import { Button } from "../button"
-import CodePreview from "@/ui/components/codePreview"
+import { Badge } from "../../badge"
+import { Button } from "../../button"
+import CodePreview from "@/components/codePreview"
 
 interface HeroSectionProps {
   snippetCode: string

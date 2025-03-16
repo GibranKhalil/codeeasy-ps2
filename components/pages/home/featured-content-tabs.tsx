@@ -5,12 +5,12 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Code, ArrowRight, BookOpen, Gamepad2, Star, Download, Clock, User } from "lucide-react"
-import { Badge } from "../badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs"
-import { Card, CardContent, CardFooter } from "../card"
-import SnippetCard from "@/ui/components/snippetCard"
-import { Button } from "../button"
-import { Avatar, AvatarFallback, AvatarImage } from "../avatar"
+import { Badge } from "../../badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../tabs"
+import { Card, CardContent, CardFooter } from "../../card"
+import SnippetCard from "@/components/snippetCard"
+import { Button } from "../../button"
+import { Avatar, AvatarFallback, AvatarImage } from "../../avatar"
 
 interface FeaturedContentTabsProps {
   recentSnippets: any[]

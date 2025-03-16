@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { mockSnippets, mockTopContributors, mockTutorials, mockGames } from "@/lib/mock-data"
-import HeroSection from "@/components/home/hero-section"
-import FeaturedContentTabs from "@/components/home/featured-content-tabs"
-import TopContributorsSection from "@/components/home/top-contributors-section"
-import CallToActionSection from "@/components/home/call-to-action-section"
+import HeroSection from "@/components/pages/home/hero-section"
+import FeaturedContentTabs from "@/components/pages/home/featured-content-tabs"
+import TopContributorsSection from "@/components/pages/home/top-contributors-section"
+import CallToActionSection from "@/components/pages/home/call-to-action-section"
 
 export default function Home() {
   const [recentSnippets, setRecentSnippets] = useState<typeof mockSnippets>([])

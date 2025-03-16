@@ -2,10 +2,10 @@
 
 import Link from "next/link"
 import { Code, Users, ArrowRight, Star } from "lucide-react"
-import { Badge } from "../badge"
-import { Button } from "../button"
-import { Card, CardContent } from "../card"
-import { Avatar, AvatarFallback, AvatarImage } from "../avatar"
+import { Badge } from "../../badge"
+import { Button } from "../../button"
+import { Card, CardContent } from "../../card"
+import { Avatar, AvatarFallback, AvatarImage } from "../../avatar"
 
 interface TopContributorsSectionProps {
   topContributors: any[]

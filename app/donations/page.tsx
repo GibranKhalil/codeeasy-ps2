@@ -1,8 +1,8 @@
 "use client"
 
+import DevelopersSupportCard from "@/components/pages/donations/developersSupportCard"
+import PlataformSupportCard from "@/components/pages/donations/plataformSupportCard"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
-import DevelopersSupportCard from "@/ui/components/pages/donations/developersSupportCard"
-import PlataformSupportCard from "@/ui/components/pages/donations/plataformSupportCard"
 
 export default function DonationsPage() {
 

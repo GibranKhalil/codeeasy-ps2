@@ -7,7 +7,7 @@ import { Input } from "@/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
 import { mockSnippets } from "@/lib/mock-data"
 import type { Snippet } from "@/lib/types"
-import SnippetCard from "@/ui/components/snippetCard"
+import SnippetCard from "@/components/snippetCard"
 import { Code, Search, Filter } from "lucide-react"
 
 export default function SnippetsPage() {
