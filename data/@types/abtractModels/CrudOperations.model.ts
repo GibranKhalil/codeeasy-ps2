@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
 import Cookies from 'js-cookie';
-import { HttpClient } from "@/data/config/httpClient.config";
-import { ICrudOperations } from "../interfaces/iCrudOperations.interface";
-import UrlBuilder from "@/data/utils/urlBuilder.utils";
-import Validator from "@/data/utils/validator.utils";
-import Parser from "@/data/utils/parser.utils";
-import { IApiRequestParams } from "../interfaces/iApiRequestParams.interface";
-import { AxiosRequestConfig } from "axios";
+import { HttpClient } from '@/data/config/httpClient.config';
+import { ICrudOperations } from '../interfaces/iCrudOperations.interface';
+import UrlBuilder from '@/data/utils/urlBuilder.utils';
+import Validator from '@/data/utils/validator.utils';
+import Parser from '@/data/utils/parser.utils';
+import { IApiRequestParams } from '../interfaces/iApiRequestParams.interface';
+import { AxiosRequestConfig } from 'axios';
 
 /**
  * Classe abstrata que implementa operações CRUD genéricas.
@@ -17,7 +17,9 @@ import { AxiosRequestConfig } from "axios";
  * @template FINDALL - O tipo de dado retornado ao buscar todos os recursos.
  * @template CREATE - O tipo de dado usado para criar ou atualizar um recurso.
  */
-export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOperations<FIND, FINDALL, CREATE> {
+export abstract class CrudOperations<FIND, FINDALL, CREATE>
+  implements ICrudOperations<FIND, FINDALL, CREATE>
+{
   private readonly httpClient: HttpClient;
   protected readonly urlBuilder: UrlBuilder;
   protected readonly validator: Validator;
@@ -30,9 +32,11 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
    * @param {string} [baseUrl] - A URL base da API (opcional, padrão é process.env.NEXT_PUBLIC_ENDPOINT).
    */
   constructor(
-    protected readonly endPoint: string, 
-    protected readonly baseUrl: string = process.env.NEXT_PUBLIC_ENDPOINT as string,
-    protected readonly tokenCookieName: string = 'token') {
+    protected readonly endPoint: string,
+    protected readonly baseUrl: string = process.env
+      .NEXT_PUBLIC_ENDPOINT as string,
+    protected readonly tokenCookieName: string = 'access_token',
+  ) {
     this.httpClient = new HttpClient();
     this.urlBuilder = new UrlBuilder(this.baseUrl, this.endPoint);
     this.validator = new Validator();
@@ -78,7 +82,10 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
    * @example
    * await service.create({ name: 'John Doe' }, { hasAuth: true });
    */
-  async create(data: CREATE | FormData, options?: IApiRequestParams): Promise<any> {
+  async create(
+    data: CREATE | FormData,
+    options?: IApiRequestParams,
+  ): Promise<any> {
     const url = this.urlBuilder.buildUrl(options);
     return this.executeRequest<any>('post', url, options, data);
   }
@@ -94,7 +101,11 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
    * @example
    * await service.update(1, { name: 'Jane Doe' }, { hasAuth: true });
    */
-  async update(id: number, data: Partial<CREATE | FormData>, options?: IApiRequestParams): Promise<any> {
+  async update(
+    id: number,
+    data: Partial<CREATE | FormData>,
+    options?: IApiRequestParams,
+  ): Promise<any> {
     const url = this.urlBuilder.buildUrl(options, id);
     return this.executeRequest<any>('patch', url, options, data);
   }
@@ -133,7 +144,10 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
    * @param {unknown} error - O erro ocorrido.
    * @throws {Error} - Deve lançar um erro ou tratar o erro de forma apropriada.
    */
-  protected abstract handleServiceError(operation: string, error: unknown): never;
+  protected abstract handleServiceError(
+    operation: string,
+    error: unknown,
+  ): never;
 
   /**
    * Retorna os headers de autenticação para requisições que requerem autenticação.
@@ -163,14 +177,19 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
    * @returns {Promise<T>} - Uma promessa que resolve com os dados da resposta.
    * @throws {Error} - Lança um erro se a resposta for inválida ou se ocorrer um erro na requisição.
    */
-  protected async executeRequest<T>(method: string, url: string, options?: IApiRequestParams, data?: unknown): Promise<T> {
+  protected async executeRequest<T>(
+    method: string,
+    url: string,
+    options?: IApiRequestParams,
+    data?: unknown,
+  ): Promise<T> {
     try {
       const config = this.buildRequestConfig(options);
       const response = await this.httpClient.request<T>({
         method,
         url,
         data,
-        ...config
+        ...config,
       });
 
       if (!this.validateResponse(response)) {
@@ -205,7 +224,8 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE> implements ICrudOper
     }
 
     if (options?.responseType) {
-      config.responseType = options.responseType as AxiosRequestConfig['responseType'];
+      config.responseType =
+        options.responseType as AxiosRequestConfig['responseType'];
     }
 
     return config;

@@ -16,6 +16,8 @@ import { Separator } from "@/components/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { Github, Mail, ArrowRight, Loader2 } from "lucide-react"
+import { userService } from "@/data/services/users/users.service"
+import Validator from "@/data/utils/validator.utils"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -54,14 +56,18 @@ export default function LoginPage() {
     try {
       setIsLoggingIn(true)
 
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const token = await userService.login(email, password)
 
-      toast({
-        title: "Login successful",
-        description: "Welcome back to PS2 Homebrew Hub!",
-      })
+      if (Validator.required(token)) {
 
-      router.push("/profile")
+        toast({
+          title: "Logado com sucesso!",
+          description: "Bem-vindo de volta ao PS2 Homebrew Hub!",
+        })
+        router.push("/")
+        return
+      }
+
     } catch (error) {
       console.error("Error logging in:", error)
       toast({
@@ -110,7 +116,7 @@ export default function LoginPage() {
                 </div>
               </div>
               <CardTitle className="text-2xl font-bold">Entrar</CardTitle>
-              <CardDescription>Sign in to your account to continue</CardDescription>
+              <CardDescription>Entre em sua conta para continuar</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
@@ -124,7 +130,7 @@ export default function LoginPage() {
                 ) : (
                   <Github className="mr-2 h-4 w-4" />
                 )}
-                Continue with GitHub
+                Continue com Github
               </Button>
 
               <div className="relative">
@@ -140,13 +146,13 @@ export default function LoginPage() {
                 <TabsList className="grid w-full grid-cols-1">
                   <TabsTrigger value="email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4" />
-                    Email
+                    E-mail
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="email">
                   <form onSubmit={handleEmailLogin} className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">E-mail</Label>
                       <Input
                         id="email"
                         type="email"
@@ -160,9 +166,9 @@ export default function LoginPage() {
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Senha</Label>
                         <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                          Forgot password?
+                          Esqueceu sua senha ?
                         </Link>
                       </div>
                       <Input
@@ -177,7 +183,7 @@ export default function LoginPage() {
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoggingIn || isGithubLoggingIn}>
                       {isLoggingIn ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Sign In
+                      Entre
                     </Button>
                   </form>
                 </TabsContent>
@@ -185,9 +191,9 @@ export default function LoginPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
+                Não possui um conta ?{" "}
                 <Link href="/register" className="text-primary hover:underline inline-flex items-center">
-                  Create an account
+                  Crie uma aqui
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </Link>
               </div>

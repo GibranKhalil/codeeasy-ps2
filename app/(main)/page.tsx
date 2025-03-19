@@ -15,7 +15,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       setRecentSnippets(mockSnippets.slice(0, 3))
       setTopContributors(mockTopContributors.slice(0, 5))
@@ -29,21 +28,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
       <HeroSection snippetCode={mockSnippets[0]?.code || ""} snippetLanguage={mockSnippets[0]?.language || "c"} />
-
-      {/* Featured Content Tabs */}
       <FeaturedContentTabs
         recentSnippets={recentSnippets}
         featuredTutorials={featuredTutorials}
         featuredGames={featuredGames}
         loading={loading}
       />
-
-      {/* Top Contributors Section */}
       <TopContributorsSection topContributors={topContributors} loading={loading} />
-
-      {/* Call to Action */}
       <CallToActionSection />
     </div>
   )

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useReducer, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -15,47 +15,75 @@ import { Separator } from "@/components/separator"
 import { Checkbox } from "@/components/checkbox"
 import { useToast } from "@/hooks/use-toast"
 import { Github, User, Mail, Lock, ArrowLeft, Loader2 } from "lucide-react"
+import { CreateUserDto } from "@/data/@types/models/users/dto/create-user.dto"
+import { userService } from "@/data/services/users/users.service"
+import { User as UserType } from "@/data/@types/models/users/entities/user.entity"
+import Validator from "@/data/utils/validator.utils"
+
+type ExtendedUserDto = CreateUserDto & { confirm?: string }
+
+const newUserInitialData: ExtendedUserDto = {
+  email: '',
+  username: '',
+  password: '',
+  confirm: ''
+}
+
+
+
+type UserAction =
+  | { type: "SET_FIELD"; field: keyof ExtendedUserDto; value: string }
+  | { type: "RESET" };
+
+const userReducer = (state: ExtendedUserDto, action: UserAction): ExtendedUserDto => {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return newUserInitialData;
+    default:
+      return state;
+  }
+};
 
 export default function RegisterPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isRegistering, setIsRegistering] = useState(false)
   const [isGithubRegistering, setIsGithubRegistering] = useState(false)
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const [user, setUser] = useReducer(userReducer, newUserInitialData);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!username.trim()) {
-      newErrors.username = "Username is required"
-    } else if (username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters"
+    if (!user.username.trim()) {
+      newErrors.username = "Usuário é um campo obrigatório"
+    } else if (user.username.length < 3) {
+      newErrors.username = "Seu nome de usuário deve ter no mínimo 3 caracteres"
     }
 
-    if (!email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid"
+    if (!user.email.trim()) {
+      newErrors.email = "E-mail é obrigatório"
+    } else if (!/\S+@\S+\.\S+/.test(user.email)) {
+      newErrors.email = "E-mail inválido"
     }
 
-    if (!password) {
-      newErrors.password = "Password is required"
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters"
+    if (!user.password) {
+      newErrors.password = "Senha obrigatório"
+    } else if (user.password.length < 6) {
+      newErrors.password = "Sua senha deve ter no mínimo 6 caracteres"
     }
 
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
+    if (user.password !== user.confirm) {
+      newErrors.confirmPassword = "Senhas não conferem"
     }
 
-    if (!acceptTerms) {
-      newErrors.acceptTerms = "You must accept the terms and conditions"
-    }
+    // if (!acceptTerms) {
+    //   newErrors.acceptTerms = "You must accept the terms and conditions"
+    // }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -69,20 +97,33 @@ export default function RegisterPage() {
     try {
       setIsRegistering(true)
 
-      // Simulate registration delay
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const newUser = user;
+      delete newUser.confirm;
+
+      const response = await userService.registerUser(newUser)
+
+      if (Validator.required((response.data as UserType).id)) {
+        toast({
+          title: "Conta criada com sucesso",
+          description: "Bem-vindo ao PS2 Homebrew Hub!",
+        })
+
+        router.push("/login")
+        return
+      }
 
       toast({
-        title: "Registration successful",
-        description: "Welcome to PS2 Homebrew Hub!",
+        title: "Não foi possível criar sua conta",
+        description: "Tivemos um problema com sua solicitação. Por favor, tente novamente!",
+        variant: "destructive",
       })
+      return
 
-      router.push("/profile")
     } catch (error) {
       console.error("Error registering:", error)
       toast({
-        title: "Registration failed",
-        description: "There was an issue creating your account. Please try again.",
+        title: "Não foi possível criar sua conta",
+        description: "Tivemos um problema com sua solicitação. Por favor, tente novamente!",
         variant: "destructive",
       })
     } finally {
@@ -125,8 +166,8 @@ export default function RegisterPage() {
                   <Image src="/placeholder.svg?height=48&width=48" alt="PS2 Homebrew Hub" fill className="rounded-lg" />
                 </div>
               </div>
-              <CardTitle className="text-2xl font-bold">Create an Account</CardTitle>
-              <CardDescription>Join the PS2 homebrew community</CardDescription>
+              <CardTitle className="text-2xl font-bold">Crie uma Conta</CardTitle>
+              <CardDescription>Entre na comunidade PS2 homebrew</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
@@ -140,7 +181,7 @@ export default function RegisterPage() {
                 ) : (
                   <Github className="mr-2 h-4 w-4" />
                 )}
-                Sign up with GitHub
+                Entre com GitHub
               </Button>
 
               <div className="relative">
@@ -154,14 +195,14 @@ export default function RegisterPage() {
 
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">Usuário</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="username"
                       placeholder="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      value={user.username}
+                      onChange={(e) => setUser({ field: 'username', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.username ? "border-destructive" : ""}`}
                       disabled={isRegistering}
                     />
@@ -170,15 +211,15 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">E-mail</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="name@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={user.email}
+                      onChange={(e) => setUser({ field: 'email', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                       disabled={isRegistering}
                     />
@@ -187,14 +228,14 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Senha</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="password"
                       type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={user.password}
+                      onChange={(e) => setUser({ field: 'password', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.password ? "border-destructive" : ""}`}
                       disabled={isRegistering}
                     />
@@ -203,14 +244,14 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">Confirme sua Senha</Label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="confirmPassword"
                       type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      value={user.confirm}
+                      onChange={(e) => setUser({ field: 'confirm', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
                       disabled={isRegistering}
                     />
@@ -218,7 +259,7 @@ export default function RegisterPage() {
                   {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
                 </div>
 
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <Checkbox
                     id="terms"
                     checked={acceptTerms}
@@ -240,20 +281,20 @@ export default function RegisterPage() {
                     </Link>
                   </label>
                 </div>
-                {errors.acceptTerms && <p className="text-sm text-destructive">{errors.acceptTerms}</p>}
+                {errors.acceptTerms && <p className="text-sm text-destructive">{errors.acceptTerms}</p>} */}
 
                 <Button type="submit" className="w-full" disabled={isRegistering || isGithubRegistering}>
                   {isRegistering ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Create Account
+                  Cria Conta
                 </Button>
               </form>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm">
-                Already have an account?{" "}
+                Já tem uma conta?{" "}
                 <Link href="/login" className="text-primary hover:underline inline-flex items-center">
                   <ArrowLeft className="mr-1 h-3 w-3" />
-                  Sign in
+                  Entre aqui
                 </Link>
               </div>
             </CardFooter>
