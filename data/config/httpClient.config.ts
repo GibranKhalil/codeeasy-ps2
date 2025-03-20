@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 
 /**
  * Classe utilitária para realizar requisições HTTP usando o Axios.
@@ -16,8 +16,8 @@ export class HttpClient {
     this.axiosInstance = axios.create({
       timeout: 10000, // Timeout de 10 segundos
       headers: {
-        'Content-Type': 'application/json' // Header padrão para JSON
-      }
+        'Content-Type': 'application/json', // Header padrão para JSON
+      },
     });
 
     this.setupInterceptors();
@@ -30,8 +30,8 @@ export class HttpClient {
    */
   private setupInterceptors(): void {
     this.axiosInstance.interceptors.response.use(
-      response => response,
-      error => Promise.reject(this.normalizeError(error))
+      (response) => response,
+      (error) => Promise.reject(this.normalizeError(error)),
     );
   }
 
@@ -45,8 +45,9 @@ export class HttpClient {
    */
   private normalizeError(error: unknown): Error {
     if (axios.isAxiosError(error)) {
-      return new Error(error.response?.data?.message || error.message);
+      return error;
     }
+
     return error instanceof Error ? error : new Error('Erro desconhecido');
   }
 

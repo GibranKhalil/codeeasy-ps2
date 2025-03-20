@@ -11,6 +11,8 @@ import SnippetCard from "@/components/snippetCard"
 import { Code, Search, Filter } from "lucide-react"
 import { enginesMap, eSnippetEngine } from "@/data/@types/enums/eSnippetEngine.enum"
 import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLanguage.enum"
+import { useAuth } from "@/hooks/use-auth"
+import Validator from "@/data/utils/validator.utils"
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
@@ -18,6 +20,8 @@ export default function SnippetsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [languageFilter, setLanguageFilter] = useState("")
   const [engineFilter, setEngineFilter] = useState("")
+
+  const { user } = useAuth()
 
   useEffect(() => {
     let filteredSnippets = [...mockSnippets]
@@ -44,12 +48,13 @@ export default function SnippetsPage() {
     <div className="container py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold">Snippets</h1>
-        <Button asChild>
-          <Link href="/snippets/create">
-            <Code className="mr-2 h-4 w-4" />
-            Criar Snippet
-          </Link>
-        </Button>
+        {Validator.required(user) &&
+          <Button asChild>
+            <Link href="/snippets/create">
+              <Code className="mr-2 h-4 w-4" />
+              Criar Snippet
+            </Link>
+          </Button>}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-8">

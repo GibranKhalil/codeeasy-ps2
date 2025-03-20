@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockTutorials } from "@/lib/mock-data"
 import type { Tutorial } from "@/lib/types"
 import { Search, Clock, Tag, PlusCircle } from "lucide-react"
+import Validator from "@/data/utils/validator.utils"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function TutorialsPage() {
   const router = useRouter()
@@ -22,6 +24,8 @@ export default function TutorialsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
+
+  const { user } = useAuth()
 
   const categories = ["all", ...Array.from(new Set(mockTutorials.map((tutorial) => tutorial.category)))]
 
@@ -79,10 +83,11 @@ export default function TutorialsPage() {
               className="pl-9"
             />
           </div>
-          <Button onClick={() => router.push("/tutorials/create")} className="gap-2 sm:w-auto w-full">
-            <PlusCircle className="h-4 w-4" />
-            Criar Tutorial
-          </Button>
+          {Validator.required(user) &&
+            <Button onClick={() => router.push("/tutorials/create")} className="gap-2 sm:w-auto w-full">
+              <PlusCircle className="h-4 w-4" />
+              Criar Tutorial
+            </Button>}
 
         </div>
 

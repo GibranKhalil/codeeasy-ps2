@@ -26,7 +26,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true)
     const token = Cookies.get('access_token');
     if (token) {
-      const user = await userService.find({ requiresAuth: true, subEndpoint: `/token/${token}` });
+      const user = await userService.find({ subEndpoint: `/token/${token}` });
+      if (!user.success) {
+        setUser(null)
+      }
       setUser(user.data);
     }
     setLoading(false)

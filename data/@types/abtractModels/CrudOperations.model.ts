@@ -144,10 +144,7 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE>
    * @param {unknown} error - O erro ocorrido.
    * @throws {Error} - Deve lançar um erro ou tratar o erro de forma apropriada.
    */
-  protected abstract handleServiceError(
-    operation: string,
-    error: unknown,
-  ): never;
+  protected abstract handleServiceError(operation: string, error: unknown): any;
 
   /**
    * Retorna os headers de autenticação para requisições que requerem autenticação.
@@ -198,7 +195,7 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE>
 
       return response;
     } catch (error) {
-      this.handleServiceError(method.toUpperCase(), error);
+      return this.handleServiceError(method.toUpperCase(), error);
     }
   }
 

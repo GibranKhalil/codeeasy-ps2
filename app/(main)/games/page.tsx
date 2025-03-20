@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockGames } from "@/lib/mock-data"
 import type { Game } from "@/lib/types"
 import { Search, Download, User, Clock } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
+import Validator from "@/data/utils/validator.utils"
 
 export default function GamesPage() {
   const router = useRouter()
@@ -21,6 +23,8 @@ export default function GamesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
+
+  const { user } = useAuth()
 
   const categories = ["all", ...Array.from(new Set(mockGames.map((game) => game.category)))]
 
@@ -78,9 +82,9 @@ export default function GamesPage() {
               className="pl-9"
             />
           </div>
-          <Button asChild>
+          {Validator.required(user) && <Button asChild>
             <Link href="/games/submit">Envie Seu Jogo</Link>
-          </Button>
+          </Button>}
         </div>
 
         <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
