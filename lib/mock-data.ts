@@ -1,81 +1,22 @@
-import type { Snippet, UserProfile } from "./types"
+import type { Snippet } from './types';
 
 // Mock user data
 export const mockUser = {
-  id: "user-123",
-  email: "demo@ps2hub.dev",
+  id: 'user-123',
+  email: 'demo@ps2hub.dev',
   user_metadata: {
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    user_name: "ps2dev",
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    user_name: 'ps2dev',
   },
-}
-
-// Mock profiles data
-export const mockProfiles: UserProfile[] = [
-  {
-    id: "user-123",
-    username: "ps2dev",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "PS2 homebrew developer and enthusiast. Working on graphics and input libraries.",
-    created_at: "2023-01-15T12:00:00Z",
-    updated_at: "2023-06-20T15:30:00Z",
-    website: "",
-    twitter: "",
-    github: ""
-  },
-  {
-    id: "user-456",
-    username: "homebrew_master",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "Creating PS2 homebrew games since 2005. Specializing in 3D engines and optimization.",
-    created_at: "2022-03-10T09:15:00Z",
-    updated_at: "2023-05-05T11:45:00Z",
-    website: "",
-    twitter: "",
-    github: ""
-  },
-  {
-    id: "user-789",
-    username: "audio_wizard",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "Audio programmer focusing on PS2 sound libraries and music players.",
-    created_at: "2022-07-22T14:20:00Z",
-    updated_at: "2023-04-18T10:30:00Z",
-    website: "",
-    twitter: "",
-    github: ""
-  },
-  {
-    id: "user-101",
-    username: "graphics_guru",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "PS2 graphics programmer. Created several demo scenes and rendering techniques.",
-    created_at: "2022-05-12T16:40:00Z",
-    updated_at: "2023-03-30T13:15:00Z",
-    website: "",
-    twitter: "",
-    github: ""
-  },
-  {
-    id: "user-202",
-    username: "code_ninja",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "Low-level PS2 programmer. Working on kernel modifications and system libraries.",
-    created_at: "2022-09-05T08:50:00Z",
-    updated_at: "2023-02-15T17:20:00Z",
-    website: "",
-    twitter: "",
-    github: ""
-  },
-]
+};
 
 // Mock snippets data
 export const mockSnippets: Snippet[] = [
   {
-    id: "snippet-1",
-    title: "PS2 Controller Input",
-    description: "How to read controller input on PS2 using the pad library",
-    language: "c",
+    id: 'snippet-1',
+    title: 'PS2 Controller Input',
+    description: 'How to read controller input on PS2 using the pad library',
+    language: 'c',
     code: `// Sample code for reading PS2 controller input
 #include <tamtypes.h>
 #include <kernel.h>
@@ -157,19 +98,19 @@ int main() {
     
     return 0;
 }`,
-    created_at: "2023-06-15T14:30:00Z",
-    updated_at: "2023-06-15T14:30:00Z",
-    user_id: "user-123",
+    created_at: '2023-06-15T14:30:00Z',
+    updated_at: '2023-06-15T14:30:00Z',
+    user_id: 'user-123',
     user: {
-      username: "ps2dev",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'ps2dev',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-2",
-    title: "Graphics Rendering",
-    description: "Basic triangle rendering with GS (Graphics Synthesizer)",
-    language: "c",
+    id: 'snippet-2',
+    title: 'Graphics Rendering',
+    description: 'Basic triangle rendering with GS (Graphics Synthesizer)',
+    language: 'c',
     code: `// Sample code for PS2 graphics rendering
 #include <tamtypes.h>
 #include <kernel.h>
@@ -281,19 +222,19 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-05-20T10:15:00Z",
-    updated_at: "2023-05-20T10:15:00Z",
-    user_id: "user-456",
+    created_at: '2023-05-20T10:15:00Z',
+    updated_at: '2023-05-20T10:15:00Z',
+    user_id: 'user-456',
     user: {
-      username: "homebrew_master",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'homebrew_master',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-3",
-    title: "Audio Playback",
-    description: "Playing audio files on PS2 using audsrv library",
-    language: "c",
+    id: 'snippet-3',
+    title: 'Audio Playback',
+    description: 'Playing audio files on PS2 using audsrv library',
+    language: 'c',
     code: `// Sample code for PS2 audio playback
 #include <tamtypes.h>
 #include <kernel.h>
@@ -361,19 +302,19 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-04-10T16:45:00Z",
-    updated_at: "2023-04-10T16:45:00Z",
-    user_id: "user-789",
+    created_at: '2023-04-10T16:45:00Z',
+    updated_at: '2023-04-10T16:45:00Z',
+    user_id: 'user-789',
     user: {
-      username: "audio_wizard",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'audio_wizard',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-4",
-    title: "Memory Card Access",
-    description: "Reading and writing to PS2 memory cards",
-    language: "c",
+    id: 'snippet-4',
+    title: 'Memory Card Access',
+    description: 'Reading and writing to PS2 memory cards',
+    language: 'c',
     code: `// Sample code for PS2 memory card access
 #include <tamtypes.h>
 #include <kernel.h>
@@ -463,19 +404,19 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-03-05T09:30:00Z",
-    updated_at: "2023-03-05T09:30:00Z",
-    user_id: "user-101",
+    created_at: '2023-03-05T09:30:00Z',
+    updated_at: '2023-03-05T09:30:00Z',
+    user_id: 'user-101',
     user: {
-      username: "graphics_guru",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'graphics_guru',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-5",
-    title: "Network Programming",
-    description: "Basic TCP/IP networking on PS2 using ps2ip",
-    language: "c",
+    id: 'snippet-5',
+    title: 'Network Programming',
+    description: 'Basic TCP/IP networking on PS2 using ps2ip',
+    language: 'c',
     code: `// Sample code for PS2 network programming
 #include <tamtypes.h>
 #include <kernel.h>
@@ -564,19 +505,19 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-02-18T13:20:00Z",
-    updated_at: "2023-02-18T13:20:00Z",
-    user_id: "user-202",
+    created_at: '2023-02-18T13:20:00Z',
+    updated_at: '2023-02-18T13:20:00Z',
+    user_id: 'user-202',
     user: {
-      username: "code_ninja",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'code_ninja',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-6",
-    title: "USB Access",
-    description: "Reading from USB devices on PS2",
-    language: "c",
+    id: 'snippet-6',
+    title: 'USB Access',
+    description: 'Reading from USB devices on PS2',
+    language: 'c',
     code: `// Sample code for PS2 USB access
 #include <tamtypes.h>
 #include <kernel.h>
@@ -689,19 +630,19 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-01-25T11:10:00Z",
-    updated_at: "2023-01-25T11:10:00Z",
-    user_id: "user-123",
+    created_at: '2023-01-25T11:10:00Z',
+    updated_at: '2023-01-25T11:10:00Z',
+    user_id: 'user-123',
     user: {
-      username: "ps2dev",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'ps2dev',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
   {
-    id: "snippet-7",
-    title: "3D Model Loading",
-    description: "Loading and rendering 3D models on PS2",
-    language: "c",
+    id: 'snippet-7',
+    title: '3D Model Loading',
+    description: 'Loading and rendering 3D models on PS2',
+    language: 'c',
     code: `// Sample code for loading and rendering 3D models on PS2
 #include <tamtypes.h>
 #include <kernel.h>
@@ -856,37 +797,58 @@ int main(void) {
     
     return 0;
 }`,
-    created_at: "2023-01-10T08:45:00Z",
-    updated_at: "2023-01-10T08:45:00Z",
-    user_id: "user-456",
+    created_at: '2023-01-10T08:45:00Z',
+    updated_at: '2023-01-10T08:45:00Z',
+    user_id: 'user-456',
     user: {
-      username: "homebrew_master",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      username: 'homebrew_master',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
   },
-]
+];
 
 // Mock top contributors data
 export const mockTopContributors = [
-  { id: "user-123", username: "ps2dev", avatar_url: "/placeholder.svg?height=100&width=100", snippets_count: 15 },
   {
-    id: "user-456",
-    username: "homebrew_master",
-    avatar_url: "/placeholder.svg?height=100&width=100",
+    id: 'user-123',
+    username: 'ps2dev',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    snippets_count: 15,
+  },
+  {
+    id: 'user-456',
+    username: 'homebrew_master',
+    avatar_url: '/placeholder.svg?height=100&width=100',
     snippets_count: 12,
   },
-  { id: "user-789", username: "audio_wizard", avatar_url: "/placeholder.svg?height=100&width=100", snippets_count: 8 },
-  { id: "user-101", username: "graphics_guru", avatar_url: "/placeholder.svg?height=100&width=100", snippets_count: 7 },
-  { id: "user-202", username: "code_ninja", avatar_url: "/placeholder.svg?height=100&width=100", snippets_count: 5 },
-]
+  {
+    id: 'user-789',
+    username: 'audio_wizard',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    snippets_count: 8,
+  },
+  {
+    id: 'user-101',
+    username: 'graphics_guru',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    snippets_count: 7,
+  },
+  {
+    id: 'user-202',
+    username: 'code_ninja',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    snippets_count: 5,
+  },
+];
 
 // Mock tutorials data
 export const mockTutorials = [
   {
-    id: "tutorial-1",
-    title: "Getting Started with PS2 Development",
-    slug: "getting-started-ps2-development",
-    excerpt: "Learn how to set up your development environment and create your first PS2 homebrew project.",
+    id: 'tutorial-1',
+    title: 'Getting Started with PS2 Development',
+    slug: 'getting-started-ps2-development',
+    excerpt:
+      'Learn how to set up your development environment and create your first PS2 homebrew project.',
     content: `
 # Getting Started with PS2 Development
 
@@ -1042,23 +1004,24 @@ Check out our other tutorials to learn more about these topics.
 
 Happy coding!
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-123",
-      username: "ps2dev",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-123',
+      username: 'ps2dev',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Beginner",
-    tags: ["setup", "hello-world", "toolchain"],
-    created_at: "2023-05-15T08:00:00Z",
-    updated_at: "2023-06-01T10:30:00Z",
+    category: 'Beginner',
+    tags: ['setup', 'hello-world', 'toolchain'],
+    created_at: '2023-05-15T08:00:00Z',
+    updated_at: '2023-06-01T10:30:00Z',
     read_time: 10, // minutes
   },
   {
-    id: "tutorial-2",
-    title: "PS2 Graphics Programming: Basics",
-    slug: "ps2-graphics-programming-basics",
-    excerpt: "Learn the fundamentals of PS2 graphics programming with the Graphics Synthesizer (GS).",
+    id: 'tutorial-2',
+    title: 'PS2 Graphics Programming: Basics',
+    slug: 'ps2-graphics-programming-basics',
+    excerpt:
+      'Learn the fundamentals of PS2 graphics programming with the Graphics Synthesizer (GS).',
     content: `
 # PS2 Graphics Programming: Basics
 
@@ -1349,115 +1312,118 @@ Remember that PS2 graphics programming can be quite low-level compared to modern
 
 Happy coding!
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-101",
-      username: "graphics_guru",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-101',
+      username: 'graphics_guru',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Graphics",
-    tags: ["graphics", "gs", "triangles", "rendering"],
-    created_at: "2023-04-20T14:45:00Z",
-    updated_at: "2023-05-05T09:15:00Z",
+    category: 'Graphics',
+    tags: ['graphics', 'gs', 'triangles', 'rendering'],
+    created_at: '2023-04-20T14:45:00Z',
+    updated_at: '2023-05-05T09:15:00Z',
     read_time: 15, // minutes
   },
   {
-    id: "tutorial-3",
-    title: "PS2 Audio Programming with IOP",
-    slug: "ps2-audio-programming-iop",
-    excerpt: "Learn how to create and play audio on the PS2 using the IO Processor (IOP) and SPU2.",
+    id: 'tutorial-3',
+    title: 'PS2 Audio Programming with IOP',
+    slug: 'ps2-audio-programming-iop',
+    excerpt:
+      'Learn how to create and play audio on the PS2 using the IO Processor (IOP) and SPU2.',
     content: `
 # PS2 Audio Programming with IOP
 
 This is a detailed tutorial on PS2 audio programming...
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-789",
-      username: "audio_wizard",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-789',
+      username: 'audio_wizard',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Audio",
-    tags: ["audio", "iop", "spu2", "sound"],
-    created_at: "2023-03-10T11:30:00Z",
-    updated_at: "2023-03-25T16:20:00Z",
+    category: 'Audio',
+    tags: ['audio', 'iop', 'spu2', 'sound'],
+    created_at: '2023-03-10T11:30:00Z',
+    updated_at: '2023-03-25T16:20:00Z',
     read_time: 12, // minutes
   },
   {
-    id: "tutorial-4",
-    title: "Memory Card Access and File I/O on PS2",
-    slug: "memory-card-access-file-io-ps2",
-    excerpt: "Complete guide to reading and writing data to PS2 memory cards.",
+    id: 'tutorial-4',
+    title: 'Memory Card Access and File I/O on PS2',
+    slug: 'memory-card-access-file-io-ps2',
+    excerpt: 'Complete guide to reading and writing data to PS2 memory cards.',
     content: `
 # Memory Card Access and File I/O on PS2
 
 This is a detailed tutorial on PS2 memory card programming...
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-123",
-      username: "ps2dev",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-123',
+      username: 'ps2dev',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "File I/O",
-    tags: ["memory-card", "file-io", "save-data"],
-    created_at: "2023-02-15T09:00:00Z",
-    updated_at: "2023-02-28T13:40:00Z",
+    category: 'File I/O',
+    tags: ['memory-card', 'file-io', 'save-data'],
+    created_at: '2023-02-15T09:00:00Z',
+    updated_at: '2023-02-28T13:40:00Z',
     read_time: 8, // minutes
   },
   {
-    id: "tutorial-5",
-    title: "Network Programming on PS2",
-    slug: "network-programming-ps2",
-    excerpt: "Learn how to add networking capabilities to your PS2 homebrew applications.",
+    id: 'tutorial-5',
+    title: 'Network Programming on PS2',
+    slug: 'network-programming-ps2',
+    excerpt:
+      'Learn how to add networking capabilities to your PS2 homebrew applications.',
     content: `
 # Network Programming on PS2
 
 This is a detailed tutorial on PS2 network programming...
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-202",
-      username: "code_ninja",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-202',
+      username: 'code_ninja',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Networking",
-    tags: ["network", "tcp-ip", "online"],
-    created_at: "2023-01-05T16:15:00Z",
-    updated_at: "2023-01-20T10:30:00Z",
+    category: 'Networking',
+    tags: ['network', 'tcp-ip', 'online'],
+    created_at: '2023-01-05T16:15:00Z',
+    updated_at: '2023-01-20T10:30:00Z',
     read_time: 14, // minutes
   },
   {
-    id: "tutorial-6",
-    title: "USB Access on PS2",
-    slug: "usb-access-ps2",
-    excerpt: "Guide to interfacing with USB devices on the PlayStation 2.",
+    id: 'tutorial-6',
+    title: 'USB Access on PS2',
+    slug: 'usb-access-ps2',
+    excerpt: 'Guide to interfacing with USB devices on the PlayStation 2.',
     content: `
 # USB Access on PS2
 
 This is a detailed tutorial on PS2 USB programming...
     `,
-    coverImage: "/placeholder.svg?height=600&width=1200",
+    coverImage: '/placeholder.svg?height=600&width=1200',
     author: {
-      id: "user-456",
-      username: "homebrew_master",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-456',
+      username: 'homebrew_master',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Hardware",
-    tags: ["usb", "hardware", "devices"],
-    created_at: "2022-12-10T08:45:00Z",
-    updated_at: "2022-12-28T14:20:00Z",
+    category: 'Hardware',
+    tags: ['usb', 'hardware', 'devices'],
+    created_at: '2022-12-10T08:45:00Z',
+    updated_at: '2022-12-28T14:20:00Z',
     read_time: 10, // minutes
   },
-]
+];
 
 // Mock games data
 export const mockGames = [
   {
-    id: "game-1",
-    title: "PS2D: 2D Platformer Engine",
-    slug: "ps2d-2d-platformer-engine",
-    description: "A complete 2D platform game engine for PS2, featuring sprite animation, physics, and level editor.",
+    id: 'game-1',
+    title: 'PS2D: 2D Platformer Engine',
+    slug: 'ps2d-2d-platformer-engine',
+    description:
+      'A complete 2D platform game engine for PS2, featuring sprite animation, physics, and level editor.',
     content: `
 # PS2D: 2D Platformer Engine
 
@@ -1535,31 +1501,31 @@ For support, feature requests, or bug reports, please contact us at:
 ps2d-engine@example.com
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-456",
-      username: "homebrew_master",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-456',
+      username: 'homebrew_master',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Engines",
-    tags: ["2d", "platformer", "engine", "game-engine"],
-    created_at: "2023-05-10T09:30:00Z",
-    updated_at: "2023-06-15T14:45:00Z",
-    download_url: "#",
+    category: 'Engines',
+    tags: ['2d', 'platformer', 'engine', 'game-engine'],
+    created_at: '2023-05-10T09:30:00Z',
+    updated_at: '2023-06-15T14:45:00Z',
+    download_url: '#',
     download_count: 1250,
     size_mb: 4.2,
-    version: "1.2.0",
+    version: '1.2.0',
   },
   {
-    id: "game-2",
-    title: "PS2 Tetris Deluxe",
-    slug: "ps2-tetris-deluxe",
+    id: 'game-2',
+    title: 'PS2 Tetris Deluxe',
+    slug: 'ps2-tetris-deluxe',
     description:
-      "An enhanced version of the classic Tetris game for PlayStation 2 with new game modes and multiplayer options.",
+      'An enhanced version of the classic Tetris game for PlayStation 2 with new game modes and multiplayer options.',
     content: `
 # PS2 Tetris Deluxe
 
@@ -1631,29 +1597,29 @@ Special thanks to the PS2 homebrew community
 This game is open source and released under the MIT License.
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-123",
-      username: "ps2dev",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-123',
+      username: 'ps2dev',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Puzzle",
-    tags: ["tetris", "puzzle", "arcade", "multiplayer"],
-    created_at: "2023-04-05T15:20:00Z",
-    updated_at: "2023-04-20T11:10:00Z",
-    download_url: "#",
+    category: 'Puzzle',
+    tags: ['tetris', 'puzzle', 'arcade', 'multiplayer'],
+    created_at: '2023-04-05T15:20:00Z',
+    updated_at: '2023-04-20T11:10:00Z',
+    download_url: '#',
     download_count: 3750,
     size_mb: 2.8,
-    version: "2.1.0",
+    version: '2.1.0',
   },
   {
-    id: "game-3",
-    title: "PS2 Racing Evolution",
-    slug: "ps2-racing-evolution",
+    id: 'game-3',
+    title: 'PS2 Racing Evolution',
+    slug: 'ps2-racing-evolution',
     description:
       "A high-speed 3D racing game showcasing the PS2's graphics capabilities with multiple tracks and vehicles.",
     content: `
@@ -1726,30 +1692,31 @@ This game demonstrates several advanced PS2 programming techniques:
 This is open-source software released under the GPLv3 license.
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-101",
-      username: "graphics_guru",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-101',
+      username: 'graphics_guru',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Racing",
-    tags: ["racing", "3d", "vehicles", "multiplayer"],
-    created_at: "2023-03-15T10:45:00Z",
-    updated_at: "2023-03-30T16:20:00Z",
-    download_url: "#",
+    category: 'Racing',
+    tags: ['racing', '3d', 'vehicles', 'multiplayer'],
+    created_at: '2023-03-15T10:45:00Z',
+    updated_at: '2023-03-30T16:20:00Z',
+    download_url: '#',
     download_count: 2100,
     size_mb: 8.5,
-    version: "1.5.0",
+    version: '1.5.0',
   },
   {
-    id: "game-4",
-    title: "PS2 RPG Framework",
-    slug: "ps2-rpg-framework",
-    description: "A complete RPG game engine for PS2 with battle system, inventory management, and quest tracking.",
+    id: 'game-4',
+    title: 'PS2 RPG Framework',
+    slug: 'ps2-rpg-framework',
+    description:
+      'A complete RPG game engine for PS2 with battle system, inventory management, and quest tracking.',
     content: `
 # PS2 RPG Framework
 
@@ -1826,30 +1793,31 @@ For support, feature requests, or contributions, please contact:
 ps2rpgframework@example.com
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-202",
-      username: "code_ninja",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-202',
+      username: 'code_ninja',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "RPG",
-    tags: ["rpg", "framework", "engine", "turn-based"],
-    created_at: "2023-02-20T13:15:00Z",
-    updated_at: "2023-03-10T09:40:00Z",
-    download_url: "#",
+    category: 'RPG',
+    tags: ['rpg', 'framework', 'engine', 'turn-based'],
+    created_at: '2023-02-20T13:15:00Z',
+    updated_at: '2023-03-10T09:40:00Z',
+    download_url: '#',
     download_count: 1850,
     size_mb: 6.2,
-    version: "1.3.2",
+    version: '1.3.2',
   },
   {
-    id: "game-5",
-    title: "Audio Synthesizer for PS2",
-    slug: "audio-synthesizer-ps2",
-    description: "A powerful audio tool that turns your PS2 into a music synthesizer with various sound capabilities.",
+    id: 'game-5',
+    title: 'Audio Synthesizer for PS2',
+    slug: 'audio-synthesizer-ps2',
+    description:
+      'A powerful audio tool that turns your PS2 into a music synthesizer with various sound capabilities.',
     content: `
 # Audio Synthesizer for PS2
 
@@ -1942,30 +1910,31 @@ For questions, feature requests, or to share your creations:
 audiosynth.ps2@example.com
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-789",
-      username: "audio_wizard",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-789',
+      username: 'audio_wizard',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Audio",
-    tags: ["audio", "synthesizer", "music", "tool"],
-    created_at: "2023-01-25T11:30:00Z",
-    updated_at: "2023-02-15T14:15:00Z",
-    download_url: "#",
+    category: 'Audio',
+    tags: ['audio', 'synthesizer', 'music', 'tool'],
+    created_at: '2023-01-25T11:30:00Z',
+    updated_at: '2023-02-15T14:15:00Z',
+    download_url: '#',
     download_count: 1400,
     size_mb: 3.7,
-    version: "2.0.1",
+    version: '2.0.1',
   },
   {
-    id: "game-6",
-    title: "PS2 Chess Master",
-    slug: "ps2-chess-master",
-    description: "A feature-rich chess game for PS2 with multiple difficulty levels and play modes.",
+    id: 'game-6',
+    title: 'PS2 Chess Master',
+    slug: 'ps2-chess-master',
+    description:
+      'A feature-rich chess game for PS2 with multiple difficulty levels and play modes.',
     content: `
 # PS2 Chess Master
 
@@ -2041,84 +2010,87 @@ The chess AI engine uses several advanced algorithms:
 This game is released under the MIT License.
     `,
     screenshots: [
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
-      "/placeholder.svg?height=720&width=1280",
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
+      '/placeholder.svg?height=720&width=1280',
     ],
-    coverImage: "/placeholder.svg?height=720&width=1280",
+    coverImage: '/placeholder.svg?height=720&width=1280',
     author: {
-      id: "user-202",
-      username: "code_ninja",
-      avatar_url: "/placeholder.svg?height=100&width=100",
+      id: 'user-202',
+      username: 'code_ninja',
+      avatar_url: '/placeholder.svg?height=100&width=100',
     },
-    category: "Board Games",
-    tags: ["chess", "board-game", "strategy", "2-player"],
-    created_at: "2022-12-18T10:15:00Z",
-    updated_at: "2023-01-10T16:40:00Z",
-    download_url: "#",
+    category: 'Board Games',
+    tags: ['chess', 'board-game', 'strategy', '2-player'],
+    created_at: '2022-12-18T10:15:00Z',
+    updated_at: '2023-01-10T16:40:00Z',
+    download_url: '#',
     download_count: 1650,
     size_mb: 1.8,
-    version: "1.4.0",
+    version: '1.4.0',
   },
-]
+];
 
 // Mock donation methods
 export const mockDonationMethods = [
   {
-    id: "donation-paypal",
-    name: "PayPal",
-    description: "Quick and secure donations via PayPal",
-    icon: "credit-card",
-    url: "#paypal",
+    id: 'donation-paypal',
+    name: 'PayPal',
+    description: 'Quick and secure donations via PayPal',
+    icon: 'credit-card',
+    url: '#paypal',
   },
   {
-    id: "donation-crypto",
-    name: "Cryptocurrency",
-    description: "Donate using Bitcoin, Ethereum, or other cryptocurrencies",
-    icon: "bitcoin",
-    url: "#crypto",
+    id: 'donation-crypto',
+    name: 'Cryptocurrency',
+    description: 'Donate using Bitcoin, Ethereum, or other cryptocurrencies',
+    icon: 'bitcoin',
+    url: '#crypto',
   },
   {
-    id: "donation-patreon",
-    name: "Patreon",
-    description: "Become a monthly supporter and get exclusive benefits",
-    icon: "heart",
-    url: "#patreon",
+    id: 'donation-patreon',
+    name: 'Patreon',
+    description: 'Become a monthly supporter and get exclusive benefits',
+    icon: 'heart',
+    url: '#patreon',
   },
   {
-    id: "donation-github",
-    name: "GitHub Sponsors",
-    description: "Support developers directly through GitHub Sponsors",
-    icon: "github",
-    url: "#github",
+    id: 'donation-github',
+    name: 'GitHub Sponsors',
+    description: 'Support developers directly through GitHub Sponsors',
+    icon: 'github',
+    url: '#github',
   },
-]
+];
 
 // Mock featured developers for donations
 export const mockFeaturedDevelopers = [
   {
-    id: "user-123",
-    username: "ps2dev",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "PS2 homebrew developer and enthusiast. Working on graphics and input libraries.",
-    projects: ["PS2 Tetris Deluxe", "MemCard PRO", "USB Loader"],
-    donation_url: "#ps2dev",
+    id: 'user-123',
+    username: 'ps2dev',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    bio: 'PS2 homebrew developer and enthusiast. Working on graphics and input libraries.',
+    projects: ['PS2 Tetris Deluxe', 'MemCard PRO', 'USB Loader'],
+    donation_url: '#ps2dev',
   },
   {
-    id: "user-456",
-    username: "homebrew_master",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "Creating PS2 homebrew games since 2005. Specializing in 3D engines and optimization.",
-    projects: ["PS2D: 2D Platformer Engine", "PS2 Model Viewer", "Texture Studio"],
-    donation_url: "#homebrew_master",
+    id: 'user-456',
+    username: 'homebrew_master',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    bio: 'Creating PS2 homebrew games since 2005. Specializing in 3D engines and optimization.',
+    projects: [
+      'PS2D: 2D Platformer Engine',
+      'PS2 Model Viewer',
+      'Texture Studio',
+    ],
+    donation_url: '#homebrew_master',
   },
   {
-    id: "user-789",
-    username: "audio_wizard",
-    avatar_url: "/placeholder.svg?height=100&width=100",
-    bio: "Audio programmer focusing on PS2 sound libraries and music players.",
-    projects: ["Audio Synthesizer for PS2", "MIDI Player", "Sound Library"],
-    donation_url: "#audio_wizard",
+    id: 'user-789',
+    username: 'audio_wizard',
+    avatar_url: '/placeholder.svg?height=100&width=100',
+    bio: 'Audio programmer focusing on PS2 sound libraries and music players.',
+    projects: ['Audio Synthesizer for PS2', 'MIDI Player', 'Sound Library'],
+    donation_url: '#audio_wizard',
   },
-]
-
+];
