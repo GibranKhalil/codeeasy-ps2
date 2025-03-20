@@ -9,13 +9,15 @@ import { mockSnippets } from "@/lib/mock-data"
 import type { Snippet } from "@/lib/types"
 import SnippetCard from "@/components/snippetCard"
 import { Code, Search, Filter } from "lucide-react"
+import { enginesMap, eSnippetEngine } from "@/data/@types/enums/eSnippetEngine.enum"
+import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLanguage.enum"
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [languageFilter, setLanguageFilter] = useState("")
-  const [languages, setLanguages] = useState<string[]>([])
+  const [engineFilter, setEngineFilter] = useState("")
 
   useEffect(() => {
     let filteredSnippets = [...mockSnippets]
@@ -32,9 +34,6 @@ export default function SnippetsPage() {
     }
 
     setSnippets(filteredSnippets)
-
-    const uniqueLanguages = [...new Set(mockSnippets.map((s) => s.language))]
-    setLanguages(uniqueLanguages)
 
     setLoading(false)
 
@@ -76,10 +75,30 @@ export default function SnippetsPage() {
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {languages.map((lang) => (
-                <SelectItem key={lang} value={lang}>
-                  {lang}
+              {Object.values(eSnippetLanguage).map((lang, index) => (
+                <SelectItem key={index} value={lang}>
+                  {languageMap.get(lang)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="w-full sm:w-48">
+          <Select value={languageFilter} onValueChange={setLanguageFilter}>
+            <SelectTrigger>
+              <SelectValue
+                placeholder={
+                  <div className="flex items-center">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Engines
+                  </div>
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(eSnippetEngine).map((eng, index) => (
+                <SelectItem key={index} value={eng}>
+                  {enginesMap.get(eng)}
                 </SelectItem>
               ))}
             </SelectContent>

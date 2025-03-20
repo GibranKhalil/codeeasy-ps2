@@ -2,35 +2,36 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useTheme } from "next-themes"
-import { Moon, Sun, Menu, Github, LogOut, User } from "lucide-react"
-import { useUser } from "@/lib/use-user"
+import { usePathname, useRouter } from "next/navigation"
+import { Menu, Github, LogOut, User } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/sheet"
 import { Button } from "@/components/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function Navbar() {
   const pathname = usePathname()
-  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const { user, loading } = useUser()
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const { user, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const handleLogout = async () => {
-    window.location.href = "/"
+    router.push("/register")
+    logout()
   }
 
   const navItems = [
     { href: "/", label: "Início" },
+    { href: "/games", label: "Jogos" },
+    { href: "/tutorials", label: "Tutoriais" },
     { href: "/snippets", label: "Snippets" },
     { href: "/ranking", label: "Ranking" },
-    { href: "/tutorials", label: "Tutoriais" },
-    { href: "/games", label: "Jogos" },
     { href: "/donations", label: "Doações" },
   ]
 
@@ -89,21 +90,21 @@ export default function Navbar() {
             <span className="sr-only">Toggle theme</span>
           </Button> */}
 
-          {!loading && (
+          {!isLoading && (
             <>
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.user_metadata?.avatar_url || ""} />
+                        <AvatarImage src={user.avatarUrl || ""} />
                         <AvatarFallback>{user.email?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href="/profile">
+                      <Link href={`/profile/${user.pid}`}>
                         <User className="mr-2 h-4 w-4" />
                         Perfil
                       </Link>
@@ -115,12 +116,18 @@ export default function Navbar() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button variant="default" size="sm" asChild>
-                  <Link href="/login">
-                    <Github className="mr-2 h-4 w-4" />
-                    Entrar
-                  </Link>
-                </Button>
+                <div className="flex gap-2 items-center">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link href="/login">
+                      Entrar
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link href="/register">
+                      Crie uma conta
+                    </Link>
+                  </Button>
+                </div>
               )}
             </>
           )}

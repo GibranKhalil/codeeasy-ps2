@@ -7,4 +7,5 @@ export class CreateSnippetDto {
   code!: string;
   language!: eSnippetLanguage;
   creator!: User;
+  engine?: string;
 }

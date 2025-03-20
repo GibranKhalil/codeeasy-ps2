@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useReducer, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
@@ -12,23 +12,42 @@ import { Textarea } from "@/components/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
 import { useUser } from "@/lib/use-user"
 import { ArrowLeft, Save } from "lucide-react"
+import { CreateSnippetDto } from "@/data/@types/models/snippet/dto/create-snippet.dto"
+import { User } from "@/data/@types/models/users/entities/user.entity"
+import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLanguage.enum"
+import { snippetService } from "@/data/services/snippets/snippets.service"
+import Validator from "@/data/utils/validator.utils"
+import { enginesMap, eSnippetEngine } from "@/data/@types/enums/eSnippetEngine.enum"
 
-const LANGUAGES = [
-  { value: "c", label: "C" },
-  { value: "cpp", label: "C++" },
-  { value: "assembly", label: "Assembly" },
-  { value: "javascript", label: "JavaScript" },
-  { value: "python", label: "Python" },
-]
+const newSnippetInitialData: CreateSnippetDto = {
+  code: '',
+  creator: new User(),
+  description: '',
+  language: eSnippetLanguage.Js,
+  title: '',
+  engine: ''
+}
+
+type SnippetAction =
+  | { type: "SET_FIELD"; field: keyof CreateSnippetDto; value: string }
+  | { type: "RESET" };
+
+const snippetReducer = (state: CreateSnippetDto, action: SnippetAction): CreateSnippetDto => {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "RESET":
+      return newSnippetInitialData;
+    default:
+      return state;
+  }
+};
 
 export default function CreateSnippetPage() {
   const router = useRouter()
 
   const { user, loading } = useUser()
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [language, setLanguage] = useState("")
-  const [code, setCode] = useState("")
+  const [snippet, setSnippet] = useReducer(snippetReducer, newSnippetInitialData)
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -48,10 +67,10 @@ export default function CreateSnippetPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!title.trim()) newErrors.title = "Title is required"
-    if (!description.trim()) newErrors.description = "Description is required"
-    if (!language) newErrors.language = "Language is required"
-    if (!code.trim()) newErrors.code = "Code is required"
+    if (!snippet.title.trim()) newErrors.title = "Título é obrigatório"
+    if (!snippet.description.trim()) newErrors.description = "Descrição é obrigatório"
+    if (!snippet.language) newErrors.language = "Linguagem é obrigatório"
+    if (!snippet.code.trim()) newErrors.code = "Código é obrigatório"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -65,16 +84,17 @@ export default function CreateSnippetPage() {
     try {
       setIsSaving(true)
 
-      // Simulate saving
-      console.log("Creating snippet:", { title, description, language, code })
+      const response = await snippetService.create(snippet, { requiresAuth: true })
 
-      // Simulate delay
-      setTimeout(() => {
-        setIsSaving(false)
-        router.push("/snippets")
-      }, 1500)
+      if (Validator.required(response)) {
+        router.push('/snippets')
+      }
+
     } catch (error) {
       console.error("Error creating snippet:", error)
+      setIsSaving(false)
+    }
+    finally {
       setIsSaving(false)
     }
   }
@@ -84,7 +104,7 @@ export default function CreateSnippetPage() {
       <div className="flex items-center mb-6">
         <Button variant="ghost" onClick={() => router.back()} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Back
+          Voltar
         </Button>
       </div>
 
@@ -95,50 +115,68 @@ export default function CreateSnippetPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Título</Label>
+              <Label htmlFor="title">Título <span className="text-destructive">*</span></Label>
               <Input
                 id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={snippet.title}
+                onChange={(e) => setSnippet({ field: 'title', type: "SET_FIELD", value: e.target.value })}
                 className={errors.title ? "border-destructive" : ""}
               />
               {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Descrição</Label>
+              <Label htmlFor="description">Descrição <span className="text-destructive">*</span></Label>
               <Textarea
                 id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={snippet.description}
+                onChange={(e) => setSnippet({ field: 'description', type: 'SET_FIELD', value: e.target.value })}
                 className={errors.description ? "border-destructive" : ""}
               />
               {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="language">Linguagem</Label>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger id="language" className={errors.language ? "border-destructive" : ""}>
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {LANGUAGES.map((lang) => (
-                    <SelectItem key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.language && <p className="text-sm text-destructive">{errors.language}</p>}
+              <div className="space-y-2">
+                <Label htmlFor="language">Linguagem <span className="text-destructive">*</span></Label>
+                <Select value={snippet.language} onValueChange={(e) => setSnippet({ field: 'language', type: 'SET_FIELD', value: e })}>
+                  <SelectTrigger id="language" className={errors.language ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Selecione a linguagem utilizada" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(eSnippetLanguage).map((lang, index) => (
+                      <SelectItem key={index} value={lang}>
+                        {languageMap.get(lang)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.language && <p className="text-sm text-destructive">{errors.language}</p>}
+              </div>
+
+              <div className="space-y-2 mt-4">
+                <Label htmlFor="engine">Engine <span className="text-destructive">*</span></Label>
+                <Select value={snippet.engine} onValueChange={(e) => setSnippet({ field: 'engine', type: 'SET_FIELD', value: e })}>
+                  <SelectTrigger id="engine">
+                    <SelectValue placeholder="Seleciona a engine utilizada" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(eSnippetEngine).map((eng, index) => (
+                      <SelectItem key={index} value={eng}>
+                        {enginesMap.get(eng)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="code">Código</Label>
+              <Label htmlFor="code">Código <span className="text-destructive">*</span></Label>
               <Textarea
                 id="code"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
+                value={snippet.code}
+                onChange={(e) => setSnippet({ field: 'code', type: 'SET_FIELD', value: e.target.value })}
                 className={`font-mono min-h-[300px] ${errors.code ? "border-destructive" : ""}`}
               />
               {errors.code && <p className="text-sm text-destructive">{errors.code}</p>}

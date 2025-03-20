@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Metadata } from "next"
 import { Inter } from "next/font/google"
 import '../globals.css'
+import { AuthProvider } from "@/shared/authContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,7 +21,9 @@ export default function AuthLayout({
         <html lang="pt-BR" suppressHydrationWarning>
             <body className={`${inter.className} min-h-screen bg-background`}>
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-                    {children}
+                    <AuthProvider>
+                        {children}
+                    </AuthProvider>
                 </ThemeProvider>
             </body>
         </html>

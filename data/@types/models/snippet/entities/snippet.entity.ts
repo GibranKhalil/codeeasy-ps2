@@ -9,6 +9,7 @@ export class Snippet {
   description!: string;
   code!: string;
   language!: eSnippetLanguage;
+  engine!: string;
   views!: Interactions['views'];
   likes!: Interactions['likes'];
   forks!: Interactions['forks'];

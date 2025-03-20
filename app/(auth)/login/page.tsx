@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Github, Mail, ArrowRight, Loader2 } from "lucide-react"
 import { userService } from "@/data/services/users/users.service"
 import Validator from "@/data/utils/validator.utils"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,6 +29,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const { login, user } = useAuth()
+
+  useEffect(() => {
+    if (Validator.required(user)) {
+      router.push('/')
+    }
+    console.log(user)
+  }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -59,6 +69,7 @@ export default function LoginPage() {
       const token = await userService.login(email, password)
 
       if (Validator.required(token)) {
+        login(token)
 
         toast({
           title: "Logado com sucesso!",

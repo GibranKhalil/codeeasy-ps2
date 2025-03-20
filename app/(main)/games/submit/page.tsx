@@ -15,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { Badge } from "@/components/badge"
 import { Separator } from "@/components/separator"
-import { Progress } from "@/components/progress"
 import { useToast } from "@/hooks/use-toast"
 import { useUser } from "@/lib/use-user"
 import {
@@ -91,6 +90,8 @@ export default function SubmitGamePage() {
   const coverImageInputRef = useRef<HTMLInputElement>(null)
   const screenshotInputRef = useRef<HTMLInputElement>(null)
   const gameFileInputRef = useRef<HTMLInputElement>(null)
+
+  const [gameLink, setGameLink] = useState<string>()
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -267,9 +268,9 @@ export default function SubmitGamePage() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={() => router.back()} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
-              Back
+              Voltar
             </Button>
-            <h1 className="text-3xl font-bold">Submit Game</h1>
+            <h1 className="text-3xl font-bold">Enviar Jogo</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -281,12 +282,12 @@ export default function SubmitGamePage() {
               {previewMode ? (
                 <>
                   <FileText className="mr-2 h-4 w-4" />
-                  Edit
+                  Editar
                 </>
               ) : (
                 <>
                   <Eye className="mr-2 h-4 w-4" />
-                  Preview
+                  Pré-Visualizar
                 </>
               )}
             </Button>
@@ -297,15 +298,15 @@ export default function SubmitGamePage() {
           {previewMode ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Preview</CardTitle>
-                <CardDescription>This is how your game submission will appear to users</CardDescription>
+                <CardTitle className="text-2xl">Pré-Visualização</CardTitle>
+                <CardDescription>É assim que o envio do jogo aparecerá para os usuários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {coverImage && (
                   <div className="relative h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden">
                     <Image
                       src={coverImage || "/placeholder.svg"}
-                      alt={title || "Game cover"}
+                      alt={title || "Capa do jogo"}
                       fill
                       className="object-cover"
                     />
@@ -317,8 +318,8 @@ export default function SubmitGamePage() {
                     {category && <Badge className="bg-primary">{category}</Badge>}
                     {version && <Badge variant="outline">v{version}</Badge>}
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Game Title"}</h1>
-                  <p className="text-xl text-muted-foreground">{description || "Game description will appear here."}</p>
+                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Título do jogo"}</h1>
+                  <p className="text-xl text-muted-foreground">{description || "A descrição do jogo aparecerá aqui."}</p>
                 </div>
 
                 {screenshots.length > 0 && (
@@ -340,29 +341,29 @@ export default function SubmitGamePage() {
                 )}
 
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">About This Game</h2>
+                  <h2 className="text-xl font-semibold">Sobre esse jogo</h2>
                   <div className="prose dark:prose-invert max-w-none">
-                    <ReactMarkdown>{content || "Game content will appear here."}</ReactMarkdown>
+                    <ReactMarkdown>{content || "O conteúdo do jogo aparecerá aqui."}</ReactMarkdown>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">Game Information</h2>
+                  <h2 className="text-xl font-semibold">Informações do jogo</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground">Version</p>
+                      <p className="text-sm text-muted-foreground">Versão</p>
                       <p className="font-medium">{version || "1.0.0"}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground">Size</p>
+                      <p className="text-sm text-muted-foreground">Tamanho</p>
                       <p className="font-medium">{sizeMb ? `${sizeMb} MB` : "Unknown"}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground">Category</p>
+                      <p className="text-sm text-muted-foreground">Categoria</p>
                       <p className="font-medium">{category || "Uncategorized"}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-sm text-muted-foreground">Developer</p>
+                      <p className="text-sm text-muted-foreground">Desenvolvedor</p>
                       <p className="font-medium">{user?.user_metadata?.user_name || "Anonymous"}</p>
                     </div>
                   </div>
@@ -395,38 +396,38 @@ export default function SubmitGamePage() {
                 <TabsList className="mb-6 w-full justify-start">
                   <TabsTrigger value="details" className="flex items-center gap-1.5">
                     <Info className="h-4 w-4" />
-                    Basic Details
+                    Detalhes básicos
                   </TabsTrigger>
                   <TabsTrigger value="media" className="flex items-center gap-1.5">
                     <ImageIcon className="h-4 w-4" />
-                    Media
+                    Mídia
                   </TabsTrigger>
                   <TabsTrigger value="content" className="flex items-center gap-1.5">
                     <FileText className="h-4 w-4" />
-                    Content
+                    Conteúdo
                   </TabsTrigger>
                   <TabsTrigger value="file" className="flex items-center gap-1.5">
                     <Gamepad2 className="h-4 w-4" />
-                    Game File
+                    Arquivo do jogo
                   </TabsTrigger>
                 </TabsList>
 
                 <Card>
                   <TabsContent value="details" className="m-0">
                     <CardHeader>
-                      <CardTitle>Basic Details</CardTitle>
-                      <CardDescription>Provide basic information about your game</CardDescription>
+                      <CardTitle>Detalhes básicos</CardTitle>
+                      <CardDescription>Forneça informações básicas sobre o seu jogo</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="title">
-                          Game Title <span className="text-destructive">*</span>
+                          Título do jogo <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           id="title"
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
-                          placeholder="Enter the title of your game"
+                          placeholder="Digite o título do seu jogo"
                           className={errors.title ? "border-destructive" : ""}
                         />
                         {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
@@ -434,13 +435,13 @@ export default function SubmitGamePage() {
 
                       <div className="space-y-2">
                         <Label htmlFor="description">
-                          Short Description <span className="text-destructive">*</span>
+                          Breve descrição <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="description"
                           value={description}
                           onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Provide a brief description of your game (max 200 characters)"
+                          placeholder="Forneça uma breve descrição do seu jogo (máximo de 200 caracteres)"
                           className={errors.description ? "border-destructive" : ""}
                           maxLength={200}
                         />
@@ -448,7 +449,7 @@ export default function SubmitGamePage() {
                           <p className="text-sm text-destructive">{errors.description}</p>
                         ) : (
                           <p className="text-xs text-muted-foreground text-right">
-                            {description.length}/200 characters
+                            {description.length}/200 Caracteres
                           </p>
                         )}
                       </div>
@@ -456,11 +457,11 @@ export default function SubmitGamePage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="category">
-                            Category <span className="text-destructive">*</span>
+                            Categoria <span className="text-destructive">*</span>
                           </Label>
                           <Select value={category} onValueChange={setCategory}>
                             <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
-                              <SelectValue placeholder="Select a category" />
+                              <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
                               {GAME_CATEGORIES.map((cat) => (
@@ -485,14 +486,14 @@ export default function SubmitGamePage() {
                               className="pl-10"
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">Separate tags with commas</p>
+                          <p className="text-xs text-muted-foreground">Separe as tags com vírgulas</p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="version">
-                            Version <span className="text-destructive">*</span>
+                            Versão <span className="text-destructive">*</span>
                           </Label>
                           <Input
                             id="version"
@@ -506,7 +507,7 @@ export default function SubmitGamePage() {
 
                         <div className="space-y-2">
                           <Label htmlFor="sizeMb">
-                            File Size (MB) <span className="text-destructive">*</span>
+                            Tamanho do arquivo (MB) <span className="text-destructive">*</span>
                           </Label>
                           <Input
                             id="sizeMb"
@@ -524,23 +525,23 @@ export default function SubmitGamePage() {
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" onClick={() => router.back()} type="button">
-                        Cancel
+                        Cancelar
                       </Button>
                       <Button type="button" onClick={() => setActiveTab("media")}>
-                        Next: Media
+                        Próximo: Mídia
                       </Button>
                     </CardFooter>
                   </TabsContent>
 
                   <TabsContent value="media" className="m-0">
                     <CardHeader>
-                      <CardTitle>Media</CardTitle>
-                      <CardDescription>Upload cover image and screenshots for your game</CardDescription>
+                      <CardTitle>Mídia</CardTitle>
+                      <CardDescription>Carregue a imagem da capa e as capturas de tela do seu jogo</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label>
-                          Cover Image <span className="text-destructive">*</span>
+                          Imagem da capa <span className="text-destructive">*</span>
                         </Label>
                         <div
                           className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors ${errors.coverImage ? "border-destructive" : "border-border"
@@ -571,8 +572,8 @@ export default function SubmitGamePage() {
                           ) : (
                             <>
                               <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                              <p className="text-sm text-muted-foreground mb-1">Click to upload cover image</p>
-                              <p className="text-xs text-muted-foreground">PNG, JPG or GIF (Recommended: 1280x720px)</p>
+                              <p className="text-sm text-muted-foreground mb-1">Clique para fazer upload da imagem da capa</p>
+                              <p className="text-xs text-muted-foreground">PNG, JPG (Recomendado: 1280x720px)</p>
                             </>
                           )}
                           <input
@@ -618,7 +619,7 @@ export default function SubmitGamePage() {
                             onClick={() => screenshotInputRef.current?.click()}
                           >
                             <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-                            <p className="text-sm text-muted-foreground">Add Screenshot</p>
+                            <p className="text-sm text-muted-foreground">Adicionar Screenshot</p>
                             <input
                               ref={screenshotInputRef}
                               type="file"
@@ -630,29 +631,29 @@ export default function SubmitGamePage() {
                         </div>
                         {errors.screenshots && <p className="text-sm text-destructive">{errors.screenshots}</p>}
                         <p className="text-xs text-muted-foreground">
-                          Upload at least one screenshot of your game (Recommended: 1280x720px)
+                          Carregue pelo menos uma captura de tela do seu jogo (Recomendado: 1280x720px)
                         </p>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" type="button" onClick={() => setActiveTab("details")}>
-                        Previous: Details
+                        Anterior: Detalhes
                       </Button>
                       <Button type="button" onClick={() => setActiveTab("content")}>
-                        Next: Content
+                        Próximo: Conteúdo
                       </Button>
                     </CardFooter>
                   </TabsContent>
 
                   <TabsContent value="content" className="m-0">
                     <CardHeader>
-                      <CardTitle>Content</CardTitle>
-                      <CardDescription>Write detailed information about your game using Markdown</CardDescription>
+                      <CardTitle>Conteúdo</CardTitle>
+                      <CardDescription>Escreva informações detalhadas sobre seu jogo usando Markdown</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="content">
-                          Game Description <span className="text-destructive">*</span>
+                          Descrição do jogo <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="content"
@@ -679,19 +680,19 @@ List credits here."
                         />
                         {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}
                         <div className="flex flex-col gap-2">
-                          <p className="text-xs text-muted-foreground">You can use Markdown to format your content</p>
+                          <p className="text-xs text-muted-foreground">Você pode usar o Markdown para formatar seu conteúdo</p>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Code className="h-3 w-3" />
-                              <span>```c for code blocks</span>
+                              <span>```c para blocos de código</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BookOpen className="h-3 w-3" />
-                              <span># Heading, ## Subheading</span>
+                              <span># Título, ## Subtítulo</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Sparkles className="h-3 w-3" />
-                              <span>*italic*, **bold**</span>
+                              <span>*itálico*, **negrito**</span>
                             </div>
                           </div>
                         </div>
@@ -699,25 +700,34 @@ List credits here."
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" type="button" onClick={() => setActiveTab("media")}>
-                        Previous: Media
+                        Anterior: Mídia
                       </Button>
                       <Button type="button" onClick={() => setActiveTab("file")}>
-                        Next: Game File
+                        Próximo: Arquivo do jogo
                       </Button>
                     </CardFooter>
                   </TabsContent>
 
                   <TabsContent value="file" className="m-0">
                     <CardHeader>
-                      <CardTitle>Game File</CardTitle>
-                      <CardDescription>Upload your game file for users to download</CardDescription>
+                      <CardTitle>Arquivo do jogo</CardTitle>
+                      <CardDescription>Carregue o arquivo do jogo para os usuários baixarem</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label>
-                          Game File <span className="text-destructive">*</span>
+                          Link de Download do jogo <span className="text-destructive">*</span>
                         </Label>
-                        <div
+                        <Input
+                          id="url"
+                          value={gameLink}
+                          type="url"
+                          onChange={(e) => setGameLink(e.target.value)}
+                          placeholder="Informe a url de download do seu jogo"
+                          className={errors.gameLink ? "border-destructive" : ""}
+                        />
+                        {errors.gameLink && <p className="text-sm text-destructive">{errors.gameLink}</p>}
+                        {/* <div
                           className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors ${errors.gameFile ? "border-destructive" : "border-border"
                             }`}
                           onClick={() => gameFileInputRef.current?.click()}
@@ -740,22 +750,22 @@ List credits here."
                                 }}
                               >
                                 <X className="h-4 w-4 mr-2" />
-                                Remove
+                                Remover
                               </Button>
                             </div>
                           ) : isUploading ? (
                             <div className="w-full max-w-xs flex flex-col items-center">
                               <Loader2 className="h-10 w-10 text-primary mb-4 animate-spin" />
-                              <p className="text-sm mb-2">Uploading game file...</p>
+                              <p className="text-sm mb-2">Carregando arquivo do jogo...</p>
                               <Progress value={uploadProgress} className="w-full h-2 mb-1" />
                               <p className="text-xs text-muted-foreground">{uploadProgress}%</p>
                             </div>
                           ) : (
                             <>
                               <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                              <p className="text-sm text-muted-foreground mb-1">Click to upload game file</p>
+                              <p className="text-sm text-muted-foreground mb-1">Formatos suportados: ISO, CSO, CHDClique para fazer upload do arquivo do jogo</p>
                               <p className="text-xs text-muted-foreground mb-2">
-                                Supported formats: ISO, CSO, CHD, ISZ, BIN, ELF (Max: 100MB)
+                                Formatos suportados: ISO, CSO, CHD, ISZ, BIN, ELF (Máx.: 100 MB)
                               </p>
                               <div className="flex flex-wrap justify-center gap-1 max-w-md">
                                 {SUPPORTED_FORMATS.map((format) => (
@@ -773,7 +783,7 @@ List credits here."
                             className="hidden"
                             onChange={handleGameFileChange}
                           />
-                        </div>
+                        </div> */}
                         {errors.gameFile && (
                           <div className="flex items-start gap-2 mt-2 text-destructive">
                             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -783,7 +793,7 @@ List credits here."
                       </div>
 
                       <div className="rounded-lg bg-muted p-4">
-                        <h3 className="text-sm font-medium mb-2">File Format Information</h3>
+                        <h3 className="text-sm font-medium mb-2">Informações de formato de arquivo</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                           {SUPPORTED_FORMATS.map((format) => (
                             <div key={format.extension} className="flex items-center gap-2">
@@ -797,30 +807,30 @@ List credits here."
                       </div>
 
                       <div className="rounded-lg bg-muted p-4">
-                        <h3 className="text-sm font-medium mb-2">Submission Guidelines</h3>
+                        <h3 className="text-sm font-medium mb-2">Diretrizes de Submissão</h3>
                         <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
-                          <li>Your game must be compatible with PS2 homebrew.</li>
-                          <li>Include all necessary files for the game to run.</li>
-                          <li>Provide clear installation instructions in your description.</li>
-                          <li>Ensure your game does not violate any copyright or intellectual property rights.</li>
-                          <li>Your submission will be reviewed before being published.</li>
+                          <li>Seu jogo deve ser compatível com o homebrew do PS2.</li>
+                          <li>Inclua todos os arquivos necessários para que o jogo seja executado.</li>
+                          <li>Forneça instruções de instalação claras em sua descrição.</li>
+                          <li>Certifique-se de que seu jogo não viole nenhum direito autoral ou de propriedade intelectual.</li>
+                          <li>Seu envio será analisado antes de ser publicado.</li>
                         </ul>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" type="button" onClick={() => setActiveTab("content")}>
-                        Previous: Content
+                        Anterior: Conteúdo
                       </Button>
                       <Button type="submit" disabled={isSubmitting || isUploading}>
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Submitting...
+                            Enviando...
                           </>
                         ) : (
                           <>
                             <Save className="mr-2 h-4 w-4" />
-                            Submit Game
+                            Enviar Jogo
                           </>
                         )}
                       </Button>

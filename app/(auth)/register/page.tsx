@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useReducer, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -19,6 +19,7 @@ import { CreateUserDto } from "@/data/@types/models/users/dto/create-user.dto"
 import { userService } from "@/data/services/users/users.service"
 import { User as UserType } from "@/data/@types/models/users/entities/user.entity"
 import Validator from "@/data/utils/validator.utils"
+import { useAuth } from "@/hooks/use-auth"
 
 type ExtendedUserDto = CreateUserDto & { confirm?: string }
 
@@ -28,8 +29,6 @@ const newUserInitialData: ExtendedUserDto = {
   password: '',
   confirm: ''
 }
-
-
 
 type UserAction =
   | { type: "SET_FIELD"; field: keyof ExtendedUserDto; value: string }
@@ -54,30 +53,39 @@ export default function RegisterPage() {
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const [user, setUser] = useReducer(userReducer, newUserInitialData);
+  const [newUser, setUser] = useReducer(userReducer, newUserInitialData);
+
+  const { user } = useAuth()
+
+  useEffect(() => {
+    if (Validator.required(user)) {
+      router.push('/snippets')
+      return
+    }
+  }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!user.username.trim()) {
+    if (!newUser.username.trim()) {
       newErrors.username = "Usuário é um campo obrigatório"
-    } else if (user.username.length < 3) {
+    } else if (newUser.username.length < 3) {
       newErrors.username = "Seu nome de usuário deve ter no mínimo 3 caracteres"
     }
 
-    if (!user.email.trim()) {
+    if (!newUser.email.trim()) {
       newErrors.email = "E-mail é obrigatório"
-    } else if (!/\S+@\S+\.\S+/.test(user.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(newUser.email)) {
       newErrors.email = "E-mail inválido"
     }
 
-    if (!user.password) {
+    if (!newUser.password) {
       newErrors.password = "Senha obrigatório"
-    } else if (user.password.length < 6) {
+    } else if (newUser.password.length < 6) {
       newErrors.password = "Sua senha deve ter no mínimo 6 caracteres"
     }
 
-    if (user.password !== user.confirm) {
+    if (newUser.password !== newUser.confirm) {
       newErrors.confirmPassword = "Senhas não conferem"
     }
 
@@ -97,10 +105,10 @@ export default function RegisterPage() {
     try {
       setIsRegistering(true)
 
-      const newUser = user;
-      delete newUser.confirm;
+      const newUserData = newUser;
+      delete newUserData.confirm;
 
-      const response = await userService.registerUser(newUser)
+      const response = await userService.registerUser(newUserData)
 
       if (Validator.required((response.data as UserType).id)) {
         toast({
@@ -201,7 +209,7 @@ export default function RegisterPage() {
                     <Input
                       id="username"
                       placeholder="username"
-                      value={user.username}
+                      value={newUser.username}
                       onChange={(e) => setUser({ field: 'username', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.username ? "border-destructive" : ""}`}
                       disabled={isRegistering}
@@ -218,7 +226,7 @@ export default function RegisterPage() {
                       id="email"
                       type="email"
                       placeholder="name@example.com"
-                      value={user.email}
+                      value={newUser.email}
                       onChange={(e) => setUser({ field: 'email', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.email ? "border-destructive" : ""}`}
                       disabled={isRegistering}
@@ -234,7 +242,7 @@ export default function RegisterPage() {
                     <Input
                       id="password"
                       type="password"
-                      value={user.password}
+                      value={newUser.password}
                       onChange={(e) => setUser({ field: 'password', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.password ? "border-destructive" : ""}`}
                       disabled={isRegistering}
@@ -250,7 +258,7 @@ export default function RegisterPage() {
                     <Input
                       id="confirmPassword"
                       type="password"
-                      value={user.confirm}
+                      value={newUser.confirm}
                       onChange={(e) => setUser({ field: 'confirm', type: 'SET_FIELD', value: e.target.value })}
                       className={`pl-10 ${errors.confirmPassword ? "border-destructive" : ""}`}
                       disabled={isRegistering}

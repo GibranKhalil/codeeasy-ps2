@@ -180,9 +180,9 @@ export default function CreateTutorialPage() {
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={() => router.back()} className="gap-2">
               <ArrowLeft className="h-4 w-4" />
-              Back
+              Voltar
             </Button>
-            <h1 className="text-3xl font-bold">Create Tutorial</h1>
+            <h1 className="text-3xl font-bold">Criar Tutorial</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -194,12 +194,12 @@ export default function CreateTutorialPage() {
               {previewMode ? (
                 <>
                   <FileText className="mr-2 h-4 w-4" />
-                  Edit
+                  Editar
                 </>
               ) : (
                 <>
                   <Eye className="mr-2 h-4 w-4" />
-                  Preview
+                  Pré-visualizar
                 </>
               )}
             </Button>
@@ -210,8 +210,8 @@ export default function CreateTutorialPage() {
           {previewMode ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Preview</CardTitle>
-                <CardDescription>This is how your tutorial will appear to users</CardDescription>
+                <CardTitle className="text-2xl">Pré-Visualização</CardTitle>
+                <CardDescription>Isto é como seu tutorial vai aparecer para os usuários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {coverImage && (
@@ -230,11 +230,11 @@ export default function CreateTutorialPage() {
                     {category && <Badge className="bg-primary">{category}</Badge>}
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="mr-1 h-4 w-4" />
-                      {readTime} min read
+                      {readTime} minutos de leitura
                     </div>
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Tutorial Title"}</h1>
-                  <p className="text-xl text-muted-foreground">{excerpt || "Tutorial excerpt will appear here."}</p>
+                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Título do Tutorial"}</h1>
+                  <p className="text-xl text-muted-foreground">{excerpt || "A descrição do tutorial vai aparecer aqui"}</p>
                 </div>
 
                 {parsedTags.length > 0 && (
@@ -250,7 +250,7 @@ export default function CreateTutorialPage() {
                 <Separator />
 
                 <div className="prose dark:prose-invert max-w-none">
-                  <ReactMarkdown>{content || "Tutorial content will appear here."}</ReactMarkdown>
+                  <ReactMarkdown>{content || "O conteúdo do tutorial aparecerá aqui"}</ReactMarkdown>
                 </div>
 
                 <div className="flex items-center justify-between mt-8 pt-8 border-t">
@@ -260,7 +260,7 @@ export default function CreateTutorialPage() {
                     </div>
                     <div>
                       <p className="font-medium">{user?.user_metadata?.user_name || "Anonymous"}</p>
-                      <p className="text-sm text-muted-foreground">Author</p>
+                      <p className="text-sm text-muted-foreground">Autor</p>
                     </div>
                   </div>
                 </div>
@@ -272,28 +272,28 @@ export default function CreateTutorialPage() {
                 <TabsList className="mb-6 w-full justify-start">
                   <TabsTrigger value="details" className="flex items-center gap-1.5">
                     <Info className="h-4 w-4" />
-                    Basic Details
+                    Informações Básicas
                   </TabsTrigger>
                   <TabsTrigger value="media" className="flex items-center gap-1.5">
                     <ImageIcon className="h-4 w-4" />
-                    Cover Image
+                    Imagem de Capa
                   </TabsTrigger>
                   <TabsTrigger value="content" className="flex items-center gap-1.5">
                     <FileText className="h-4 w-4" />
-                    Content
+                    Conteúdo
                   </TabsTrigger>
                 </TabsList>
 
                 <Card>
                   <TabsContent value="details" className="m-0">
                     <CardHeader>
-                      <CardTitle>Basic Details</CardTitle>
-                      <CardDescription>Provide basic information about your tutorial</CardDescription>
+                      <CardTitle>Informações Básicas</CardTitle>
+                      <CardDescription>Informe as informações básicas do seu tutorial</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="title">
-                          Tutorial Title <span className="text-destructive">*</span>
+                          Título <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           id="title"
@@ -307,7 +307,7 @@ export default function CreateTutorialPage() {
 
                       <div className="space-y-2">
                         <Label htmlFor="excerpt">
-                          Excerpt <span className="text-destructive">*</span>
+                          Descrição <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="excerpt"
@@ -327,7 +327,7 @@ export default function CreateTutorialPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <Label htmlFor="category">
-                            Category <span className="text-destructive">*</span>
+                            Categoria <span className="text-destructive">*</span>
                           </Label>
                           <Select value={category} onValueChange={setCategory}>
                             <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
@@ -362,7 +362,7 @@ export default function CreateTutorialPage() {
 
                       <div className="space-y-2">
                         <Label htmlFor="readTime">
-                          Estimated Read Time (minutes) <span className="text-destructive">*</span>
+                          Tempo de leitura estimado (minutos) <span className="text-destructive">*</span>
                         </Label>
                         <Input
                           id="readTime"
@@ -379,23 +379,23 @@ export default function CreateTutorialPage() {
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" onClick={() => router.back()} type="button">
-                        Cancel
+                        Cancelar
                       </Button>
                       <Button type="button" onClick={() => setActiveTab("media")}>
-                        Next: Cover Image
+                        Próximo: Imagem de Capa
                       </Button>
                     </CardFooter>
                   </TabsContent>
 
                   <TabsContent value="media" className="m-0">
                     <CardHeader>
-                      <CardTitle>Cover Image</CardTitle>
-                      <CardDescription>Upload a cover image for your tutorial</CardDescription>
+                      <CardTitle>Imagem de Capa</CardTitle>
+                      <CardDescription>Coloque uma Imagem como capa do seu tutorial</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label>
-                          Cover Image <span className="text-destructive">*</span>
+                          Imagem de Capa <span className="text-destructive">*</span>
                         </Label>
                         <div
                           className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors ${errors.coverImage ? "border-destructive" : "border-border"
@@ -426,8 +426,8 @@ export default function CreateTutorialPage() {
                           ) : (
                             <>
                               <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                              <p className="text-sm text-muted-foreground mb-1">Click to upload cover image</p>
-                              <p className="text-xs text-muted-foreground">PNG, JPG or GIF (Recommended: 1200x600px)</p>
+                              <p className="text-sm text-muted-foreground mb-1">Clique para enviar uma imagem de capa</p>
+                              <p className="text-xs text-muted-foreground">PNG, JPG (Recomendado: 1200x600px)</p>
                             </>
                           )}
                           <input
@@ -442,34 +442,34 @@ export default function CreateTutorialPage() {
                       </div>
 
                       <div className="rounded-lg bg-muted p-4">
-                        <h3 className="text-sm font-medium mb-2">Cover Image Tips</h3>
+                        <h3 className="text-sm font-medium mb-2">Imagem de Capa Tips</h3>
                         <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
-                          <li>Use a high-quality image that represents your tutorial content.</li>
-                          <li>Recommended dimensions: 1200x600 pixels (2:1 ratio).</li>
-                          <li>Keep important elements centered as the image may be cropped on different devices.</li>
-                          <li>Avoid text in the image as it may become illegible when scaled down.</li>
+                          <li>Use uma imagem de alta qualidade que represente o conteúdo do tutorial.</li>
+                          <li>Dimensões recomendadas: 1200x600 pixels (proporção 2:1).</li>
+                          <li>Mantenha os elementos importantes centralizados, pois a imagem pode ser cortada em diferentes dispositivos.</li>
+                          <li>Evite texto na imagem, pois ele pode se tornar ilegível quando reduzido.</li>
                         </ul>
                       </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       <Button variant="ghost" type="button" onClick={() => setActiveTab("details")}>
-                        Previous: Details
+                        Anterior: Informações
                       </Button>
                       <Button type="button" onClick={() => setActiveTab("content")}>
-                        Next: Content
+                        Próximo: Conteúdo
                       </Button>
                     </CardFooter>
                   </TabsContent>
 
                   <TabsContent value="content" className="m-0">
                     <CardHeader>
-                      <CardTitle>Content</CardTitle>
-                      <CardDescription>Write your tutorial content using Markdown</CardDescription>
+                      <CardTitle>Conteúdo</CardTitle>
+                      <CardDescription>Escreva o conteúdo do tutorial usando Markdown</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="content">
-                          Tutorial Content <span className="text-destructive">*</span>
+                          Conteúdo <span className="text-destructive">*</span>
                         </Label>
                         <Textarea
                           id="content"
@@ -495,48 +495,48 @@ Detailed instructions here..."
                       </div>
 
                       <div className="rounded-lg bg-muted p-4">
-                        <h3 className="text-sm font-medium mb-2">Markdown Tips</h3>
+                        <h3 className="text-sm font-medium mb-2">Dicas Markdown</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <Code className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Formatting</span>
+                              <span className="text-sm font-medium">Formatando</span>
                             </div>
                             <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
                               <li>
-                                <code># Heading 1</code> for main headings
+                                <code># Título 1</code> para os títulos principais
                               </li>
                               <li>
-                                <code>## Heading 2</code> for subheadings
+                                <code>## Títutlo 2</code> para os subtítulos
                               </li>
                               <li>
-                                <code>**bold text**</code> for <strong>bold text</strong>
+                                <code>**texto em negrito**</code> for <strong>texto em negrito</strong>
                               </li>
                               <li>
-                                <code>*italic text*</code> for <em>italic text</em>
+                                <code>*texto em itálico*</code> for <em>texto em itálico</em>
                               </li>
                               <li>
-                                <code>[link text](url)</code> for links
+                                <code>[Texto do link](url)</code> para links
                               </li>
                             </ul>
                           </div>
                           <div className="space-y-2">
                             <div className="flex items-center gap-2">
                               <BookOpen className="h-4 w-4 text-primary" />
-                              <span className="text-sm font-medium">Lists & Code</span>
+                              <span className="text-sm font-medium">Listas & Código</span>
                             </div>
                             <ul className="text-sm text-muted-foreground space-y-1 list-disc pl-5">
                               <li>
-                                <code>- Item</code> for bullet lists
+                                <code>- Item</code> para listas com marcadores
                               </li>
                               <li>
-                                <code>1. Item</code> for numbered lists
+                                <code>1. Item</code> para listas numeradas
                               </li>
                               <li>
-                                <code>\`\`\`c</code> and <code>\`\`\`</code> for code blocks
+                                <code>\`\`\`c</code> e <code>\`\`\`</code> para blocos de código
                               </li>
                               <li>
-                                <code>`inline code`</code> for <code>inline code</code>
+                                <code>`código embutido`</code> para <code>código embutido</code>
                               </li>
                             </ul>
                           </div>
@@ -546,20 +546,7 @@ Detailed instructions here..."
                     <CardFooter className="flex justify-between">
                       <div className="flex gap-2">
                         <Button variant="ghost" type="button" onClick={() => setActiveTab("media")}>
-                          Previous: Cover Image
-                        </Button>
-                        <Button
-                          variant="outline"
-                          type="button"
-                          onClick={(e) => handleSubmit(e, true)}
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting && isDraft ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <FileText className="mr-2 h-4 w-4" />
-                          )}
-                          Save as Draft
+                          Anterior: Imagem
                         </Button>
                       </div>
                       <Button type="submit" disabled={isSubmitting}>
@@ -568,7 +555,7 @@ Detailed instructions here..."
                         ) : (
                           <Save className="mr-2 h-4 w-4" />
                         )}
-                        Publish Tutorial
+                        Publicar Tutorial
                       </Button>
                     </CardFooter>
                   </TabsContent>

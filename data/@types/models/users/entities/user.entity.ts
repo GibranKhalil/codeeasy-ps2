@@ -3,6 +3,7 @@ import { Role } from '../../roles/entities/role.entity';
 
 export class User {
   id!: number;
+  pid!: string;
   username!: string;
   password!: string;
   email!: string;

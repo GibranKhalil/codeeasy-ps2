@@ -17,8 +17,7 @@ import { Input } from "@/components/input"
 import { Badge } from "@/components/badge"
 import { Separator } from "@/components/separator"
 import { useToast } from "@/hooks/use-toast"
-import { useUser } from "@/lib/use-user"
-import { mockSnippets, mockProfiles, mockTutorials, mockGames } from "@/lib/mock-data"
+import { mockTutorials, mockGames } from "@/lib/mock-data"
 import SnippetCard from "@/components/snippetCard"
 import {
   Save,
@@ -39,15 +38,20 @@ import {
   Heart,
   Clock,
   Download,
+  Linkedin,
 } from "lucide-react"
-import { Snippet, UserProfile } from "@/lib/types"
+import { Snippet } from "@/lib/types"
+import { useAuth } from "@/hooks/use-auth"
+import Validator from "@/data/utils/validator.utils"
+import type { User as UserDto } from "@/data/@types/models/users/entities/user.entity"
+import { ptBR } from "date-fns/locale"
 
 export default function ProfilePage() {
   const router = useRouter()
 
   const { toast } = useToast()
-  const { user, loading } = useUser()
-  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const { user, isLoadingUser } = useAuth()
+  const [profile, setProfile] = useState<UserDto | null>(null)
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [tutorials, setTutorials] = useState<typeof mockTutorials>([])
   const [games, setGames] = useState<typeof mockGames>([])
@@ -61,37 +65,14 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<string>("overview")
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!Validator.required(user) && !isLoadingUser) {
       router.push("/login")
     }
-  }, [user, loading, router])
+  }, [user, isLoadingUser, router])
 
   useEffect(() => {
     if (user) {
-      const userProfile = mockProfiles.find((p) => p.id === user.id) || {
-        id: user.id,
-        username: user.user_metadata?.user_name || "user",
-        avatar_url: user.user_metadata?.avatar_url || "/placeholder.svg?height=100&width=100",
-        bio: "PS2 homebrew developer and enthusiast",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        website: "https://example.com",
-        twitter: "ps2dev",
-        github: "ps2dev",
-      }
-
-      const userSnippets = mockSnippets.filter((s) => s.user_id === user.id)
-      const userTutorials = mockTutorials.filter((t) => t.author.id === user.id)
-      const userGames = mockGames.filter((g) => g.author.id === user.id)
-
-      setProfile(userProfile)
-      setBio(userProfile.bio || "")
-      setWebsite(userProfile.website || "")
-      setTwitter(userProfile.twitter || "")
-      setGithub(userProfile.github || "")
-      setSnippets(userSnippets)
-      setTutorials(userTutorials)
-      setGames(userGames)
+      setProfile(user)
       setLoadingProfile(false)
 
       return;
@@ -109,9 +90,7 @@ export default function ProfilePage() {
       setProfile({
         ...profile,
         bio: bio,
-        website: website,
-        twitter: twitter,
-        github: github,
+        links: { website, github, linkedIn: twitter }
       })
 
       toast({
@@ -132,7 +111,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading || loadingProfile) {
+  if (isLoadingUser || loadingProfile) {
     return (
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
@@ -179,24 +158,24 @@ export default function ProfilePage() {
             <div className="px-6 pb-6 relative">
               <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-end -mt-12">
                 <Avatar className="h-24 w-24 border-4 border-background shadow-md">
-                  <AvatarImage src={profile.avatar_url} />
+                  <AvatarImage src={profile.avatarUrl} />
                   <AvatarFallback>
                     <User className="h-12 w-12" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-1">
                   <h1 className="text-2xl font-bold">{profile.username}</h1>
-                  <p className="text-muted-foreground">{profile.bio || "No bio provided yet."}</p>
+                  <p className="text-muted-foreground">{profile.bio || "Nenhuma Bio escrita ainda."}</p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
                   <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit Profile
+                    Editar Perfil
                   </Button>
                   <Button variant="default" size="sm" asChild>
                     <Link href="/snippets/create">
                       <PlusCircle className="h-4 w-4 mr-2" />
-                      New Snippet
+                      Novo Snippet
                     </Link>
                   </Button>
                 </div>
@@ -205,39 +184,39 @@ export default function ProfilePage() {
               <div className="flex flex-wrap gap-4 mt-6">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1.5" />
-                  Joined {format(new Date(profile.created_at), "MMMM yyyy")}
+                  Entrou em {format(new Date(profile.createdAt), "MMMM yyyy", { locale: ptBR })}
                 </div>
-                {profile.github && (
+                {profile.links && profile.links.github && (
                   <Link
-                    href={`https://github.com/${profile.github}`}
+                    href={`https://github.com/${profile.links.github}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Github className="h-4 w-4 mr-1.5" />
-                    {profile.github}
+                    {profile.links.github}
                   </Link>
                 )}
-                {profile.twitter && (
+                {profile.links && profile.links.linkedIn && (
                   <Link
-                    href={`https://twitter.com/${profile.twitter}`}
+                    href={`https://twitter.com/${profile.links.linkedIn}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Twitter className="h-4 w-4 mr-1.5" />
-                    {profile.twitter}
+                    {profile.links.linkedIn}
                   </Link>
                 )}
-                {profile.website && (
+                {profile.links && profile.links.website && (
                   <Link
-                    href={profile.website}
+                    href={profile.links.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Globe className="h-4 w-4 mr-1.5" />
-                    {profile.website.replace(/^https?:\/\//, "")}
+                    {profile.links.website.replace(/^https?:\/\//, "")}
                   </Link>
                 )}
               </div>
@@ -302,7 +281,7 @@ export default function ProfilePage() {
                 <div className="lg:col-span-2 space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Activity</CardTitle>
+                      <CardTitle>Atividade</CardTitle>
                     </CardHeader>
                     <CardContent>
                       {totalContributions > 0 ? (
@@ -320,7 +299,7 @@ export default function ProfilePage() {
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(snippet.created_at), "MMMM dd, yyyy")}
+                                  {format(new Date(snippet.created_at), "MMMM dd, yyyy", { locale: ptBR })}
                                 </p>
                               </div>
                             </div>
@@ -367,14 +346,14 @@ export default function ProfilePage() {
                       ) : (
                         <div className="text-center py-6">
                           <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-medium">No activity yet</h3>
+                          <h3 className="text-lg font-medium">Sem atividades ainda</h3>
                           <p className="text-muted-foreground mt-1">
-                            Start contributing by creating snippets, tutorials, or games
+                            Comece a contribuir criando snippets, tutoriais ou jogos
                           </p>
                           <Button className="mt-4" asChild>
                             <Link href="/snippets/create">
                               <PlusCircle className="h-4 w-4 mr-2" />
-                              Create Snippet
+                              Criar Snippet
                             </Link>
                           </Button>
                         </div>
@@ -406,23 +385,23 @@ export default function ProfilePage() {
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>About</CardTitle>
+                      <CardTitle>Sobre</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground mb-1">Bio</h3>
-                          <p className="text-sm">{profile.bio || "No bio provided yet."}</p>
+                          <p className="text-sm">{profile.bio || "Nenhuma Bio escrita ainda."}</p>
                         </div>
 
                         <Separator />
 
                         <div>
-                          <h3 className="text-sm font-medium text-muted-foreground mb-2">Contact & Links</h3>
+                          <h3 className="text-sm font-medium text-muted-foreground mb-2">Contatos & Links</h3>
                           <div className="space-y-2">
-                            {profile.github && (
+                            {profile.links && profile.links.github && (
                               <Link
-                                href={`https://github.com/${profile.github}`}
+                                href={`https://github.com/${profile.links.github}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
@@ -431,9 +410,9 @@ export default function ProfilePage() {
                                 GitHub
                               </Link>
                             )}
-                            {profile.twitter && (
+                            {profile.links && profile.links.linkedIn && (
                               <Link
-                                href={`https://twitter.com/${profile.twitter}`}
+                                href={`https://twitter.com/${profile.links.linkedIn}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
@@ -442,9 +421,9 @@ export default function ProfilePage() {
                                 Twitter
                               </Link>
                             )}
-                            {profile.website && (
+                            {profile.links && profile.links.website && (
                               <Link
-                                href={profile.website}
+                                href={profile.links.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
@@ -459,10 +438,10 @@ export default function ProfilePage() {
                         <Separator />
 
                         <div>
-                          <h3 className="text-sm font-medium text-muted-foreground mb-2">Member Since</h3>
-                          <p className="text-sm flex items-center">
+                          <h3 className="text-sm font-medium text-muted-foreground mb-2">Membro Desde</h3>
+                          <p className="text-sm flex items-center capitalize">
                             <Calendar className="h-4 w-4 mr-2" />
-                            {format(new Date(profile.created_at), "MMMM dd, yyyy")}
+                            {format(new Date(profile.createdAt), "MMMM dd, yyyy", { locale: ptBR })}
                           </p>
                         </div>
                       </div>
@@ -471,16 +450,16 @@ export default function ProfilePage() {
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Support</CardTitle>
+                      <CardTitle>Apoie</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-center space-y-4">
                         <Heart className="h-8 w-8 text-red-500 mx-auto" />
                         <p className="text-sm">
-                          If you enjoy {profile.username}'s contributions, consider supporting them.
+                          Se você gosta das contribuições de {profile.username}, considere apoiá-las.
                         </p>
                         <Button className="w-full" asChild>
-                          <Link href="/donations">Support {profile.username}</Link>
+                          <Link href="/donations">Apoie {profile.username}</Link>
                         </Button>
                       </div>
                     </CardContent>
@@ -568,9 +547,9 @@ export default function ProfilePage() {
                   <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground mb-4">You haven't created any tutorials yet</p>
+                      <p className="text-muted-foreground mb-4">Você não criou nenhum tutorial ainda</p>
                       <Button asChild>
-                        <Link href="/tutorials/create">Create Tutorial</Link>
+                        <Link href="/tutorials/create">Criar Tutorial</Link>
                       </Button>
                     </CardContent>
                   </Card>
@@ -585,7 +564,7 @@ export default function ProfilePage() {
                   <Button asChild>
                     <Link href="/games/submit">
                       <PlusCircle className="mr-2 h-4 w-4" />
-                      Submit Game
+                      Enviar Jogo
                     </Link>
                   </Button>
                 </div>
@@ -625,9 +604,9 @@ export default function ProfilePage() {
                   <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <Gamepad2 className="h-12 w-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground mb-4">You haven't submitted any games yet</p>
+                      <p className="text-muted-foreground mb-4">Você não enviou nenhum jogo ainda</p>
                       <Button asChild>
-                        <Link href="/games/submit">Submit Game</Link>
+                        <Link href="/games/submit">Enviar Jogo</Link>
                       </Button>
                     </CardContent>
                   </Card>
@@ -638,8 +617,8 @@ export default function ProfilePage() {
             <TabsContent value="settings">
               <Card>
                 <CardHeader>
-                  <CardTitle>Profile Settings</CardTitle>
-                  <CardDescription>Update your profile information and preferences</CardDescription>
+                  <CardTitle>Configurações de Perfil</CardTitle>
+                  <CardDescription>Atualizar as informações e preferências do seu perfil</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
@@ -649,7 +628,7 @@ export default function ProfilePage() {
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
                       className="min-h-[100px]"
-                      placeholder="Tell us about yourself and your PS2 homebrew projects"
+                      placeholder="Conte-nos sobre você e seus projetos homebrew PS2"
                     />
                   </div>
 
@@ -668,11 +647,11 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter</Label>
+                    <Label htmlFor="linkedin">LinkedIn</Label>
                     <div className="relative">
-                      <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="twitter"
+                        id="linkedin"
                         value={twitter}
                         onChange={(e) => setTwitter(e.target.value)}
                         className="pl-10"
@@ -704,9 +683,9 @@ export default function ProfilePage() {
                       variant="outline"
                       onClick={() => {
                         setBio(profile.bio || "")
-                        setWebsite(profile.website || "")
-                        setTwitter(profile.twitter || "")
-                        setGithub(profile.github || "")
+                        setWebsite(profile.links.website || "")
+                        setTwitter(profile.links.linkedIn || "")
+                        setGithub(profile.links.github || "")
                       }}
                       disabled={isSaving}
                     >
@@ -718,38 +697,38 @@ export default function ProfilePage() {
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Account Settings</CardTitle>
-                  <CardDescription>Manage your account preferences and security</CardDescription>
+                  <CardTitle>Configurações da Conta</CardTitle>
+                  <CardDescription>Gerenciar as preferências e a segurança da sua conta</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">E-mail</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="email" type="email" value="user@example.com" disabled className="pl-10" />
+                      <Input id="email" type="email" value={profile.email} disabled className="pl-10" />
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      To change your email address, please contact support
+                      Para alterar seu endereço de e-mail, entre em contato com o suporte
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
+                    <Label htmlFor="username">Usuário</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input id="username" value={profile.username} disabled className="pl-10" />
                     </div>
-                    <p className="text-xs text-muted-foreground">Username cannot be changed after account creation</p>
+                    <p className="text-xs text-muted-foreground">O nome de usuário não pode ser alterado após a criação da conta</p>
                   </div>
 
                   <Separator />
 
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Danger Zone</h3>
+                    <h3 className="text-sm font-medium">Zona Perigosa</h3>
                     <p className="text-sm text-muted-foreground">
-                      These actions are irreversible. Please proceed with caution.
+                      Essas ações são irreversíveis. Por favor, proceda com cautela.
                     </p>
-                    <Button variant="destructive">Delete Account</Button>
+                    <Button variant="destructive">Excluir Conta</Button>
                   </div>
                 </CardContent>
               </Card>
