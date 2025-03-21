@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useReducer, useState } from "react"
+import { useEffect, useReducer, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
@@ -10,7 +10,6 @@ import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import { Textarea } from "@/components/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
-import { useUser } from "@/lib/use-user"
 import { ArrowLeft, Save } from "lucide-react"
 import { CreateSnippetDto } from "@/data/@types/models/snippet/dto/create-snippet.dto"
 import { User } from "@/data/@types/models/users/entities/user.entity"
@@ -18,6 +17,7 @@ import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLangu
 import { snippetService } from "@/data/services/snippets/snippets.service"
 import Validator from "@/data/utils/validator.utils"
 import { enginesMap, eSnippetEngine } from "@/data/@types/enums/eSnippetEngine.enum"
+import { useAuth } from "@/hooks/use-auth"
 
 const newSnippetInitialData: CreateSnippetDto = {
   code: '',
@@ -46,22 +46,25 @@ const snippetReducer = (state: CreateSnippetDto, action: SnippetAction): CreateS
 export default function CreateSnippetPage() {
   const router = useRouter()
 
-  const { user, loading } = useUser()
   const [snippet, setSnippet] = useReducer(snippetReducer, newSnippetInitialData)
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const { user, isLoadingUser } = useAuth()
 
-  if (loading) {
+
+  useEffect(() => {
+    if (!isLoadingUser && !Validator.required(user)) {
+      router.push("/")
+      return
+    }
+  }, [])
+
+  if (isLoadingUser) {
     return (
       <div className="container py-8 flex justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
       </div>
     )
-  }
-
-  if (!user) {
-    router.push("/login")
-    return null
   }
 
   const validateForm = () => {

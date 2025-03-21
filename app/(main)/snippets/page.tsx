@@ -20,7 +20,6 @@ export default function SnippetsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [languageFilter, setLanguageFilter] = useState("")
   const [engineFilter, setEngineFilter] = useState("")
-
   const { user } = useAuth()
 
   useEffect(() => {

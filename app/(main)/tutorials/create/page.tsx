@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { Badge } from "@/components/badge"
 import { Separator } from "@/components/separator"
 import { useToast } from "@/hooks/use-toast"
-import { useUser } from "@/lib/use-user"
+
 import {
   ArrowLeft,
   Upload,
@@ -34,6 +34,8 @@ import {
   User,
 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { useAuth } from "@/hooks/use-auth"
+import Validator from "@/data/utils/validator.utils"
 
 const TUTORIAL_CATEGORIES = [
   "Beginner",
@@ -53,7 +55,7 @@ export default function CreateTutorialPage() {
   const router = useRouter()
 
   const { toast } = useToast()
-  const { user, loading: userLoading } = useUser()
+  const { isLoadingUser, user } = useAuth()
   const [activeTab, setActiveTab] = useState("details")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState(false)
@@ -71,10 +73,13 @@ export default function CreateTutorialPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  if (!userLoading && !user) {
-    router.push("/login")
-    return null
-  }
+
+  useEffect(() => {
+    if (!isLoadingUser && !Validator.required(user)) {
+      router.push("/")
+      return
+    }
+  }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -162,7 +167,7 @@ export default function CreateTutorialPage() {
     },
   }
 
-  if (userLoading) {
+  if (isLoadingUser) {
     return (
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
@@ -259,7 +264,7 @@ export default function CreateTutorialPage() {
                       <User className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-medium">{user?.user_metadata?.user_name || "Anonymous"}</p>
+                      <p className="font-medium">{user?.username || "Anonymous"}</p>
                       <p className="text-sm text-muted-foreground">Autor</p>
                     </div>
                   </div>

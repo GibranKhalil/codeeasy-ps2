@@ -10,21 +10,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockSnippets } from "@/lib/mock-data"
-import { useUser } from "@/lib/use-user"
-import type { Snippet } from "@/lib/types"
+
 import { Copy, Clock, ArrowLeft, Edit, Trash, Check, Maximize, Minimize } from "lucide-react"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
+import { useAuth } from "@/hooks/use-auth"
+import { Snippet } from "@/lib/types"
 
 export default function SnippetPage() {
   const params = useParams()
   const router = useRouter()
 
-  const { user } = useUser()
   const [snippet, setSnippet] = useState<Snippet | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const { user } = useAuth()
 
   useEffect(() => {
     const foundSnippet = mockSnippets.find((s) => s.id === params.id)
@@ -43,7 +45,7 @@ export default function SnippetPage() {
   }
 
   const handleDelete = async () => {
-    if (!snippet || !user || user.id !== snippet.user_id) return
+    if (!snippet || !user || user.id !== Number(snippet.user_id)) return
 
     if (window.confirm("Tem certeza que deseja excluir este snippet")) {
       console.log("Deleting snippet:", snippet.id)
@@ -79,7 +81,7 @@ export default function SnippetPage() {
           Back
         </Button>
         <div className="flex gap-2">
-          {user && user.id === snippet.user_id && (
+          {user && user.id === Number(snippet.user_id) && (
             <>
               <Button variant="outline" asChild>
                 <a href={`/snippets/${snippet.id}/edit`}>

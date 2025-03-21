@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -16,7 +16,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { Badge } from "@/components/badge"
 import { Separator } from "@/components/separator"
 import { useToast } from "@/hooks/use-toast"
-import { useUser } from "@/lib/use-user"
 import {
   ArrowLeft,
   Upload,
@@ -37,6 +36,8 @@ import {
   AlertCircle,
 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { useAuth } from "@/hooks/use-auth"
+import Validator from "@/data/utils/validator.utils"
 
 const GAME_CATEGORIES = [
   "Action",
@@ -69,7 +70,7 @@ const SUPPORTED_FORMATS = [
 export default function SubmitGamePage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { user, loading: userLoading } = useUser()
+  const { user, isLoadingUser } = useAuth()
   const [activeTab, setActiveTab] = useState("details")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState(false)
@@ -95,10 +96,12 @@ export default function SubmitGamePage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  if (!userLoading && !user) {
-    router.push("/login")
-    return null
-  }
+  useEffect(() => {
+    if (!isLoadingUser && !Validator.required(user)) {
+      router.push("/")
+      return
+    }
+  }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -250,7 +253,7 @@ export default function SubmitGamePage() {
     },
   }
 
-  if (userLoading) {
+  if (isLoadingUser) {
     return (
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
@@ -364,7 +367,7 @@ export default function SubmitGamePage() {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Desenvolvedor</p>
-                      <p className="font-medium">{user?.user_metadata?.user_name || "Anonymous"}</p>
+                      <p className="font-medium">{user?.username || "Anonymous"}</p>
                     </div>
                   </div>
                 </div>

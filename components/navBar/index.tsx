@@ -122,7 +122,7 @@ export default function Navbar() {
                       Entrar
                     </Link>
                   </Button>
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button variant="default" size="sm" asChild>
                     <Link href="/register">
                       Crie uma conta
                     </Link>
