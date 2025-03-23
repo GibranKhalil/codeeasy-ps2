@@ -1,18 +1,18 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/button"
 import { Input } from "@/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
-import { mockSnippets } from "@/lib/mock-data"
-import type { Snippet } from "@/lib/types"
 import SnippetCard from "@/components/snippetCard"
 import { Code, Search, Filter } from "lucide-react"
 import { enginesMap, eSnippetEngine } from "@/data/@types/enums/eSnippetEngine.enum"
 import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLanguage.enum"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
+import { snippetService } from "@/data/services/snippets/snippets.service"
+import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
@@ -22,26 +22,16 @@ export default function SnippetsPage() {
   const [engineFilter, setEngineFilter] = useState("")
   const { user } = useAuth()
 
-  useEffect(() => {
-    let filteredSnippets = [...mockSnippets]
-
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filteredSnippets = filteredSnippets.filter(
-        (snippet) => snippet.title.toLowerCase().includes(query) || snippet.description.toLowerCase().includes(query),
-      )
-    }
-
-    if (languageFilter && languageFilter !== "all") {
-      filteredSnippets = filteredSnippets.filter((snippet) => snippet.language === languageFilter)
-    }
-
-    setSnippets(filteredSnippets)
+  const fetchSnippets = useCallback(async () => {
+    const response = await snippetService.find()
+    setSnippets(response.data)
 
     setLoading(false)
+  }, [])
 
-    return
-  }, [searchQuery, languageFilter])
+  useEffect(() => {
+    fetchSnippets()
+  }, [fetchSnippets])
 
   return (
     <div className="container py-8">
@@ -88,7 +78,7 @@ export default function SnippetsPage() {
           </Select>
         </div>
         <div className="w-full sm:w-48">
-          <Select value={languageFilter} onValueChange={setLanguageFilter}>
+          <Select value={engineFilter} onValueChange={setEngineFilter}>
             <SelectTrigger>
               <SelectValue
                 placeholder={

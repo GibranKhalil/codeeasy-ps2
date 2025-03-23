@@ -21,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth"
 
 const newSnippetInitialData: CreateSnippetDto = {
   code: '',
-  creator: new User(),
+  creatorId: 0,
   description: '',
   language: eSnippetLanguage.Js,
   title: '',
@@ -87,11 +87,17 @@ export default function CreateSnippetPage() {
     try {
       setIsSaving(true)
 
-      const response = await snippetService.create(snippet, { requiresAuth: true })
+      if (user) {
+        const response = await snippetService.create({ ...snippet, creatorId: user?.id as number }, { requiresAuth: true })
 
-      if (Validator.required(response)) {
-        router.push('/snippets')
+        if (Validator.required(response)) {
+          router.push('/snippets')
+        }
+
+        return
       }
+
+      throw new Error("ERRO ao criar snippet: Usuário desconhecido")
 
     } catch (error) {
       console.error("Error creating snippet:", error)

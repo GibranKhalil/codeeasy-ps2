@@ -6,6 +6,7 @@ import { Code, BookOpen, Github, Sparkles, ChevronRight } from "lucide-react"
 import { Badge } from "../../badge"
 import { Button } from "../../button"
 import CodePreview from "@/components/codePreview"
+import PS2Logo3DModel from "../ps2Logo3DModel"
 
 interface HeroSectionProps {
   snippetCode: string
@@ -76,18 +77,8 @@ export default function HeroSection({ snippetCode, snippetLanguage }: HeroSectio
             transition={{ duration: 0.5, delay: 0.3 }}
             className="relative lg:ml-auto"
           >
-            <div className="relative bg-black/80 backdrop-blur-sm rounded-lg border border-primary/20 shadow-xl overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-8 bg-black/50 flex items-center px-3">
-                <div className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-500"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500"></div>
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-500"></div>
-                </div>
-                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-                  <span className="text-xs text-white/70">PS2 Controller Input</span>
-                </div>
-              </div>
-              <CodePreview code={snippetCode} language={snippetLanguage} />
+            <div className="flex-shrink-0 w-fit">
+              <PS2Logo3DModel />
             </div>
 
             <div className="absolute -bottom-6 -right-6 -z-10 h-[250px] w-[250px] rounded-full bg-primary/30 blur-[100px]" />

@@ -5,6 +5,7 @@ import { eSnippetLanguage } from '@/data/@types/enums/eSnippetLanguage.enum';
 
 export class Snippet {
   id!: number;
+  pid!: string;
   title!: string;
   description!: string;
   code!: string;

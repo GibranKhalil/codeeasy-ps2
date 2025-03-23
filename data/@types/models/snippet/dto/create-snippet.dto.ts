@@ -6,6 +6,6 @@ export class CreateSnippetDto {
   description!: string;
   code!: string;
   language!: eSnippetLanguage;
-  creator!: User;
+  creatorId!: number;
   engine?: string;
 }

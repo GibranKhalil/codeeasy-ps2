@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
+import { Highlight, themes } from "prism-react-renderer"
+
 
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockSnippets } from "@/lib/mock-data"
 
 import { Copy, Clock, ArrowLeft, Edit, Trash, Check, Maximize, Minimize } from "lucide-react"
@@ -53,9 +54,38 @@ export default function SnippetPage() {
     }
   }
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
+  function openFullscreen(elem: HTMLElement) {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if ((elem as any).webkitRequestFullscreen) {
+      (elem as any).webkitRequestFullscreen();
+    } else if ((elem as any).msRequestFullscreen) {
+      (elem as any).msRequestFullscreen();
+    }
   }
+
+
+  function closeFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if ((document as any).webkitExitFullscreen) {
+      (document as any).webkitExitFullscreen();
+    } else if ((document as any).msExitFullscreen) {
+      (document as any).msExitFullscreen();
+    }
+  }
+
+  function toggleFullscreen() {
+    const elem = document.getElementById("codeViewer") as HTMLElement;
+    if (!document.fullscreenElement) {
+      openFullscreen(elem);
+      setIsFullscreen(true)
+    } else {
+      setIsFullscreen(false)
+      closeFullscreen();
+    }
+  }
+
 
   if (loading) {
     return (
@@ -74,7 +104,7 @@ export default function SnippetPage() {
   }
 
   return (
-    <div className={`${isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : "container py-8"}`}>
+    <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
         <Button variant="ghost" onClick={() => router.back()} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
@@ -95,9 +125,6 @@ export default function SnippetPage() {
               </Button>
             </>
           )}
-          <Button variant="outline" onClick={toggleFullscreen}>
-            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-          </Button>
         </div>
       </div>
 
@@ -113,44 +140,48 @@ export default function SnippetPage() {
             </Badge>
           </div>
         </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="code">
-            <TabsList className="mb-4">
-              <TabsTrigger value="code">Code</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-            </TabsList>
-            <TabsContent value="code" className="relative">
-              <div className="absolute right-2 top-2 z-10">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleCopyCode}
-                  className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
-                >
-                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
-              <div className="rounded-md overflow-hidden">
-                <SyntaxHighlighter
-                  language={snippet.language || "c"}
-                  style={vscDarkPlus}
-                  showLineNumbers
-                  customStyle={{
-                    margin: 0,
-                    borderRadius: "0.375rem",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {snippet.code || ""}
-                </SyntaxHighlighter>
-              </div>
-            </TabsContent>
-            <TabsContent value="preview">
-              <div className="bg-muted p-4 rounded-md">
-                <p className="text-sm">Preview not available for this language.</p>
-              </div>
-            </TabsContent>
-          </Tabs>
+        <CardContent id="codeViewer" className={`bg-[#111111] p-0 h-4/5 max-h-[500px] flex flex-col ${!isFullscreen ? 'relative overflow-auto' : 'overflow-hidden'}`}>
+          <div className={`flex justify-end items-center gap-2 sticky ${!isFullscreen ? 'mr-4 top-2' : 'p-4 border-b  top-0 bg-[#111111]'}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCopyCode}
+              className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+            >
+              {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFullscreen}
+              className="h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm"
+            >
+              {!isFullscreen ? <Maximize size={18} /> : <Minimize size={18} />}
+            </Button>
+          </div>
+          <div className="h-full px-4">
+            <Highlight
+              theme={themes.oneDark}
+              code={snippet.code}
+              language={snippet.language || 'javascript'}
+            >
+              {({ style, tokens, getLineProps, getTokenProps }) => (
+                <pre style={{
+                  ...style, height: '100%', width: '100%', overflow: 'auto', scrollbarWidth: "thin",
+                  scrollbarColor: "#393A40 #1E1E1E", background: 'transparent'
+                }} className="overflow-y-auto">
+                  {tokens.map((line, i) => (
+                    <div key={i} {...getLineProps({ line })}>
+                      <span className="mr-6 select-none">{i + 1}</span>
+                      {line.map((token, key) => (
+                        <span key={key} {...getTokenProps({ token })} />
+                      ))}
+                    </div>
+                  ))}
+                </pre>
+              )}
+            </Highlight>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t p-4">
           <div className="flex items-center">
