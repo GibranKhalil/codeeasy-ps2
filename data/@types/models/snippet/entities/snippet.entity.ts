@@ -2,6 +2,7 @@ import { Interactions } from '@/data/@types/interactions.type';
 import { Tag } from '../../tags/entities/tag.entity';
 import { User } from '../../users/entities/user.entity';
 import { eSnippetLanguage } from '@/data/@types/enums/eSnippetLanguage.enum';
+import { eContentStatus } from '@/data/@types/enums/eContentStatus.enum';
 
 export class Snippet {
   id!: number;
@@ -20,4 +21,5 @@ export class Snippet {
   lastModifier!: User;
   modifiers!: User[];
   tags!: Tag[];
+  status!: eContentStatus;
 }

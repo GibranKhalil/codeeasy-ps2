@@ -7,7 +7,7 @@ import UrlBuilder from '@/data/utils/urlBuilder.utils';
 import Validator from '@/data/utils/validator.utils';
 import Parser from '@/data/utils/parser.utils';
 import { IApiRequestParams } from '../interfaces/iApiRequestParams.interface';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 
 /**
  * Classe abstrata que implementa operações CRUD genéricas.
@@ -32,6 +32,7 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE>
    * @param {string} [baseUrl] - A URL base da API (opcional, padrão é process.env.NEXT_PUBLIC_ENDPOINT).
    */
   constructor(
+    protected readonly entityName: string,
     protected readonly endPoint: string,
     protected readonly baseUrl: string = process.env
       .NEXT_PUBLIC_ENDPOINT as string,
@@ -144,7 +145,27 @@ export abstract class CrudOperations<FIND, FINDALL, CREATE>
    * @param {unknown} error - O erro ocorrido.
    * @throws {Error} - Deve lançar um erro ou tratar o erro de forma apropriada.
    */
-  protected abstract handleServiceError(operation: string, error: unknown): any;
+  protected handleServiceError(operation: string, error: unknown): any {
+    const errorMessage = `ERRO na operação: ${operation}! de ${this.entityName}`;
+
+    if (error instanceof AxiosError && error.response) {
+      const status = error.response.status;
+      const message =
+        error.response.data?.message || 'Erro inesperado no servidor';
+
+      return {
+        success: false,
+        status,
+        message,
+      };
+    }
+
+    return {
+      success: false,
+      status: 500,
+      message: errorMessage,
+    };
+  }
 
   /**
    * Retorna os headers de autenticação para requisições que requerem autenticação.

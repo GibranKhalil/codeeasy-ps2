@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { format } from "date-fns"
@@ -11,10 +11,11 @@ import { Input } from "@/components/input"
 import { Button } from "@/components/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockTutorials } from "@/lib/mock-data"
-import type { Tutorial } from "@/lib/types"
 import { Search, Clock, Tag, PlusCircle } from "lucide-react"
 import Validator from "@/data/utils/validator.utils"
 import { useAuth } from "@/hooks/use-auth"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
+import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
 
 export default function TutorialsPage() {
   const router = useRouter()
@@ -29,35 +30,19 @@ export default function TutorialsPage() {
 
   const categories = ["all", ...Array.from(new Set(mockTutorials.map((tutorial) => tutorial.category)))]
 
-  useEffect(() => {
-    setTutorials(mockTutorials)
-    setFilteredTutorials(mockTutorials)
-    setLoading(false)
 
-    return
+  const fetchTutorials = useCallback(async () => {
+    const response = await tutorialsService.find()
+    setTutorials(response.data.data)
   }, [])
 
   useEffect(() => {
-    if (tutorials.length > 0) {
-      let filtered = [...tutorials]
+    fetchTutorials()
+    setLoading(false)
 
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (tutorial) =>
-            tutorial.title.toLowerCase().includes(query) ||
-            tutorial.excerpt.toLowerCase().includes(query) ||
-            tutorial.tags.some((tag) => tag.toLowerCase().includes(query)),
-        )
-      }
+    return
+  }, [fetchTutorials])
 
-      if (activeCategory !== "all") {
-        filtered = filtered.filter((tutorial) => tutorial.category === activeCategory)
-      }
-
-      setFilteredTutorials(filtered)
-    }
-  }, [searchQuery, activeCategory, tutorials])
 
   const handleTutorialClick = (slug: string) => {
     router.push(`/tutorials/${slug}`)
@@ -129,11 +114,11 @@ export default function TutorialsPage() {
                   <Card
                     key={tutorial.id}
                     className="overflow-hidden cursor-pointer transition-all hover:shadow-md"
-                    onClick={() => handleTutorialClick(tutorial.slug)}
+                    onClick={() => handleTutorialClick(tutorial.pid)}
                   >
                     <div className="relative h-48 w-full">
                       <Image
-                        src={tutorial.coverImage || "/placeholder.svg"}
+                        src={tutorial.coverImage_url || "/placeholder.svg"}
                         alt={tutorial.title}
                         fill
                         className="object-cover"
@@ -142,11 +127,11 @@ export default function TutorialsPage() {
                     <CardHeader className="p-4 pb-0">
                       <div className="flex items-start justify-between">
                         <Badge variant="outline" className="mb-2">
-                          {tutorial.category}
+                          {tutorial.category.name}
                         </Badge>
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Clock className="mr-1 h-4 w-4" />
-                          {tutorial.read_time} min read
+                          {tutorial.readTime} min read
                         </div>
                       </div>
                       <CardTitle className="line-clamp-2 text-xl">{tutorial.title}</CardTitle>
@@ -155,8 +140,8 @@ export default function TutorialsPage() {
                       <p className="text-muted-foreground line-clamp-3">{tutorial.excerpt}</p>
                       <div className="flex flex-wrap gap-2 mt-4">
                         {tutorial.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
+                          <Badge key={tag.id} variant="secondary" className="text-xs">
+                            {tag.name}
                           </Badge>
                         ))}
                         {tutorial.tags.length > 3 && (
@@ -170,16 +155,16 @@ export default function TutorialsPage() {
                       <div className="flex items-center">
                         <div className="relative h-6 w-6 rounded-full overflow-hidden mr-2">
                           <Image
-                            src={tutorial.author.avatar_url || "/placeholder.svg"}
-                            alt={tutorial.author.username}
+                            src={tutorial.creator.avatarUrl || "/placeholder.svg"}
+                            alt={tutorial.creator.username}
                             fill
                             className="object-cover"
                           />
                         </div>
-                        <span className="text-sm">{tutorial.author.username}</span>
+                        <span className="text-sm">{tutorial.creator.username}</span>
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {format(new Date(tutorial.created_at), "MMM dd, yyyy")}
+                        {format(new Date(tutorial.createdAt), "MMM dd, yyyy")}
                       </div>
                     </CardFooter>
                   </Card>

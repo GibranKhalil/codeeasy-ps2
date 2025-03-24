@@ -54,7 +54,7 @@ export default function FeaturedContentTabs({
         <div className="flex flex-col items-center justify-center mb-8 text-center">
           <Badge className="mb-4">
             <Star className="h-3.5 w-3.5 mr-1.5" />
-            Featured Content
+            Conteúdo em destaque
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight">Explore os Conteúdos de PS2 Homebrew</h2>
           <p className="mt-2 text-muted-foreground max-w-[700px]">
@@ -104,7 +104,7 @@ export default function FeaturedContentTabs({
                       </Card>
                     ))
                   : recentSnippets.map((snippet, index) => (
-                    <motion.div key={snippet.id} variants={cardVariants}>
+                    <motion.div key={index} variants={cardVariants}>
                       <SnippetCard snippet={snippet} />
                     </motion.div>
                   ))}

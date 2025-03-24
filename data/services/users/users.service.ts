@@ -1,43 +1,11 @@
-'use client';
-
 import Cookies from 'js-cookie';
 import { CrudOperations } from '@/data/@types/abtractModels/CrudOperations.model';
 import { CreateUserDto } from '@/data/@types/models/users/dto/create-user.dto';
-import { AxiosError } from 'axios';
+import { User } from '@/data/@types/models/users/entities/user.entity';
 
-class UserService extends CrudOperations<any, any, any> {
+class UserService extends CrudOperations<User, any, any> {
   constructor(endpoint: string) {
-    super(endpoint);
-  }
-
-  /**
-   * Trata erros ocorridos durante operações de serviço.
-   *
-   * @param {string} operation - A operação que causou o erro.
-   * @param {unknown} error - O erro ocorrido.
-   * @throws {Error} - Lança um erro com uma mensagem descritiva.
-   */
-
-  protected handleServiceError(operation: string, error: unknown) {
-    const errorMessage = `ERRO na operação: ${operation}!`;
-
-    if (error instanceof AxiosError && error.response) {
-      const status = error.response.status;
-      const message =
-        error.response.data?.message || 'Erro inesperado no servidor';
-
-      return {
-        success: false,
-        status,
-        message,
-      };
-    }
-
-    return {
-      success: false,
-      status: 500,
-      message: errorMessage,
-    };
+    super('Usuários', endpoint);
   }
 
   async registerUser(createUserDto: CreateUserDto) {
@@ -50,8 +18,6 @@ class UserService extends CrudOperations<any, any, any> {
       { email, password },
       { subEndpoint: '/login' },
     );
-
-    console.log(process.env.NODE_ENV === 'production');
 
     const token = response?.data?.access_token;
     if (token) {

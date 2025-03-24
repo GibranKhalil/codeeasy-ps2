@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -11,10 +11,11 @@ import { Button } from "@/components/button"
 import { Input } from "@/components/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { mockGames } from "@/lib/mock-data"
-import type { Game } from "@/lib/types"
 import { Search, Download, User, Clock } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
+import { gameService } from "@/data/services/games/game.service"
+import { Game } from "@/data/@types/models/games/entities/game.entity"
 
 export default function GamesPage() {
   const router = useRouter()
@@ -28,35 +29,16 @@ export default function GamesPage() {
 
   const categories = ["all", ...Array.from(new Set(mockGames.map((game) => game.category)))]
 
+  const fetchGames = useCallback(async () => {
+    const response = await gameService.find();
+    setGames(response.data.data)
+  }, [])
+
   useEffect(() => {
-    setGames(mockGames)
-    setFilteredGames(mockGames)
     setLoading(false)
 
     return
   }, [])
-
-  useEffect(() => {
-    if (games.length > 0) {
-      let filtered = [...games]
-
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        filtered = filtered.filter(
-          (game) =>
-            game.title.toLowerCase().includes(query) ||
-            game.description.toLowerCase().includes(query) ||
-            game.tags.some((tag) => tag.toLowerCase().includes(query)),
-        )
-      }
-
-      if (activeCategory !== "all") {
-        filtered = filtered.filter((game) => game.category === activeCategory)
-      }
-
-      setFilteredGames(filtered)
-    }
-  }, [searchQuery, activeCategory, games])
 
   const handleGameClick = (slug: string) => {
     router.push(`/games/${slug}`)
@@ -121,17 +103,17 @@ export default function GamesPage() {
                   <Card
                     key={game.id}
                     className="overflow-hidden cursor-pointer transition-all hover:shadow-md"
-                    onClick={() => handleGameClick(game.slug)}
+                    onClick={() => handleGameClick(game.pid)}
                   >
                     <div className="relative h-48 w-full">
                       <Image
-                        src={game.coverImage || "/placeholder.svg"}
+                        src={game.coverImage_url || "/placeholder.svg"}
                         alt={game.title}
                         fill
                         className="object-cover"
                       />
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                        <Badge className="bg-primary">{game.category}</Badge>
+                        <Badge className="bg-primary">{game.category.name}</Badge>
                       </div>
                     </div>
                     <CardContent className="p-4">
@@ -140,8 +122,8 @@ export default function GamesPage() {
 
                       <div className="flex flex-wrap gap-2 mt-3">
                         {game.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
+                          <Badge key={tag.id} variant="secondary" className="text-xs">
+                            {tag.name}
                           </Badge>
                         ))}
                       </div>
@@ -149,22 +131,22 @@ export default function GamesPage() {
                       <div className="flex items-center justify-between mt-4 text-sm">
                         <div className="flex items-center text-muted-foreground">
                           <User className="mr-1 h-4 w-4" />
-                          {game.author.username}
+                          {game.creator.username}
                         </div>
                         <div className="flex items-center text-muted-foreground">
                           <Download className="mr-1 h-4 w-4" />
-                          {game.download_count.toLocaleString()}
+                          {game.downloads.toLocaleString()}
                         </div>
                       </div>
                     </CardContent>
                     <CardFooter className="p-4 border-t flex justify-between">
                       <div className="text-xs text-muted-foreground flex items-center">
                         <Clock className="mr-1 h-3 w-3" />
-                        {format(new Date(game.updated_at), "MMM dd, yyyy")}
+                        {format(new Date(game.updatedAt), "MMM dd, yyyy")}
                       </div>
                       <div className="flex items-center">
                         <span className="text-xs font-medium mr-1">v{game.version}</span>
-                        <span className="text-xs text-muted-foreground">{game.size_mb}MB</span>
+                        <span className="text-xs text-muted-foreground">{game.fileSize}MB</span>
                       </div>
                     </CardFooter>
                   </Card>
@@ -173,8 +155,8 @@ export default function GamesPage() {
             ) : (
               <div className="text-center py-12">
                 <Download className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="text-lg font-medium mt-4">No games found</h3>
-                <p className="text-muted-foreground mt-2">Try adjusting your search or filter criteria</p>
+                <h3 className="text-lg font-medium mt-4">Nenhum jogo encontrado</h3>
+                <p className="text-muted-foreground mt-2">Tente ajustar sua pesquisa ou critérios de filtro</p>
               </div>
             )}
           </TabsContent>

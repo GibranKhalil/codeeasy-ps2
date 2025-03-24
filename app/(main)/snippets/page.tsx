@@ -24,7 +24,7 @@ export default function SnippetsPage() {
 
   const fetchSnippets = useCallback(async () => {
     const response = await snippetService.find()
-    setSnippets(response.data)
+    setSnippets(response.data.data)
 
     setLoading(false)
   }, [])
@@ -36,7 +36,12 @@ export default function SnippetsPage() {
   return (
     <div className="container py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold">Snippets</h1>
+        <div>
+          <h1 className="text-3xl font-bold">Snippets</h1>
+          <p className="text-muted-foreground mt-2">
+            Aperfeiçoe seu jogo com código revisado e funcional para qualquer demanda.
+          </p>
+        </div>
         {Validator.required(user) &&
           <Button asChild>
             <Link href="/snippets/create">
@@ -116,8 +121,9 @@ export default function SnippetsPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium">Nenhum snippet encontrado</h3>
-          <p className="text-muted-foreground mt-2">Tente ajustar seus filtros</p>
+          <Code className="h-12 w-12 mx-auto text-muted-foreground" />
+          <h3 className="text-lg font-medium mt-4">Nenhum snippet encontrado</h3>
+          <p className="text-muted-foreground mt-2">Tente ajustar sua pesquisa ou critérios de filtro</p>
         </div>
       )}
     </div>

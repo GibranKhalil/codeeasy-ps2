@@ -40,11 +40,11 @@ import {
   Download,
   Linkedin,
 } from "lucide-react"
-import { Snippet } from "@/lib/types"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
 import type { User as UserDto } from "@/data/@types/models/users/entities/user.entity"
 import { ptBR } from "date-fns/locale"
+import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(snippet.created_at), "MMMM dd, yyyy", { locale: ptBR })}
+                                  {format(new Date(snippet.createdAt), "MMMM dd, yyyy", { locale: ptBR })}
                                 </p>
                               </div>
                             </div>
