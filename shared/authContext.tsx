@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const token = Cookies.get('access_token');
     if (token) {
       const user = await userService.find({ subEndpoint: `/token/${token}` });
+      console.log(user)
       if (!user.success) {
         setUser(null)
       }

@@ -16,9 +16,9 @@ import { Separator } from "@/components/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { Github, Mail, ArrowRight, Loader2 } from "lucide-react"
-import { userService } from "@/data/services/users/users.service"
 import Validator from "@/data/utils/validator.utils"
 import { useAuth } from "@/hooks/use-auth"
+import { authService } from "@/data/services/auth/auth.service"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -66,7 +66,7 @@ export default function LoginPage() {
     try {
       setIsLoggingIn(true)
 
-      const token = await userService.login(email, password)
+      const token = await authService.login(email, password)
 
       if (Validator.required(token)) {
         login(token)

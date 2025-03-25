@@ -4,4 +4,8 @@ export class CreateUserDto {
   email!: string;
   githubId?: string;
   avatarUrl?: string;
+  bio?: string;
+  linkedin?: string;
+  github?: string;
+  website?: string;
 }

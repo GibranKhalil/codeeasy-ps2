@@ -20,6 +20,7 @@ import { userService } from "@/data/services/users/users.service"
 import { User as UserType } from "@/data/@types/models/users/entities/user.entity"
 import Validator from "@/data/utils/validator.utils"
 import { useAuth } from "@/hooks/use-auth"
+import { authService } from "@/data/services/auth/auth.service"
 
 type ExtendedUserDto = CreateUserDto & { confirm?: string }
 
@@ -108,7 +109,7 @@ export default function RegisterPage() {
       const newUserData = newUser;
       delete newUserData.confirm;
 
-      const response = await userService.registerUser(newUserData)
+      const response = await authService.registerUser(newUserData)
 
       if (Validator.required((response.data as UserType).id)) {
         toast({

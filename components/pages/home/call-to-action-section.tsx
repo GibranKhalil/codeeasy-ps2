@@ -23,7 +23,7 @@ export default function CallToActionSection() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild>
                 <Link href="/donations">
-                  <Heart className="mr-2 h-4 w-4 text-red-200" />
+                  <Heart fill="#E5484D" className="mr-2 h-4 w-4 text-[#E5484D]" />
                   Apoie o Projeto
                 </Link>
               </Button>

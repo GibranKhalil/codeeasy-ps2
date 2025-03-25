@@ -1,4 +1,3 @@
-import { SocialLinks } from '@/data/@types/socialLinks.type';
 import { Role } from '../../roles/entities/role.entity';
 
 export class User {
@@ -8,7 +7,9 @@ export class User {
   password!: string;
   email!: string;
   bio!: string;
-  links!: SocialLinks;
+  linkedin?: string;
+  github?: string;
+  website?: string;
   lastLoginAt!: Date;
   githubId?: string;
   avatarUrl?: string;

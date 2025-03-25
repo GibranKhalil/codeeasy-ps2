@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -11,58 +11,106 @@ import { Button } from "@/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
-import { Label } from "@/components/label"
-import { Textarea } from "@/components/textarea"
-import { Input } from "@/components/input"
 import { Badge } from "@/components/badge"
 import { Separator } from "@/components/separator"
-import { useToast } from "@/hooks/use-toast"
-import { mockTutorials, mockGames } from "@/lib/mock-data"
 import SnippetCard from "@/components/snippetCard"
 import {
-  Save,
   User,
   Code,
   Settings,
   BookOpen,
   Gamepad2,
   Github,
-  Twitter,
   Globe,
-  Mail,
   Calendar,
   Edit,
   Loader2,
   PlusCircle,
   Activity,
   Heart,
-  Clock,
   Download,
   Linkedin,
+  ShieldEllipsis,
+  FileCheck,
+  ShieldCheck,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
 import type { User as UserDto } from "@/data/@types/models/users/entities/user.entity"
 import { ptBR } from "date-fns/locale"
 import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
+import { SettingsPage } from "@/components/pages/profile/tabs/settings"
+import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
+import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { TutorialCard } from "@/components/trainingCard"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
+import { snippetService } from "@/data/services/snippets/snippets.service"
+import { gameService } from "@/data/services/games/game.service"
+import { rolesService } from "@/data/services/roles/roles.service"
+import RolesManager from "@/components/admin/rolesManager"
+import SubmissionsManager from "@/components/admin/SubmissionsManager"
 
 export default function ProfilePage() {
   const router = useRouter()
 
-  const { toast } = useToast()
   const { user, isLoadingUser } = useAuth()
+
   const [profile, setProfile] = useState<UserDto | null>(null)
   const [snippets, setSnippets] = useState<Snippet[]>([])
-  const [tutorials, setTutorials] = useState<typeof mockTutorials>([])
-  const [games, setGames] = useState<typeof mockGames>([])
-  const [bio, setBio] = useState<string>("")
-  const [website, setWebsite] = useState<string>("")
-  const [twitter, setTwitter] = useState<string>("")
-  const [github, setGithub] = useState<string>("")
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [isSaving, setIsSaving] = useState<boolean>(false)
+  const [tutorials, setTutorials] = useState<Tutorial[]>([])
+  const [games, setGames] = useState<Game[]>([])
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true)
   const [activeTab, setActiveTab] = useState<string>("overview")
+
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+
+  const featchTutorialsByCreator = useCallback(async () => {
+    if (user) {
+      const response = await tutorialsService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
+      setTutorials(response.data.data)
+    }
+  }, [user])
+
+  const featchSnippetsByCreator = useCallback(async () => {
+    if (user) {
+      const response = await snippetService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
+      setSnippets(response.data.data)
+    }
+  }, [user])
+
+  const featchGamesByCreator = useCallback(async () => {
+    if (user) {
+      const response = await gameService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
+      setGames(response.data.data)
+    }
+  }, [user])
+
+  const featchRoles = useCallback(async () => {
+    if (activeTab === "admin-roles" && user) {
+      const response = await rolesService.find({ requiresAuth: true })
+      console.log(response)
+    }
+  }, [activeTab, user])
+
+  useEffect(() => {
+    if (user) {
+      setLoadingProfile(false)
+      setProfile(user)
+      return
+    }
+  }, [user])
+
+  useEffect(() => {
+    featchTutorialsByCreator()
+    featchSnippetsByCreator()
+    featchGamesByCreator()
+    return
+  }, [featchTutorialsByCreator, featchTutorialsByCreator, featchGamesByCreator])
+
+  useEffect(() => {
+    featchRoles()
+  }, [featchRoles])
+
 
   useEffect(() => {
     if (!Validator.required(user) && !isLoadingUser) {
@@ -70,53 +118,20 @@ export default function ProfilePage() {
     }
   }, [user, isLoadingUser, router])
 
-  useEffect(() => {
-    if (user) {
-      setProfile(user)
-      setLoadingProfile(false)
+  const hasAdminRole = useMemo(() => {
+    return profile && profile.roles && profile.roles.map((role) => role.name.toLowerCase()).includes("admin")
+  }, [profile])
 
-      return;
-    }
-  }, [user])
-
-  const handleSaveProfile = async () => {
-    if (!user || !profile) return
-
-    try {
-      setIsSaving(true)
-
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      setProfile({
-        ...profile,
-        bio: bio,
-        links: { website, github, linkedIn: twitter }
-      })
-
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      })
-
-      setIsSaving(false)
-      setIsEditing(false)
-    } catch (error) {
-      console.error("Error updating profile:", error)
-      toast({
-        title: "Update failed",
-        description: "There was an error updating your profile. Please try again.",
-        variant: "destructive",
-      })
-      setIsSaving(false)
-    }
-  }
+  const hasModeratorRole = useMemo(() => {
+    return profile && profile.roles && (profile.roles.map((role) => role.name.toLowerCase()).includes("moderator") || profile.roles.map((role) => role.name.toLowerCase()).includes("admin"))
+  }, [profile])
 
   if (isLoadingUser || loadingProfile) {
     return (
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">Carregando Perfil...</p>
         </div>
       </div>
     )
@@ -172,51 +187,45 @@ export default function ProfilePage() {
                     <Edit className="h-4 w-4 mr-2" />
                     Editar Perfil
                   </Button>
-                  <Button variant="default" size="sm" asChild>
-                    <Link href="/snippets/create">
-                      <PlusCircle className="h-4 w-4 mr-2" />
-                      Novo Snippet
-                    </Link>
-                  </Button>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-4 mt-6">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1.5" />
-                  Entrou em {format(new Date(profile.createdAt), "MMMM yyyy", { locale: ptBR })}
+                  Entrou {format(new Date(profile.createdAt), "d/MM/y", { locale: ptBR })}
                 </div>
-                {profile.links && profile.links.github && (
+                {profile && profile.github && (
                   <Link
-                    href={`https://github.com/${profile.links.github}`}
+                    href={`${profile.github}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Github className="h-4 w-4 mr-1.5" />
-                    {profile.links.github}
+                    {profile.github}
                   </Link>
                 )}
-                {profile.links && profile.links.linkedIn && (
+                {profile && profile.linkedin && (
                   <Link
-                    href={`https://twitter.com/${profile.links.linkedIn}`}
+                    href={`${profile.linkedin}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <Twitter className="h-4 w-4 mr-1.5" />
-                    {profile.links.linkedIn}
+                    <Linkedin className="h-4 w-4 mr-1.5" />
+                    {profile.linkedin}
                   </Link>
                 )}
-                {profile.links && profile.links.website && (
+                {profile && profile.website && (
                   <Link
-                    href={profile.links.website}
+                    href={profile.website}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Globe className="h-4 w-4 mr-1.5" />
-                    {profile.links.website.replace(/^https?:\/\//, "")}
+                    {profile.website.replace(/^https?:\/\//, "")}
                   </Link>
                 )}
               </div>
@@ -231,13 +240,13 @@ export default function ProfilePage() {
                 <Card className="bg-muted/40">
                   <CardContent className="p-4 flex flex-col items-center justify-center">
                     <div className="text-2xl font-bold">{tutorials.length}</div>
-                    <div className="text-sm text-muted-foreground">Tutorials</div>
+                    <div className="text-sm text-muted-foreground">Tutoriais</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-muted/40">
                   <CardContent className="p-4 flex flex-col items-center justify-center">
                     <div className="text-2xl font-bold">{games.length}</div>
-                    <div className="text-sm text-muted-foreground">Games</div>
+                    <div className="text-sm text-muted-foreground">Jogos</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-muted/40">
@@ -274,6 +283,17 @@ export default function ProfilePage() {
                 <Settings className="h-4 w-4" />
                 Configurações
               </TabsTrigger>
+              {hasModeratorRole &&
+                <TabsTrigger value="admin-submissions" className="flex items-center gap-1.5">
+                  <FileCheck className="h-4 w-4" />
+                  Submissões
+                </TabsTrigger>}
+              {hasAdminRole &&
+                <TabsTrigger value="admin-roles" className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4" />
+                  Papéis
+                </TabsTrigger>
+              }
             </TabsList>
 
             <TabsContent value="overview">
@@ -293,7 +313,7 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Created a new snippet:{" "}
+                                  Criar um novo snippet:{" "}
                                   <Link href={`/snippets/${snippet.id}`} className="text-primary hover:underline">
                                     {snippet.title}
                                   </Link>
@@ -312,13 +332,13 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Published a tutorial:{" "}
-                                  <Link href={`/tutorials/${tutorial.slug}`} className="text-primary hover:underline">
+                                  Publicar um tutorial:{" "}
+                                  <Link href={`/tutorials/${tutorial.pid}`} className="text-primary hover:underline">
                                     {tutorial.title}
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(tutorial.created_at), "MMMM dd, yyyy")}
+                                  {format(new Date(tutorial.createdAt), "MMMM dd, yyyy")}
                                 </p>
                               </div>
                             </div>
@@ -331,13 +351,13 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Released a game:{" "}
-                                  <Link href={`/games/${game.slug}`} className="text-primary hover:underline">
+                                  Enviar um jogo:{" "}
+                                  <Link href={`/games/${game.pid}`} className="text-primary hover:underline">
                                     {game.title}
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(game.created_at), "MMMM dd, yyyy")}
+                                  {format(new Date(game.createdAt), "MMMM dd, yyyy")}
                                 </p>
                               </div>
                             </div>
@@ -399,9 +419,9 @@ export default function ProfilePage() {
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground mb-2">Contatos & Links</h3>
                           <div className="space-y-2">
-                            {profile.links && profile.links.github && (
+                            {profile && profile.github && (
                               <Link
-                                href={`https://github.com/${profile.links.github}`}
+                                href={`${profile.github}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
@@ -410,20 +430,20 @@ export default function ProfilePage() {
                                 GitHub
                               </Link>
                             )}
-                            {profile.links && profile.links.linkedIn && (
+                            {profile && profile.linkedin && (
                               <Link
-                                href={`https://twitter.com/${profile.links.linkedIn}`}
+                                href={`${profile.linkedin}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
                               >
-                                <Twitter className="h-4 w-4 mr-2" />
-                                Twitter
+                                <Linkedin className="h-4 w-4 mr-2" />
+                                LinkedIn
                               </Link>
                             )}
-                            {profile.links && profile.links.website && (
+                            {profile && profile.website && (
                               <Link
-                                href={profile.links.website}
+                                href={profile.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center text-sm hover:text-primary transition-colors"
@@ -514,33 +534,8 @@ export default function ProfilePage() {
 
                 {tutorials.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {tutorials.map((tutorial) => (
-                      <Card key={tutorial.id} className="overflow-hidden cursor-pointer transition-all hover:shadow-md">
-                        <Link href={`/tutorials/${tutorial.slug}`} className="h-full flex flex-col">
-                          <div className="relative h-40 w-full">
-                            <Image
-                              src={tutorial.coverImage || "/placeholder.svg"}
-                              alt={tutorial.title}
-                              fill
-                              className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                            <Badge className="absolute bottom-3 left-3 bg-primary/80 hover:bg-primary/80">
-                              {tutorial.category}
-                            </Badge>
-                          </div>
-                          <CardContent className="p-4 flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center text-sm text-muted-foreground">
-                                <Clock className="mr-1 h-4 w-4" />
-                                {tutorial.read_time} min read
-                              </div>
-                            </div>
-                            <h3 className="font-bold text-lg mb-2 line-clamp-2">{tutorial.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-3">{tutorial.excerpt}</p>
-                          </CardContent>
-                        </Link>
-                      </Card>
+                    {tutorials.map((tutorial, index) => (
+                      <TutorialCard tutorial={tutorial} key={index} />
                     ))}
                   </div>
                 ) : (
@@ -573,17 +568,17 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {games.map((game) => (
                       <Card key={game.id} className="overflow-hidden cursor-pointer transition-all hover:shadow-md">
-                        <Link href={`/games/${game.slug}`} className="h-full flex flex-col">
+                        <Link href={`/games/${game.pid}`} className="h-full flex flex-col">
                           <div className="relative h-40 w-full">
                             <Image
-                              src={game.coverImage || "/placeholder.svg"}
+                              src={game.coverImage_url || "/placeholder.svg"}
                               alt={game.title}
                               fill
                               className="object-cover"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                             <Badge className="absolute bottom-3 left-3 bg-primary/80 hover:bg-primary/80">
-                              {game.category}
+                              {game.category.name}
                             </Badge>
                           </div>
                           <CardContent className="p-4 flex-1">
@@ -592,7 +587,7 @@ export default function ProfilePage() {
                             <div className="flex items-center justify-between mt-4 text-sm">
                               <div className="flex items-center text-muted-foreground">
                                 <Download className="mr-1 h-4 w-4" />
-                                {game.download_count.toLocaleString()}
+                                {game.downloads.toLocaleString()}
                               </div>
                             </div>
                           </CardContent>
@@ -615,124 +610,36 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Configurações de Perfil</CardTitle>
-                  <CardDescription>Atualizar as informações e preferências do seu perfil</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="bio">Biografia</Label>
-                    <Textarea
-                      id="bio"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      className="min-h-[100px]"
-                      placeholder="Conte-nos sobre você e seus projetos homebrew PS2"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="website"
-                        value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
-                        className="pl-10"
-                        placeholder="https://example.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="linkedin">LinkedIn</Label>
-                    <div className="relative">
-                      <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="linkedin"
-                        value={twitter}
-                        onChange={(e) => setTwitter(e.target.value)}
-                        className="pl-10"
-                        placeholder="username"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="github">GitHub</Label>
-                    <div className="relative">
-                      <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="github"
-                        value={github}
-                        onChange={(e) => setGithub(e.target.value)}
-                        className="pl-10"
-                        placeholder="username"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button onClick={handleSaveProfile} disabled={isSaving}>
-                      {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-                      Salvar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setBio(profile.bio || "")
-                        setWebsite(profile.links.website || "")
-                        setTwitter(profile.links.linkedIn || "")
-                        setGithub(profile.links.github || "")
-                      }}
-                      disabled={isSaving}
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>Configurações da Conta</CardTitle>
-                  <CardDescription>Gerenciar as preferências e a segurança da sua conta</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">E-mail</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="email" type="email" value={profile.email} disabled className="pl-10" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Para alterar seu endereço de e-mail, entre em contato com o suporte
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Usuário</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input id="username" value={profile.username} disabled className="pl-10" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">O nome de usuário não pode ser alterado após a criação da conta</p>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Zona Perigosa</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Essas ações são irreversíveis. Por favor, proceda com cautela.
-                    </p>
-                    <Button variant="destructive">Excluir Conta</Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SettingsPage id={user.id} email={user.email} profile={{ github: user.github, linkedin: user.linkedin, website: user.website, bio: user.bio }} username={user.username} />
             </TabsContent>
+
+            {hasModeratorRole &&
+              <TabsContent value="admin-submissions">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gerenciamento de Submissões</CardTitle>
+                    <CardDescription>Revise e aprove submissões de usuários</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <SubmissionsManager />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            }
+
+            {hasAdminRole &&
+              <TabsContent value="admin-roles">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gerenciamento de Papéis</CardTitle>
+                    <CardDescription>Crie e atribua papéis aos usuários</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <RolesManager />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            }
           </Tabs>
         </motion.div>
       </motion.div>

@@ -9,12 +9,16 @@ import CallToActionSection from "@/components/pages/home/call-to-action-section"
 import { snippetService } from "@/data/services/snippets/snippets.service"
 import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
 import { AxiosResponse } from "axios"
+import { gameService } from "@/data/services/games/game.service"
+import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
+import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
 
 export default function Home() {
   const [recentSnippets, setRecentSnippets] = useState<Snippet[]>([])
   const [topContributors, setTopContributors] = useState<typeof mockTopContributors>([])
-  const [featuredTutorials, setFeaturedTutorials] = useState<typeof mockTutorials>([])
-  const [featuredGames, setFeaturedGames] = useState<typeof mockGames>([])
+  const [featuredTutorials, setFeaturedTutorials] = useState<Tutorial[]>([])
+  const [featuredGames, setFeaturedGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
 
 
@@ -24,21 +28,21 @@ export default function Home() {
   }, [])
 
 
-  // const fetchFeaturedTutorials = useCallback(async () => {
-  //   const response = await tutorialsService.find({ subEndpoint: '/featured' }) as unknown as AxiosResponse<Tutorial[]>
-  //   setFeaturedTutorials(response.data)
-  // }, [])
+  const fetchFeaturedTutorials = useCallback(async () => {
+    const response = await tutorialsService.find({ subEndpoint: '/featured' }) as unknown as AxiosResponse<Tutorial[]>
+    setFeaturedTutorials(response.data)
+  }, [])
 
-  // const fetchFeaturedGames = useCallback(async () => {
-  //   const response = await gameService.find({ subEndpoint: '/featured' }) as unknown as AxiosResponse<Game[]>
-  //   setFeaturedGames(response.data)
-  // }, [])
+  const fetchFeaturedGames = useCallback(async () => {
+    const response = await gameService.find({ subEndpoint: '/featured' }) as unknown as AxiosResponse<Game[]>
+    setFeaturedGames(response.data)
+  }, [])
 
   useEffect(() => {
     fetchFeaturedSnippets()
+    fetchFeaturedGames()
+    fetchFeaturedTutorials()
     setTopContributors(mockTopContributors.slice(0, 5))
-    setFeaturedTutorials(mockTutorials.slice(0, 3))
-    setFeaturedGames(mockGames.slice(0, 3))
     setLoading(false)
 
     return
@@ -53,7 +57,7 @@ export default function Home() {
         featuredGames={featuredGames}
         loading={loading}
       />
-      <TopContributorsSection topContributors={topContributors} loading={loading} />
+      {/* <TopContributorsSection topContributors={topContributors} loading={loading} /> */}
       <CallToActionSection />
     </div>
   )

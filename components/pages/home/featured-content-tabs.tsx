@@ -2,15 +2,15 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { motion } from "framer-motion"
-import { Code, ArrowRight, BookOpen, Gamepad2, Star, Download, Clock, User } from "lucide-react"
+import { Code, ArrowRight, BookOpen, Gamepad2, Star } from "lucide-react"
 import { Badge } from "../../badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../tabs"
-import { Card, CardContent, CardFooter } from "../../card"
+import { Card, CardContent } from "../../card"
 import SnippetCard from "@/components/snippetCard"
 import { Button } from "../../button"
-import { Avatar, AvatarFallback, AvatarImage } from "../../avatar"
+import { TutorialCard } from "@/components/trainingCard"
+import { GameCard } from "@/components/gameCard"
 
 interface FeaturedContentTabsProps {
   recentSnippets: any[]
@@ -54,7 +54,7 @@ export default function FeaturedContentTabs({
         <div className="flex flex-col items-center justify-center mb-8 text-center">
           <Badge className="mb-4">
             <Star className="h-3.5 w-3.5 mr-1.5" />
-            Conteúdo em destaque
+            Conteúdo em Destaque
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight">Explore os Conteúdos de PS2 Homebrew</h2>
           <p className="mt-2 text-muted-foreground max-w-[700px]">
@@ -103,7 +103,7 @@ export default function FeaturedContentTabs({
                         </CardContent>
                       </Card>
                     ))
-                  : recentSnippets.map((snippet, index) => (
+                  : recentSnippets && recentSnippets.map((snippet, index) => (
                     <motion.div key={index} variants={cardVariants}>
                       <SnippetCard snippet={snippet} />
                     </motion.div>
@@ -140,43 +140,7 @@ export default function FeaturedContentTabs({
                       </Card>
                     ))
                   : featuredTutorials.map((tutorial, index) => (
-                    <motion.div key={index} variants={cardVariants}>
-                      <Card className="overflow-hidden h-full flex flex-col cursor-pointer transition-all hover:shadow-md">
-                        <Link href={`/tutorials/${tutorial.slug}`} className="h-full flex flex-col">
-                          <div className="relative h-40 w-full">
-                            <Image
-                              src={tutorial.coverImage || "/placeholder.svg"}
-                              alt={tutorial.title}
-                              fill
-                              className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                            <Badge className="absolute bottom-3 left-3 bg-primary/80 hover:bg-primary/80">
-                              {tutorial.category}
-                            </Badge>
-                          </div>
-                          <CardContent className="p-4 flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center text-sm text-muted-foreground">
-                                <Clock className="mr-1 h-4 w-4" />
-                                {tutorial.read_time} min read
-                              </div>
-                            </div>
-                            <h3 className="font-bold text-lg mb-2 line-clamp-2">{tutorial.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-3">{tutorial.excerpt}</p>
-                          </CardContent>
-                          <CardFooter className="p-4 border-t">
-                            <div className="flex items-center">
-                              <Avatar className="h-6 w-6 mr-2">
-                                <AvatarImage src={tutorial.author.avatar_url} />
-                                <AvatarFallback>{tutorial.author.username.charAt(0).toUpperCase()}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm">{tutorial.author.username}</span>
-                            </div>
-                          </CardFooter>
-                        </Link>
-                      </Card>
-                    </motion.div>
+                    <TutorialCard tutorial={tutorial} key={index} />
                   ))}
               </motion.div>
               <div className="flex justify-center mt-8">
@@ -210,44 +174,7 @@ export default function FeaturedContentTabs({
                       </Card>
                     ))
                   : featuredGames.map((game, index) => (
-                    <motion.div key={index} variants={cardVariants}>
-                      <Card className="overflow-hidden h-full flex flex-col cursor-pointer transition-all hover:shadow-md">
-                        <Link href={`/games/${game.slug}`} className="h-full flex flex-col">
-                          <div className="relative h-40 w-full">
-                            <Image
-                              src={game.coverImage || "/placeholder.svg"}
-                              alt={game.title}
-                              fill
-                              className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                            <Badge className="absolute bottom-3 left-3 bg-primary/80 hover:bg-primary/80">
-                              {game.category}
-                            </Badge>
-                          </div>
-                          <CardContent className="p-4 flex-1">
-                            <h3 className="font-bold text-lg mb-2 line-clamp-2">{game.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-3">{game.description}</p>
-                            <div className="flex items-center justify-between mt-4 text-sm">
-                              <div className="flex items-center text-muted-foreground">
-                                <User className="mr-1 h-4 w-4" />
-                                {game.author.username}
-                              </div>
-                              <div className="flex items-center text-muted-foreground">
-                                <Download className="mr-1 h-4 w-4" />
-                                {game.download_count.toLocaleString()}
-                              </div>
-                            </div>
-                          </CardContent>
-                          <CardFooter className="p-4 border-t">
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-xs text-muted-foreground">v{game.version}</span>
-                              <span className="text-xs text-muted-foreground">{game.size_mb}MB</span>
-                            </div>
-                          </CardFooter>
-                        </Link>
-                      </Card>
-                    </motion.div>
+                    <GameCard game={game} key={index} />
                   ))}
               </motion.div>
               <div className="flex justify-center mt-8">
