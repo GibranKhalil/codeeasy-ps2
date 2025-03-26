@@ -49,6 +49,7 @@ import { gameService } from "@/data/services/games/game.service"
 import { rolesService } from "@/data/services/roles/roles.service"
 import RolesManager from "@/components/admin/rolesManager"
 import SubmissionsManager from "@/components/admin/SubmissionsManager"
+import { Role } from "@/data/@types/models/roles/entities/role.entity"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -59,38 +60,32 @@ export default function ProfilePage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [tutorials, setTutorials] = useState<Tutorial[]>([])
   const [games, setGames] = useState<Game[]>([])
+
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true)
   const [activeTab, setActiveTab] = useState<string>("overview")
 
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
-  const featchTutorialsByCreator = useCallback(async () => {
+  const fetchTutorialsByCreator = useCallback(async () => {
     if (user) {
       const response = await tutorialsService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
       setTutorials(response.data.data)
     }
   }, [user])
 
-  const featchSnippetsByCreator = useCallback(async () => {
+  const fetchSnippetsByCreator = useCallback(async () => {
     if (user) {
       const response = await snippetService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
       setSnippets(response.data.data)
     }
   }, [user])
 
-  const featchGamesByCreator = useCallback(async () => {
+  const fetchGamesByCreator = useCallback(async () => {
     if (user) {
       const response = await gameService.find({ requiresAuth: true, subEndpoint: `/creator/${user.id}`, params: { limit: 3 } })
       setGames(response.data.data)
     }
   }, [user])
-
-  const featchRoles = useCallback(async () => {
-    if (activeTab === "admin-roles" && user) {
-      const response = await rolesService.find({ requiresAuth: true })
-      console.log(response)
-    }
-  }, [activeTab, user])
 
   useEffect(() => {
     if (user) {
@@ -101,15 +96,11 @@ export default function ProfilePage() {
   }, [user])
 
   useEffect(() => {
-    featchTutorialsByCreator()
-    featchSnippetsByCreator()
-    featchGamesByCreator()
+    fetchTutorialsByCreator()
+    fetchSnippetsByCreator()
+    fetchGamesByCreator()
     return
-  }, [featchTutorialsByCreator, featchTutorialsByCreator, featchGamesByCreator])
-
-  useEffect(() => {
-    featchRoles()
-  }, [featchRoles])
+  }, [fetchTutorialsByCreator, fetchTutorialsByCreator, fetchGamesByCreator])
 
 
   useEffect(() => {
