@@ -55,7 +55,6 @@ export default function RolesManager({ }: RolesManagerProps) {
             setIsLoading(true)
             const response = await userService.find({ requiresAuth: true, subEndpoint: '/roles' })
             setUsers(response.data.data)
-            console.log(response.data)
             fetchRoles()
         } catch (error) {
             toast({
@@ -87,11 +86,9 @@ export default function RolesManager({ }: RolesManagerProps) {
 
         try {
             setIsCreatingRole(true)
-            const createdRole = await rolesService.create({
+            await rolesService.create({
                 name: newRole.name,
             }, { requiresAuth: true })
-
-            console.log(createdRole)
 
             toast({
                 title: "Papel Criado",
@@ -167,7 +164,6 @@ export default function RolesManager({ }: RolesManagerProps) {
 
         try {
             const response = await userService.delete(userId, { requiresAuth: true, subEndpoint: `/${userId}/${roleId}` })
-            console.log(response)
             toast({
                 title: "Papel Removido",
                 description: "Papel removido do usuário com sucesso.",
@@ -183,34 +179,34 @@ export default function RolesManager({ }: RolesManagerProps) {
         }
     }
 
-    const handleDeleteRole = async (roleId: number) => {
-        try {
-            await rolesService.delete(roleId)
+    // const handleDeleteRole = async (roleId: number) => {
+    //     try {
+    //         await rolesService.delete(roleId)
 
-            toast({
-                title: "Papel Excluído",
-                description: "Papel excluído com sucesso.",
-                variant: "default"
-            })
+    //         toast({
+    //             title: "Papel Excluído",
+    //             description: "Papel excluído com sucesso.",
+    //             variant: "default"
+    //         })
 
-            // Potentially refresh roles list or remove from local state
-        } catch (error) {
-            toast({
-                title: "Erro ao Excluir Papel",
-                description: "Não foi possível excluir o papel.",
-                variant: "destructive"
-            })
-        }
-    }
+    //         // Potentially refresh roles list or remove from local state
+    //     } catch (error) {
+    //         toast({
+    //             title: "Erro ao Excluir Papel",
+    //             description: "Não foi possível excluir o papel.",
+    //             variant: "destructive"
+    //         })
+    //     }
+    // }
 
-    const togglePermission = (permission: string) => {
-        setNewRole(prev => ({
-            ...prev,
-            permissions: prev.permissions.includes(permission)
-                ? prev.permissions.filter(p => p !== permission)
-                : [...prev.permissions, permission]
-        }))
-    }
+    // const togglePermission = (permission: string) => {
+    //     setNewRole(prev => ({
+    //         ...prev,
+    //         permissions: prev.permissions.includes(permission)
+    //             ? prev.permissions.filter(p => p !== permission)
+    //             : [...prev.permissions, permission]
+    //     }))
+    // }
 
     useEffect(() => {
         fetchUsers()
@@ -230,7 +226,6 @@ export default function RolesManager({ }: RolesManagerProps) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
-            {/* Create Role Section */}
             <Card>
                 <CardHeader>
                     <CardTitle>Criar Novo Papel</CardTitle>
@@ -287,7 +282,6 @@ export default function RolesManager({ }: RolesManagerProps) {
                 </CardContent>
             </Card>
 
-            {/* Assign Role Section */}
             <Card>
                 <CardHeader>
                     <CardTitle>Atribuir Papel a Usuário</CardTitle>

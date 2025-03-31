@@ -1,15 +1,30 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Submission } from "@/data/@types/models/submissions/entities/submission.entity"
-import { format } from "date-fns"
+import { format, formatDate } from "date-fns"
+import { Label } from "@/components/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
+import { Card, CardContent, CardHeader } from "@/components/card"
+import { Badge } from "@/components/badge"
+import { Button } from "@/components/button"
+import { Check, Eye, Loader2, X } from "lucide-react"
+import { submissionService } from "@/data/services/submissions/submissions.service"
+import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
+import { Separator } from "@/components/separator"
+import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
+import { Tag } from "@/data/@types/models/tags/entities/tag.entity"
+import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/dialog"
+import { Textarea } from "@/components/textarea"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 
 export default function SubmissionsManager() {
     const { toast } = useToast()
 
     const [submissions, setSubmissions] = useState<Submission[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [typeFilter, setTypeFilter] = useState<string>("all")
     const [statusFilter, setStatusFilter] = useState<string>("pending")
     const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
@@ -17,6 +32,15 @@ export default function SubmissionsManager() {
     const [showModal, setShowModal] = useState(false)
     const [modalMode, setModalMode] = useState<"view" | "feedback">("view")
 
+    const fetchSubmissions = useCallback(async () => {
+        const response = await submissionService.find({ requiresAuth: true })
+        console.log(response.data.data)
+        setSubmissions(response.data.data)
+    }, [])
+
+    useEffect(() => {
+        fetchSubmissions()
+    }, [fetchSubmissions])
 
     const openViewModal = (submission: Submission) => {
         setSelectedSubmission(submission)
@@ -24,7 +48,6 @@ export default function SubmissionsManager() {
         setShowModal(true)
     }
 
-    // Função para abrir o modal de feedback
     const openFeedbackModal = (submission: Submission, action: "approve" | "reject") => {
         setSelectedSubmission(submission)
         setFeedback(submission.comment || "")
@@ -32,12 +55,10 @@ export default function SubmissionsManager() {
         setShowModal(true)
     }
 
-    // Função para processar a submissão (aprovar/rejeitar)
     const processSubmission = async (action: "approve" | "reject") => {
 
     }
 
-    // Função para obter o ícone do tipo de submissão
     const getTypeIcon = (type: string) => {
         switch (type) {
             case "snippet":
@@ -51,7 +72,6 @@ export default function SubmissionsManager() {
         }
     }
 
-    // Função para obter a cor do status
     const getStatusColor = (status: string) => {
         switch (status) {
             case "pending":
@@ -65,181 +85,231 @@ export default function SubmissionsManager() {
         }
     }
 
-    // Renderizar o conteúdo da submissão
     const renderSubmissionContent = (submission: Submission) => {
         switch (submission.type) {
             case "snippet":
-                const snippet = submission.snippet as any
+                const snippet = submission.snippet as Snippet;
                 return (
-                    <div className="mt-4">
-                        <h3 className="text-lg font-medium">Descrição:</h3>
-                        <p className="mt-1 mb-3">{snippet.description}</p>
+                    <Card className="mt-4 w-full">
+                        <CardHeader>
+                            {/* Pode adicionar um CardTitle ou CardDescription se fizer sentido */}
+                            {/* <CardTitle>Snippet de Código</CardTitle> */}
+                        </CardHeader>
+                        <CardContent>
+                            <h3 className="text-lg font-semibold mb-1">Descrição:</h3>
+                            <p className="text-sm text-muted-foreground mb-4">{snippet.pid}</p>
 
-                        <h3 className="text-lg font-medium">Código ({snippet.language}):</h3>
-                        <pre className="mt-1 p-4 bg-gray-100 rounded-md overflow-x-auto">
-                            <code>{snippet.code}</code>
-                        </pre>
-                    </div>
-                )
+                            <Separator className="my-4" /> {/* Divisória opcional */}
+
+                            <h3 className="text-lg font-semibold mb-1">Código ({snippet.language}):</h3>
+                            <div className="rounded-md border bg-muted p-4 overflow-x-auto">
+                                <pre className="text-sm font-mono">
+                                    <code>{snippet.code}</code>
+                                </pre>
+                            </div>
+                        </CardContent>
+                    </Card>
+                );
 
             case "tutorial":
-                const tutorial = submission.tutorial as any
+                const tutorial = submission.tutorial as Tutorial;
                 return (
-                    <div className="mt-4">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">{tutorial.category}</span>
-                            <span className="text-sm text-gray-500">Tempo de leitura: {tutorial.read_time} min</span>
-                        </div>
+                    <Card className="mt-4 w-full">
+                        <CardHeader>
+                            {/* <CardTitle>Tutorial</CardTitle> Optional */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                <Badge variant="outline">{tutorial.category?.name}</Badge>
+                                <span>|</span>
+                                <span>Tempo de leitura: {tutorial.readTime} min</span>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <h3 className="text-lg font-semibold mb-1">Resumo:</h3>
+                            <p className="text-sm text-muted-foreground mb-4">{tutorial.excerpt}</p>
 
-                        <h3 className="text-lg font-medium">Resumo:</h3>
-                        <p className="mt-1 mb-3">{tutorial.excerpt}</p>
+                            <Separator className="my-4" />
 
-                        <h3 className="text-lg font-medium">Conteúdo:</h3>
-                        <div className="mt-1 p-4 bg-gray-100 rounded-md overflow-y-auto max-h-96">{tutorial.content}</div>
+                            <h3 className="text-lg font-semibold mb-1">Conteúdo:</h3>
+                            {/* Usando `prose` do Tailwind Typography (se instalado) pode ser bom para renderizar markdown/html */}
+                            <div className="mt-1 p-4 border rounded-md overflow-y-auto max-h-96 text-sm prose dark:prose-invert max-w-none">
+                                {/* Idealmente, renderize o conteúdo HTML/Markdown aqui */}
+                                {tutorial.content}
+                            </div>
 
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            {tutorial.tags.map((tag: string, index: number) => (
-                                <span key={index} className="px-2 py-1 bg-gray-200 text-gray-800 text-xs rounded-full">
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )
+                            {tutorial.tags && tutorial.tags.length > 0 && (
+                                <>
+                                    <Separator className="my-4" />
+                                    <div className="flex flex-wrap gap-2">
+                                        {tutorial.tags.map((tag: Tag, index: number) => (
+                                            <Badge key={index} variant="secondary">
+                                                {tag.name}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+                );
 
             case "game":
-                const game = submission.game as any
+                const game = submission.game as Game;
                 return (
-                    <div className="mt-4">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">{game.category}</span>
-                            <span className="text-sm text-gray-500">
-                                Versão: {game.version} | {game.size_mb} MB
-                            </span>
-                        </div>
+                    <Card className="mt-4 w-full">
+                        <CardHeader>
+                            {/* <CardTitle>Game</CardTitle> Optional */}
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                                <Badge variant="outline">{game.category.name}</Badge>
+                                <span>|</span>
+                                <span>Versão: {game.version}</span>
+                                <span>|</span>
+                                <span>Tamanho: {game.fileSize} MB</span>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <h3 className="text-lg font-semibold mb-1">Descrição:</h3>
+                            <p className="text-sm text-muted-foreground mb-4">{game.description}</p>
 
-                        <h3 className="text-lg font-medium">Descrição:</h3>
-                        <p className="mt-1 mb-3">{game.description}</p>
+                            <Separator className="my-4" />
 
-                        <h3 className="text-lg font-medium">Conteúdo:</h3>
-                        <div className="mt-1 p-4 bg-gray-100 rounded-md overflow-y-auto max-h-96">{game.content}</div>
+                            <h3 className="text-lg font-semibold mb-1">Detalhes/Conteúdo:</h3>
+                            {/* Similar ao tutorial, considere usar `prose` */}
+                            <div className="mt-1 p-4 border rounded-md overflow-y-auto max-h-96 text-sm prose dark:prose-invert max-w-none">
+                                {game.description}
+                            </div>
 
-                        <h3 className="text-lg font-medium mt-3">Screenshots:</h3>
-                        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {game.screenshots.map((screenshot: string, index: number) => (
-                                <img
-                                    key={index}
-                                    src={screenshot || "/placeholder.svg"}
-                                    alt={`Screenshot ${index + 1}`}
-                                    className="rounded-md w-full h-auto object-cover"
-                                />
-                            ))}
-                        </div>
+                            {game.screenshots && game.screenshots.length > 0 && (
+                                <>
+                                    <Separator className="my-4" />
+                                    <h3 className="text-lg font-semibold mb-2">Screenshots:</h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        {game.screenshots.map((screenshot: string, index: number) => (
+                                            <img
+                                                key={index}
+                                                src={screenshot || "/placeholder.svg"} // Mantenha o placeholder
+                                                alt={`Screenshot ${index + 1}`}
+                                                className="rounded-md border w-full h-auto object-cover aspect-video" // Adicionado aspect-video para consistência
+                                            />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
 
-                        <div className="mt-3 flex flex-wrap gap-2">
-                            {game.tags.map((tag: string, index: number) => (
-                                <span key={index} className="px-2 py-1 bg-gray-200 text-gray-800 text-xs rounded-full">
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )
+
+                            {game.tags && game.tags.length > 0 && (
+                                <>
+                                    <Separator className="my-4" />
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                        {game.tags.map((tag: Tag, index: number) => (
+                                            <Badge key={index} variant="secondary">
+                                                {tag.name}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+                );
 
             default:
-                return <p>Tipo de conteúdo não suportado</p>
+                // Pode usar um Alert ou AlertDescription do Shadcn para erros/avisos
+                return (
+                    <Card className="mt-4 w-full">
+                        <CardContent className="pt-6"> {/* pt-6 para padding quando não há header */}
+                            <p className="text-destructive">Tipo de conteúdo não suportado ou dados ausentes.</p>
+                        </CardContent>
+                    </Card>
+                );
         }
-    }
+    };
 
     return (
         <div>
-            {/* Filtros */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="flex-1">
-                    <label htmlFor="type-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                        Tipo de Submissão
-                    </label>
-                    <select
-                        id="type-filter"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                <div className="flex-1 space-y-2">
+                    <Label htmlFor="type-filter">Tipo de Submissão</Label>
+                    <Select
                         value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value)}
+                        onValueChange={setTypeFilter}
                     >
-                        <option value="all">Todos os tipos</option>
-                        <option value="snippet">Snippets de Código</option>
-                        <option value="tutorial">Tutoriais</option>
-                        <option value="game">Jogos</option>
-                    </select>
+                        <SelectTrigger id="type-filter">
+                            <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todos os tipos</SelectItem>
+                            <SelectItem value="snippet">Snippets de Código</SelectItem>
+                            <SelectItem value="tutorial">Tutoriais</SelectItem>
+                            <SelectItem value="game">Jogos</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
-                <div className="flex-1">
-                    <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
-                        Status
-                    </label>
-                    <select
-                        id="status-filter"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                <div className="flex-1 space-y-2">
+                    <Label htmlFor="status-filter">Status</Label>
+                    <Select
                         value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                        onValueChange={setStatusFilter}
                     >
-                        <option value="all">Todos os status</option>
-                        <option value="pending">Pendentes</option>
-                        <option value="approved">Aprovados</option>
-                        <option value="rejected">Rejeitados</option>
-                    </select>
+                        <SelectTrigger id="status-filter">
+                            <SelectValue placeholder="Selecione o status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">Todos os status</SelectItem>
+                            <SelectItem value="pending">Pendentes</SelectItem>
+                            <SelectItem value="approved">Aprovados</SelectItem>
+                            <SelectItem value="rejected">Rejeitados</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
-            {/* Lista de submissões */}
             {loading ? (
                 <div className="flex justify-center items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
                 </div>
             ) : submissions.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <p className="text-lg text-gray-600">Nenhuma submissão encontrada com os filtros selecionados</p>
+                <div className="text-center py-12 rounded-lg">
+                    <p className="text-lg text-muted-foreground">
+                        Nenhuma submissão encontrada com os filtros selecionados
+                    </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">
-                    {submissions.map((submission) => (
-                        <div key={submission.id} className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                            <div className="p-4 sm:p-6">
+                    {submissions && submissions.map((submission) => (
+                        <Card key={submission.id} className="overflow-hidden">
+                            <CardContent className="p-6">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex items-start gap-3">
                                         <div className="text-2xl">{getTypeIcon(submission.type)}</div>
                                         <div>
-                                            <h2 className="text-xl font-semibold">{submission.id}</h2>
-                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 text-sm text-gray-600">
-                                                {/* <div className="flex items-center gap-2">
-                                                    <img
-                                                        src={submission.avatar_url || "/placeholder.svg"}
-                                                        alt={submission.author.username}
-                                                        className="w-5 h-5 rounded-full"
-                                                    />
-                                                    <span>{submission.author.username}</span>
-                                                </div> */}
+                                            <h2 className="text-xl font-semibold">{submission.title}</h2>
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 text-sm text-muted-foreground">
                                                 <span className="hidden sm:inline">•</span>
-                                                <span>Enviado em {format(new Date(submission.submittedAt), "d/MM/y")}</span>
+                                                <span>
+                                                    Enviado em {format(new Date(submission.submittedAt), "d/MM/y")}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(submission.status)}`}>
-                                            {submission.status === "pending"
-                                                ? "Pendente"
-                                                : submission.status === "approved"
-                                                    ? "Aprovado"
-                                                    : "Rejeitado"}
-                                        </span>
-                                    </div>
+                                    <Badge
+                                        variant="outline"
+                                        className={getStatusColor(submission.status)}
+                                    >
+                                        {submission.status === "pending"
+                                            ? "Pendente"
+                                            : submission.status === "approved"
+                                                ? "Aprovado"
+                                                : "Rejeitado"}
+                                    </Badge>
                                 </div>
 
                                 {submission.submittedAt && (
-                                    <div className="mt-4 text-sm text-gray-600">
+                                    <div className="mt-4 text-sm text-muted-foreground">
                                         <p>Revisado em: {format(new Date(submission.submittedAt), "d/MM/y")}</p>
                                         {submission.comment && (
-                                            <div className="mt-2 p-3 bg-gray-50 rounded-md">
+                                            <div className="mt-2 p-3 bg-secondary/50 rounded-md">
                                                 <p className="font-medium">Feedback:</p>
                                                 <p className="mt-1">{submission.comment}</p>
                                             </div>
@@ -248,154 +318,145 @@ export default function SubmissionsManager() {
                                 )}
 
                                 <div className="mt-4 flex flex-wrap gap-3">
-                                    <button
+                                    <Button
                                         onClick={() => openViewModal(submission)}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                        size="sm"
                                     >
+                                        <Eye className="mr-2 h-4 w-4" />
                                         Ver Detalhes
-                                    </button>
+                                    </Button>
 
                                     {submission.status === "pending" && (
                                         <>
-                                            <button
+                                            <Button
                                                 onClick={() => openFeedbackModal(submission, "approve")}
-                                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                                variant="default"
+                                                size="sm"
                                             >
+                                                <Check className="mr-2 h-4 w-4" />
                                                 Aprovar
-                                            </button>
+                                            </Button>
 
-                                            <button
+                                            <Button
                                                 onClick={() => openFeedbackModal(submission, "reject")}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                variant="destructive"
+                                                size="sm"
                                             >
+                                                <X className="mr-2 h-4 w-4" />
                                                 Rejeitar
-                                            </button>
+                                            </Button>
                                         </>
                                     )}
                                 </div>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
             )}
 
-            {/* Modal de visualização/feedback */}
-            {showModal && selectedSubmission && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            {selectedSubmission && (
+                <Dialog open={showModal} onOpenChange={setShowModal}>
+                    <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl font-bold">
+                                {modalMode === "view"
+                                    ? `Detalhes: ${selectedSubmission.title}`
+                                    : selectedSubmission.status === "pending"
+                                        ? "Revisar Submissão"
+                                        : "Atualizar Feedback"}
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="flex-grow overflow-y-auto pr-6 pl-6 -mr-6 -ml-6"> {/* Adiciona scroll ao corpo se o conteúdo for grande */}
+                            {modalMode === "view" ? (
+                                <div>
+                                    <div className="mb-4 flex items-center gap-3">
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={selectedSubmission.creator.avatarUrl || undefined} alt={`@${selectedSubmission.creator.username}`} />
+                                            <AvatarFallback>{selectedSubmission.creator.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium">{selectedSubmission.creator.username}</p>
+                                            <p className="text-sm text-muted-foreground">Enviado em {formatDate(selectedSubmission.submittedAt, 'dd/MM/Y')}</p>
+                                        </div>
+                                    </div>
+                                    <Separator className="my-4" />
+
+                                    {renderSubmissionContent(selectedSubmission)}
+                                </div>
+                            ) : (
+                                <div className="py-4 space-y-4">
+                                    <div className="mb-4 flex items-center gap-3">
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={selectedSubmission.creator.avatarUrl || undefined} alt={`@${selectedSubmission.creator.username}`} />
+                                            <AvatarFallback>{selectedSubmission.creator.username.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-medium">{selectedSubmission.creator.username}</p>
+                                            <p className="text-sm text-muted-foreground">Enviado em {formatDate(selectedSubmission.submittedAt, 'dd/MM/Y')}</p>
+                                        </div>
+                                    </div>
+                                    <Separator className="my-4" />
+                                    {renderSubmissionContent(selectedSubmission)}
+                                    <div className="space-y-2 pt-4">
+                                        <Label htmlFor="feedback">Feedback para o autor</Label>
+                                        <Textarea
+                                            id="feedback"
+                                            rows={5}
+                                            placeholder="Explique o motivo da aprovação ou rejeição..."
+                                            value={feedback}
+                                            onChange={(e) => setFeedback(e.target.value)}
+                                            className="resize-y"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-                            &#8203;
-                        </span>
-
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                {modalMode === "view" ? (
-                                    <div>
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-bold">{selectedSubmission.id}</h3>
-                                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-500">
-                                                <span className="sr-only">Fechar</span>
-                                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        {/* <div className="mt-4 flex items-center gap-3">
-                                            <img
-                                                src={selectedSubmission.author.avatar_url || "/placeholder.svg"}
-                                                alt={selectedSubmission.author.username}
-                                                className="w-8 h-8 rounded-full"
-                                            />
-                                            <div>
-                                                <p className="font-medium">{selectedSubmission.author.username}</p>
-                                                <p className="text-sm text-gray-500">Enviado em {formatDate(selectedSubmission.created_at)}</p>
-                                            </div>
-                                        </div> */}
-
-                                        {renderSubmissionContent(selectedSubmission)}
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="text-2xl font-bold">
-                                                {selectedSubmission.status === "pending" ? "Revisar Submissão" : "Atualizar Feedback"}
-                                            </h3>
-                                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-500">
-                                                <span className="sr-only">Fechar</span>
-                                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="mt-4">
-                                            <label htmlFor="feedback" className="block text-sm font-medium text-gray-700 mb-1">
-                                                Feedback para o autor
-                                            </label>
-                                            <textarea
-                                                id="feedback"
-                                                rows={5}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                placeholder="Explique o motivo da aprovação ou rejeição..."
-                                                value={feedback}
-                                                onChange={(e) => setFeedback(e.target.value)}
-                                            ></textarea>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                {modalMode === "view" ? (
-                                    <button
-                                        type="button"
-                                        className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                        onClick={() => setShowModal(false)}
-                                    >
+                        <DialogFooter className="mt-auto pt-4"> {/* mt-auto para fixar no fundo se usar flex-col */}
+                            {modalMode === "view" ? (
+                                <DialogClose asChild>
+                                    <Button type="button" variant="outline">
                                         Fechar
-                                    </button>
-                                ) : (
-                                    <>
-                                        <button
-                                            type="button"
-                                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                                            onClick={() =>
-                                                processSubmission(
-                                                    selectedSubmission.status === "pending" ? "approve" : (selectedSubmission.status as any),
-                                                )
-                                            }
-                                        >
-                                            {selectedSubmission.status === "pending" ? "Aprovar" : "Atualizar"}
-                                        </button>
-
-                                        {selectedSubmission.status === "pending" && (
-                                            <button
-                                                type="button"
-                                                className="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                                onClick={() => processSubmission("reject")}
-                                            >
-                                                Rejeitar
-                                            </button>
-                                        )}
-
-                                        <button
-                                            type="button"
-                                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                            onClick={() => setShowModal(false)}
-                                        >
+                                    </Button>
+                                </DialogClose>
+                            ) : (
+                                <>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="outline">
                                             Cancelar
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                        </Button>
+                                    </DialogClose>
+
+                                    {selectedSubmission.status === "pending" && (
+                                        <Button
+                                            type="button"
+                                            variant="destructive" // Botão de rejeição
+                                            onClick={() => processSubmission("reject")}
+                                            disabled={!feedback} // Opcional: Desabilitar se feedback for obrigatório para rejeitar
+                                        >
+                                            Rejeitar
+                                        </Button>
+                                    )}
+
+                                    <Button
+                                        type="button"
+                                        // variant="default" // Botão primário (padrão)
+                                        onClick={() =>
+                                            processSubmission(
+                                                selectedSubmission.status === "pending" ? "approve" : (selectedSubmission.status as any),
+                                            )
+                                        }
+                                        // Opcional: Desabilitar se feedback for obrigatório para aprovar/atualizar
+                                        disabled={selectedSubmission.status === "pending" && !feedback}
+                                    >
+                                        {selectedSubmission.status === "pending" ? "Aprovar" : "Atualizar"}
+                                    </Button>
+                                </>
+                            )}
+                        </DialogFooter>
+
+                    </DialogContent>
+                </Dialog>
             )}
         </div>
     )

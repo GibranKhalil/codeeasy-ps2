@@ -1,3 +1,4 @@
+import { User } from '../../users/entities/user.entity';
 import { SubmissionType } from '../entities/submission.entity';
 
 export class CreateSubmissionDto {
@@ -6,4 +7,5 @@ export class CreateSubmissionDto {
   tutorialId?: string;
   gameId?: string;
   comment?: string;
+  creator?: User;
 }
