@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { Submission } from "@/data/@types/models/submissions/entities/submission.entity"
+import { Submission, SubmissionStatus } from "@/data/@types/models/submissions/entities/submission.entity"
 import { format, formatDate } from "date-fns"
 import { Label } from "@/components/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
@@ -58,58 +58,11 @@ export default function SubmissionsManager() {
         setShowModal(true)
     }
 
-    const approveGameOrReject = async (id: number, status: number) => {
-        const response = await gameService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
-        console.log("GAME: ", response)
-    }
-
-    const approveTutorialOrReject = async (id: number, status: number) => {
-        const response = await tutorialsService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
-        console.log("TUTORIAL: ", response)
-    }
-
-    const approveSnippetOrReject = async (id: number, status: number) => {
-        const response = await snippetService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
-        console.log("SNIPPET: ", response)
-    }
-
-    const handleApproveContent = async () => {
-        if (selectedSubmission?.game) {
-            return await approveGameOrReject(selectedSubmission.game.id, eContentStatus.APPROVED)
+    const approveOrRejectContent = async (status: SubmissionStatus) => {
+        if (selectedSubmission) {
+            const response = await submissionService.update(selectedSubmission?.id, { ...selectedSubmission, status, comment: feedback }, { requiresAuth: true })
+            console.log(response)
         }
-
-        if (selectedSubmission?.tutorial) {
-            return await approveTutorialOrReject(selectedSubmission.tutorial.id, eContentStatus.APPROVED)
-        }
-
-        if (selectedSubmission?.snippet) {
-            return await approveSnippetOrReject(selectedSubmission.snippet.id, eContentStatus.APPROVED)
-        }
-    }
-
-    const handleRejectContent = async () => {
-        if (selectedSubmission?.game) {
-            return await approveGameOrReject(selectedSubmission.game.id, eContentStatus.REJECTED)
-        }
-
-        if (selectedSubmission?.tutorial) {
-            return await approveTutorialOrReject(selectedSubmission.tutorial.id, eContentStatus.REJECTED)
-        }
-
-        if (selectedSubmission?.snippet) {
-            return await approveSnippetOrReject(selectedSubmission.snippet.id, eContentStatus.REJECTED)
-        }
-    }
-
-    const processSubmission = async (action: "approve" | "reject") => {
-        if (action === "approve") {
-            await handleApproveContent()
-        }
-
-        if (action === "reject") {
-            await handleRejectContent()
-        }
-
     }
 
     const getTypeIcon = (type: string) => {
@@ -419,7 +372,7 @@ export default function SubmissionsManager() {
                                         : "Atualizar Feedback"}
                             </DialogTitle>
                         </DialogHeader>
-                        <div className="flex-grow overflow-y-auto pr-6 pl-6 -mr-6 -ml-6"> {/* Adiciona scroll ao corpo se o conteúdo for grande */}
+                        <div className="flex-grow overflow-y-auto pr-6 pl-6 -mr-6 -ml-6">
                             {modalMode === "view" ? (
                                 <div>
                                     <div className="mb-4 flex items-center gap-3">
@@ -484,7 +437,7 @@ export default function SubmissionsManager() {
                                         <Button
                                             type="button"
                                             variant="destructive"
-                                            onClick={() => processSubmission("reject")}
+                                            onClick={() => approveOrRejectContent("rejected")}
                                             disabled={!feedback}
                                         >
                                             Rejeitar
@@ -494,7 +447,7 @@ export default function SubmissionsManager() {
                                     <Button
                                         type="button"
                                         onClick={() =>
-                                            processSubmission(
+                                            approveOrRejectContent(
                                                 selectedSubmission.status === "pending" ? "approve" : (selectedSubmission.status as any),
                                             )
                                         }

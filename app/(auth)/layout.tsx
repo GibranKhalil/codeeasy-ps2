@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import { Inter } from "next/font/google"
 import '../globals.css'
 import { AuthProvider } from "@/shared/authContext"
+import { Toaster } from "@/components/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,6 +24,7 @@ export default function AuthLayout({
                 <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
                     <AuthProvider>
                         {children}
+                        <Toaster />
                     </AuthProvider>
                 </ThemeProvider>
             </body>
