@@ -19,6 +19,10 @@ import { Game } from "@/data/@types/models/games/entities/game.entity"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/dialog"
 import { Textarea } from "@/components/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
+import { gameService } from "@/data/services/games/game.service"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
+import { snippetService } from "@/data/services/snippets/snippets.service"
+import { eContentStatus } from "@/data/@types/enums/eContentStatus.enum"
 
 export default function SubmissionsManager() {
     const { toast } = useToast()
@@ -34,7 +38,6 @@ export default function SubmissionsManager() {
 
     const fetchSubmissions = useCallback(async () => {
         const response = await submissionService.find({ requiresAuth: true })
-        console.log(response.data.data)
         setSubmissions(response.data.data)
     }, [])
 
@@ -55,7 +58,57 @@ export default function SubmissionsManager() {
         setShowModal(true)
     }
 
+    const approveGameOrReject = async (id: number, status: number) => {
+        const response = await gameService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
+        console.log("GAME: ", response)
+    }
+
+    const approveTutorialOrReject = async (id: number, status: number) => {
+        const response = await tutorialsService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
+        console.log("TUTORIAL: ", response)
+    }
+
+    const approveSnippetOrReject = async (id: number, status: number) => {
+        const response = await snippetService.update(id, {}, { requiresAuth: true, subEndpoint: `/pub/${id}/${status}` })
+        console.log("SNIPPET: ", response)
+    }
+
+    const handleApproveContent = async () => {
+        if (selectedSubmission?.game) {
+            return await approveGameOrReject(selectedSubmission.game.id, eContentStatus.APPROVED)
+        }
+
+        if (selectedSubmission?.tutorial) {
+            return await approveTutorialOrReject(selectedSubmission.tutorial.id, eContentStatus.APPROVED)
+        }
+
+        if (selectedSubmission?.snippet) {
+            return await approveSnippetOrReject(selectedSubmission.snippet.id, eContentStatus.APPROVED)
+        }
+    }
+
+    const handleRejectContent = async () => {
+        if (selectedSubmission?.game) {
+            return await approveGameOrReject(selectedSubmission.game.id, eContentStatus.REJECTED)
+        }
+
+        if (selectedSubmission?.tutorial) {
+            return await approveTutorialOrReject(selectedSubmission.tutorial.id, eContentStatus.REJECTED)
+        }
+
+        if (selectedSubmission?.snippet) {
+            return await approveSnippetOrReject(selectedSubmission.snippet.id, eContentStatus.REJECTED)
+        }
+    }
+
     const processSubmission = async (action: "approve" | "reject") => {
+        if (action === "approve") {
+            await handleApproveContent()
+        }
+
+        if (action === "reject") {
+            await handleRejectContent()
+        }
 
     }
 
@@ -412,7 +465,7 @@ export default function SubmissionsManager() {
                             )}
                         </div>
 
-                        <DialogFooter className="mt-auto pt-4"> {/* mt-auto para fixar no fundo se usar flex-col */}
+                        <DialogFooter className="mt-auto pt-4">
                             {modalMode === "view" ? (
                                 <DialogClose asChild>
                                     <Button type="button" variant="outline">
@@ -430,9 +483,9 @@ export default function SubmissionsManager() {
                                     {selectedSubmission.status === "pending" && (
                                         <Button
                                             type="button"
-                                            variant="destructive" // Botão de rejeição
+                                            variant="destructive"
                                             onClick={() => processSubmission("reject")}
-                                            disabled={!feedback} // Opcional: Desabilitar se feedback for obrigatório para rejeitar
+                                            disabled={!feedback}
                                         >
                                             Rejeitar
                                         </Button>
@@ -440,13 +493,11 @@ export default function SubmissionsManager() {
 
                                     <Button
                                         type="button"
-                                        // variant="default" // Botão primário (padrão)
                                         onClick={() =>
                                             processSubmission(
                                                 selectedSubmission.status === "pending" ? "approve" : (selectedSubmission.status as any),
                                             )
                                         }
-                                        // Opcional: Desabilitar se feedback for obrigatório para aprovar/atualizar
                                         disabled={selectedSubmission.status === "pending" && !feedback}
                                     >
                                         {selectedSubmission.status === "pending" ? "Aprovar" : "Atualizar"}
