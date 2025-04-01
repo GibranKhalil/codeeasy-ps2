@@ -10,7 +10,7 @@ class UserService extends CrudOperations<
   CreateUserDto | AddRoleToUserDto
 > {
   constructor(endpoint: string) {
-    super('Usuários', endpoint);
+    super('Usuário', endpoint);
   }
 }
 export const userService = new UserService('/users');
