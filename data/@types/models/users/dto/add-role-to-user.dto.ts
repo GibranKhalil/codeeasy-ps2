@@ -1,3 +1,3 @@
 export class AddRoleToUserDto {
-  roleId: number;
+  roleId!: number;
 }
