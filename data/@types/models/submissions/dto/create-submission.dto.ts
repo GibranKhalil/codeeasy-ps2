@@ -1,8 +1,6 @@
+import { eContentStatus } from '@/data/@types/enums/eContentStatus.enum';
 import { User } from '../../users/entities/user.entity';
-import {
-  SubmissionStatus,
-  SubmissionType,
-} from '../entities/submission.entity';
+import { SubmissionType } from '../entities/submission.entity';
 
 export class CreateSubmissionDto {
   type!: SubmissionType;
@@ -11,5 +9,5 @@ export class CreateSubmissionDto {
   gameId?: string;
   comment?: string;
   creator?: User;
-  status?: SubmissionStatus;
+  status?: eContentStatus;
 }
