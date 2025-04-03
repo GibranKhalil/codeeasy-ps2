@@ -139,9 +139,9 @@ export default function TutorialsPage() {
                     <CardContent className="p-4 pt-2">
                       <p className="text-muted-foreground line-clamp-3">{tutorial.excerpt}</p>
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {tutorial.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag.id} variant="secondary" className="text-xs">
-                            {tag.name}
+                        {tutorial.tags.slice(0, 3).map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
                           </Badge>
                         ))}
                         {tutorial.tags.length > 3 && (

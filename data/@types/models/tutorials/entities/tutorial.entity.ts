@@ -1,7 +1,6 @@
 import { Interactions } from '@/data/@types/interactions.type';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
-import { Tag } from '../../tags/entities/tag.entity';
 import { eContentStatus } from '@/data/@types/enums/eContentStatus.enum';
 
 export class Tutorial {
@@ -18,6 +17,6 @@ export class Tutorial {
   updatedAt!: Date;
   creator!: User;
   category!: Category;
-  tags!: Tag[];
+  tags!: string[];
   status!: eContentStatus;
 }

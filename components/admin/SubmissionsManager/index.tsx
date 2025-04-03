@@ -14,7 +14,6 @@ import { submissionService } from "@/data/services/submissions/submissions.servi
 import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
 import { Separator } from "@/components/separator"
 import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
-import { Tag } from "@/data/@types/models/tags/entities/tag.entity"
 import { Game } from "@/data/@types/models/games/entities/game.entity"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/dialog"
 import { Textarea } from "@/components/textarea"
@@ -146,9 +145,9 @@ export default function SubmissionsManager() {
                                 <>
                                     <Separator className="my-4" />
                                     <div className="flex flex-wrap gap-2">
-                                        {tutorial.tags.map((tag: Tag, index: number) => (
+                                        {tutorial.tags.map((tag: string, index: number) => (
                                             <Badge key={index} variant="secondary">
-                                                {tag.name}
+                                                {tag}
                                             </Badge>
                                         ))}
                                     </div>
@@ -206,9 +205,9 @@ export default function SubmissionsManager() {
                                 <>
                                     <Separator className="my-4" />
                                     <div className="mt-3 flex flex-wrap gap-2">
-                                        {game.tags.map((tag: Tag, index: number) => (
+                                        {game.tags.map((tag: string, index: number) => (
                                             <Badge key={index} variant="secondary">
-                                                {tag.name}
+                                                {tag}
                                             </Badge>
                                         ))}
                                     </div>
