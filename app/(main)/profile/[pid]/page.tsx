@@ -51,6 +51,7 @@ import { categoriesService } from "@/data/services/categories/categories.service
 import { Category } from "@/data/@types/models/categories/entities/category.entity"
 import { Label } from "@/components/label"
 import { Input } from "@/components/input"
+import { EditProfileDialog } from "@/components/pages/profile/dialogs/editProfileDialog"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -72,6 +73,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<string>("overview")
 
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [isOpenEditModal, setIsOpenEditModal] = useState<boolean>(false)
 
   const fetchTutorialsByCreator = useCallback(async () => {
     if (user) {
@@ -197,10 +199,22 @@ export default function ProfilePage() {
 
   return (
     <div className="container py-8">
+      {isOpenEditModal &&
+        <EditProfileDialog onOpenChange={setIsOpenEditModal} onClose={() => setIsOpenEditModal(false)} onSave={() => setIsOpenEditModal(false)} open={isOpenEditModal} />}
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-8">
         <motion.div variants={itemVariants}>
           <Card className="border-border/40 shadow-sm overflow-hidden">
-            <div className="h-32 bg-gradient-to-r from-primary/20 via-primary/10 to-background"></div>
+            <div className="h-32 relative">
+              {profile.coverImageUrl ? (
+                <img
+                  src={profile.coverImageUrl}
+                  alt="Imagem de capa"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-r from-primary/20 via-primary/10 to-background"></div>
+              )}
+            </div>
             <div className="px-6 pb-6 relative">
               <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-end -mt-12">
                 <Avatar className="h-24 w-24 border-4 border-background shadow-md">
@@ -214,7 +228,7 @@ export default function ProfilePage() {
                   <p className="text-muted-foreground">{profile.bio || "Nenhuma Bio escrita ainda."}</p>
                 </div>
                 <div className="flex gap-3 mt-4 sm:mt-0">
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Button variant="outline" size="sm" onClick={() => setIsOpenEditModal(true)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Editar Perfil
                   </Button>
@@ -224,7 +238,7 @@ export default function ProfilePage() {
               <div className="flex flex-wrap gap-4 mt-6">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4 mr-1.5" />
-                  Entrou {format(new Date(profile.createdAt), "d/MM/y", { locale: ptBR })}
+                  Entrou {format(new Date(profile.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                 </div>
                 {profile && profile.github && (
                   <Link
@@ -349,13 +363,13 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Criar um novo snippet:{" "}
+                                  Criou um novo snippet:{" "}
                                   <Link href={`/snippets/${snippet.id}`} className="text-primary hover:underline">
                                     {snippet.title}
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(snippet.createdAt), "MMMM dd, yyyy", { locale: ptBR })}
+                                  {format(new Date(snippet.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                                 </p>
                               </div>
                             </div>
@@ -368,13 +382,13 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Publicar um tutorial:{" "}
+                                  Publicou um tutorial:{" "}
                                   <Link href={`/tutorials/${tutorial.pid}`} className="text-primary hover:underline">
                                     {tutorial.title}
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(tutorial.createdAt), "MMMM dd, yyyy")}
+                                  {format(new Date(tutorial.createdAt), "dd/MM/yyyy")}
                                 </p>
                               </div>
                             </div>
@@ -387,13 +401,13 @@ export default function ProfilePage() {
                               </div>
                               <div className="flex-1">
                                 <p className="text-sm font-medium">
-                                  Enviar um jogo:{" "}
+                                  Enviou um jogo:{" "}
                                   <Link href={`/games/${game.pid}`} className="text-primary hover:underline">
                                     {game.title}
                                   </Link>
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {format(new Date(game.createdAt), "MMMM dd, yyyy")}
+                                  {format(new Date(game.createdAt), "dd/MM/yyyy")}
                                 </p>
                               </div>
                             </div>
@@ -497,7 +511,7 @@ export default function ProfilePage() {
                           <h3 className="text-sm font-medium text-muted-foreground mb-2">Membro Desde</h3>
                           <p className="text-sm flex items-center capitalize">
                             <Calendar className="h-4 w-4 mr-2" />
-                            {format(new Date(profile.createdAt), "MMMM dd, yyyy", { locale: ptBR })}
+                            {format(new Date(profile.createdAt), "dd/MM/yyyy", { locale: ptBR })}
                           </p>
                         </div>
                       </div>

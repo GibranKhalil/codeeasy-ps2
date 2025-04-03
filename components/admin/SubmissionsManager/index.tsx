@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
-import { Submission, SubmissionStatus } from "@/data/@types/models/submissions/entities/submission.entity"
+import { Submission } from "@/data/@types/models/submissions/entities/submission.entity"
 import { format, formatDate } from "date-fns"
 import { Label } from "@/components/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
@@ -18,9 +18,6 @@ import { Game } from "@/data/@types/models/games/entities/game.entity"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/dialog"
 import { Textarea } from "@/components/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
-import { gameService } from "@/data/services/games/game.service"
-import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
-import { snippetService } from "@/data/services/snippets/snippets.service"
 import { eContentStatus } from "@/data/@types/enums/eContentStatus.enum"
 
 export default function SubmissionsManager() {
@@ -50,17 +47,25 @@ export default function SubmissionsManager() {
         setShowModal(true)
     }
 
-    const openFeedbackModal = (submission: Submission, action: "approve" | "reject") => {
+    const openFeedbackModal = (submission: Submission) => {
         setSelectedSubmission(submission)
         setFeedback(submission.comment || "")
         setModalMode("feedback")
         setShowModal(true)
     }
 
-    const approveOrRejectContent = async (status: SubmissionStatus) => {
+    const approveOrRejectContent = async (status: eContentStatus) => {
         if (selectedSubmission) {
-            const response = await submissionService.update(selectedSubmission?.id, { ...selectedSubmission, status, comment: feedback }, { requiresAuth: true })
-            console.log(response)
+            const response = await submissionService.update(selectedSubmission?.id, { ...selectedSubmission, status, comment: feedback }, { requiresAuth: true, subEndpoint: `/resolve/${selectedSubmission.id}` })
+
+            if (response.success === false) {
+                console.error(response.message)
+                return
+            }
+
+            await fetchSubmissions()
+            setShowModal(false)
+            return
         }
     }
 
@@ -77,13 +82,13 @@ export default function SubmissionsManager() {
         }
     }
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: eContentStatus) => {
         switch (status) {
-            case "pending":
+            case eContentStatus.PENDING:
                 return "bg-yellow-100 text-yellow-800"
-            case "approved":
+            case eContentStatus.APPROVED:
                 return "bg-green-100 text-green-800"
-            case "rejected":
+            case eContentStatus.REJECTED:
                 return "bg-red-100 text-red-800"
             default:
                 return "bg-gray-100 text-gray-800"
@@ -173,7 +178,7 @@ export default function SubmissionsManager() {
                         </CardHeader>
                         <CardContent>
                             <h3 className="text-lg font-semibold mb-1">Descrição:</h3>
-                            <p className="text-sm text-muted-foreground mb-4">{game.description}</p>
+                            <p className="text-sm text-muted-foreground mb-4">{game.excerpt}</p>
 
                             <Separator className="my-4" />
 
@@ -191,9 +196,9 @@ export default function SubmissionsManager() {
                                         {game.screenshots.map((screenshot: string, index: number) => (
                                             <img
                                                 key={index}
-                                                src={screenshot || "/placeholder.svg"} // Mantenha o placeholder
+                                                src={screenshot || "/placeholder.svg"}
                                                 alt={`Screenshot ${index + 1}`}
-                                                className="rounded-md border w-full h-auto object-cover aspect-video" // Adicionado aspect-video para consistência
+                                                className="rounded-md border w-full h-auto object-cover aspect-video"
                                             />
                                         ))}
                                     </div>
@@ -292,7 +297,7 @@ export default function SubmissionsManager() {
                                             <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1 text-sm text-muted-foreground">
                                                 <span className="hidden sm:inline">•</span>
                                                 <span>
-                                                    Enviado em {format(new Date(submission.submittedAt), "d/MM/y")}
+                                                    Enviado em {format(new Date(submission.submittedAt), "dd/MM/yyyy")}
                                                 </span>
                                             </div>
                                         </div>
@@ -302,9 +307,9 @@ export default function SubmissionsManager() {
                                         variant="outline"
                                         className={getStatusColor(submission.status)}
                                     >
-                                        {submission.status === "pending"
+                                        {submission.status === eContentStatus.PENDING
                                             ? "Pendente"
-                                            : submission.status === "approved"
+                                            : submission.status === eContentStatus.APPROVED
                                                 ? "Aprovado"
                                                 : "Rejeitado"}
                                     </Badge>
@@ -312,7 +317,7 @@ export default function SubmissionsManager() {
 
                                 {submission.submittedAt && (
                                     <div className="mt-4 text-sm text-muted-foreground">
-                                        <p>Revisado em: {format(new Date(submission.submittedAt), "d/MM/y")}</p>
+                                        <p>Revisado em: {format(new Date(submission.resolvedAt), "dd/MM/yyyy")}</p>
                                         {submission.comment && (
                                             <div className="mt-2 p-3 bg-secondary/50 rounded-md">
                                                 <p className="font-medium">Feedback:</p>
@@ -331,10 +336,10 @@ export default function SubmissionsManager() {
                                         Ver Detalhes
                                     </Button>
 
-                                    {submission.status === "pending" && (
+                                    {submission.status === eContentStatus.PENDING && (
                                         <>
                                             <Button
-                                                onClick={() => openFeedbackModal(submission, "approve")}
+                                                onClick={() => openFeedbackModal(submission)}
                                                 variant="default"
                                                 size="sm"
                                             >
@@ -343,7 +348,7 @@ export default function SubmissionsManager() {
                                             </Button>
 
                                             <Button
-                                                onClick={() => openFeedbackModal(submission, "reject")}
+                                                onClick={() => openFeedbackModal(submission)}
                                                 variant="destructive"
                                                 size="sm"
                                             >
@@ -366,7 +371,7 @@ export default function SubmissionsManager() {
                             <DialogTitle className="text-2xl font-bold">
                                 {modalMode === "view"
                                     ? `Detalhes: ${selectedSubmission.title}`
-                                    : selectedSubmission.status === "pending"
+                                    : selectedSubmission.status === eContentStatus.PENDING
                                         ? "Revisar Submissão"
                                         : "Atualizar Feedback"}
                             </DialogTitle>
@@ -432,11 +437,11 @@ export default function SubmissionsManager() {
                                         </Button>
                                     </DialogClose>
 
-                                    {selectedSubmission.status === "pending" && (
+                                    {selectedSubmission.status === eContentStatus.PENDING && (
                                         <Button
                                             type="button"
                                             variant="destructive"
-                                            onClick={() => approveOrRejectContent("rejected")}
+                                            onClick={() => approveOrRejectContent(eContentStatus.REJECTED)}
                                             disabled={!feedback}
                                         >
                                             Rejeitar
@@ -447,12 +452,12 @@ export default function SubmissionsManager() {
                                         type="button"
                                         onClick={() =>
                                             approveOrRejectContent(
-                                                selectedSubmission.status === "pending" ? "approve" : (selectedSubmission.status as any),
+                                                selectedSubmission.status === eContentStatus.PENDING ? eContentStatus.APPROVED : (selectedSubmission.status as any),
                                             )
                                         }
-                                        disabled={selectedSubmission.status === "pending" && !feedback}
+                                        disabled={selectedSubmission.status === eContentStatus.PENDING && !feedback}
                                     >
-                                        {selectedSubmission.status === "pending" ? "Aprovar" : "Atualizar"}
+                                        {selectedSubmission.status === eContentStatus.PENDING ? "Aprovar" : "Atualizar"}
                                     </Button>
                                 </>
                             )}

@@ -13,6 +13,7 @@ export class User {
   lastLoginAt!: Date;
   githubId?: string;
   avatarUrl?: string;
+  coverImageUrl?: string;
   createdAt!: Date;
   updatedAt!: Date;
   roles!: Role[];

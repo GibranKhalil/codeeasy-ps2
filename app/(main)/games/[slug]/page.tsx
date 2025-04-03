@@ -15,7 +15,6 @@ import ReactMarkdown from "react-markdown"
 import { gameService } from "@/data/services/games/game.service"
 import { AxiosResponse } from "axios"
 import { Game } from "@/data/@types/models/games/entities/game.entity"
-import { useAuth } from "@/hooks/use-auth"
 
 export default function GamePage() {
   const params = useParams()
@@ -26,6 +25,7 @@ export default function GamePage() {
   const { slug } = params
 
   const fetchGameByPid = useCallback(async () => {
+    setLoading(true)
     const response = await gameService.find({ subEndpoint: `/pid/${slug}` }) as unknown as AxiosResponse<Game>
     setGame(response.data)
   }, [slug])
@@ -54,9 +54,9 @@ export default function GamePage() {
       <div className="container py-8">
         <Button variant="ghost" onClick={() => router.back()} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Voltar
         </Button>
-        <h1 className="text-2xl font-bold">Game not found</h1>
+        <h1 className="text-2xl font-bold">Jogo não encontrado</h1>
       </div>
     )
   }
@@ -65,7 +65,7 @@ export default function GamePage() {
     <div className="container py-8">
       <Button variant="ghost" onClick={() => router.back()} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
+        Voltar
       </Button>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -110,12 +110,12 @@ export default function GamePage() {
               </Avatar>
               <div>
                 <p className="font-medium">{game.creator.username}</p>
-                <p className="text-sm text-muted-foreground">Developer</p>
+                <p className="text-sm text-muted-foreground">Desenvolvedor</p>
               </div>
             </div>
             <Button variant="outline" size="sm">
               <Share2 className="mr-2 h-4 w-4" />
-              Share
+              Compartilhar
             </Button>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function GamePage() {
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Download className="mr-1 h-4 w-4" />
-                    {game.downloads.toLocaleString()} downloads
+                    {game.downloads.toLocaleString()} Downloads
                   </div>
                   <div className="flex items-center">
                     <Clock className="mr-1 h-4 w-4" />
@@ -143,26 +143,26 @@ export default function GamePage() {
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="font-medium mb-3">Game Information</h3>
+                  <h3 className="font-medium mb-3">Informações</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Developer:</span>
+                      <span className="text-muted-foreground">Desenvolvedor:</span>
                       <span className="font-medium">{game.creator.username}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Version:</span>
+                      <span className="text-muted-foreground">Versão:</span>
                       <span className="font-medium">{game.version}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Release Date:</span>
+                      <span className="text-muted-foreground">Lançamento:</span>
                       <span className="font-medium">{format(new Date(game.createdAt), "dd/MM/yyyy")}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Last Updated:</span>
+                      <span className="text-muted-foreground">Última Atualização:</span>
                       <span className="font-medium">{format(new Date(game.updatedAt), "dd/MM/yyyy")}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">File Size:</span>
+                      <span className="text-muted-foreground">Tamanho do Arquivo:</span>
                       <span className="font-medium">{game.fileSize} MB</span>
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export default function GamePage() {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-medium mb-4">More From This Developer</h3>
+                <h3 className="font-medium mb-4">Mais Jogos do Desenvolvedor</h3>
                 {/* <div className="space-y-4">
                   {mockGames
                     .filter((g) => g.id !== game.id && g.author.id === game.author.id)

@@ -40,14 +40,10 @@ export default function GamesPage() {
   }, [])
 
   useEffect(() => {
-    setLoading(false)
-
-    return
-  }, [])
-
-  useEffect(() => {
     fetchCategories()
     fetchGames()
+    setLoading(false)
+    return
   }, [fetchCategories, fetchGames])
 
   const handleGameClick = (slug: string) => {
@@ -128,7 +124,7 @@ export default function GamesPage() {
                     </div>
                     <CardContent className="p-4">
                       <h3 className="font-bold text-lg line-clamp-1">{game.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{game.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{game.excerpt}</p>
 
                       <div className="flex flex-wrap gap-2 mt-3">
                         {game.tags.slice(0, 3).map((tag, index) => (
@@ -152,7 +148,7 @@ export default function GamesPage() {
                     <CardFooter className="p-4 border-t flex justify-between">
                       <div className="text-xs text-muted-foreground flex items-center">
                         <Clock className="mr-1 h-3 w-3" />
-                        {format(new Date(game.updatedAt), "MMM dd, yyyy")}
+                        {format(new Date(game.updatedAt), "dd/mm/yyyy")}
                       </div>
                       <div className="flex items-center">
                         <span className="text-xs font-medium mr-1">v{game.version}</span>
