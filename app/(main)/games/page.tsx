@@ -16,22 +16,27 @@ import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
 import { gameService } from "@/data/services/games/game.service"
 import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { categoriesService } from "@/data/services/categories/categories.service"
+import { Category } from "@/data/@types/models/categories/entities/category.entity"
 
 export default function GamesPage() {
   const router = useRouter()
-  const [games, setGames] = useState<Game[]>([])
   const [filteredGames, setFilteredGames] = useState<Game[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<Category[]>([])
 
   const { user } = useAuth()
 
-  const categories = ["all", ...Array.from(new Set(mockGames.map((game) => game.category)))]
-
   const fetchGames = useCallback(async () => {
     const response = await gameService.find();
-    setGames(response.data.data)
+    setFilteredGames(response.data.data)
+  }, [])
+
+  const fetchCategories = useCallback(async () => {
+    const response = await categoriesService.find()
+    setCategories(response.data.data)
   }, [])
 
   useEffect(() => {
@@ -39,6 +44,11 @@ export default function GamesPage() {
 
     return
   }, [])
+
+  useEffect(() => {
+    fetchCategories()
+    fetchGames()
+  }, [fetchCategories, fetchGames])
 
   const handleGameClick = (slug: string) => {
     router.push(`/games/${slug}`)
@@ -71,9 +81,9 @@ export default function GamesPage() {
 
         <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
           <TabsList className="mb-4 flex h-auto flex-wrap justify-start">
-            {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className="mb-1">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+            {categories.map((category, index) => (
+              <TabsTrigger key={index} value={`${category.id}`} className="mb-1">
+                {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -99,9 +109,9 @@ export default function GamesPage() {
               </div>
             ) : filteredGames.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredGames.map((game) => (
+                {filteredGames.map((game, index) => (
                   <Card
-                    key={game.id}
+                    key={index}
                     className="overflow-hidden cursor-pointer transition-all hover:shadow-md"
                     onClick={() => handleGameClick(game.pid)}
                   >
@@ -121,9 +131,9 @@ export default function GamesPage() {
                       <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{game.description}</p>
 
                       <div className="flex flex-wrap gap-2 mt-3">
-                        {game.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag.id} variant="secondary" className="text-xs">
-                            {tag.name}
+                        {game.tags.slice(0, 3).map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
                           </Badge>
                         ))}
                       </div>

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -38,34 +38,21 @@ import {
 import ReactMarkdown from "react-markdown"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
+import { gameService } from "@/data/services/games/game.service"
+import { useGameForm } from "@/hooks/games/use-createGame"
+import { containerVariants, itemVariants } from "@/components/framerVariants/games/create"
+import { categoriesService } from "@/data/services/categories/categories.service"
+import { Category } from "@/data/@types/models/categories/entities/category.entity"
 
-const GAME_CATEGORIES = [
-  "Action",
-  "Adventure",
-  "Arcade",
-  "Board Games",
-  "Card Games",
-  "Engines",
-  "Emulators",
-  "Puzzle",
-  "Racing",
-  "RPG",
-  "Shooter",
-  "Simulation",
-  "Sports",
-  "Strategy",
-  "Tools",
-  "Other",
-]
 
-const SUPPORTED_FORMATS = [
-  { extension: "iso", description: "ISO Image" },
-  { extension: "cso", description: "Compressed ISO" },
-  { extension: "chd", description: "Compressed Hunks of Data" },
-  { extension: "isz", description: "Compressed ISO Image" },
-  { extension: "bin", description: "Binary Image" },
-  { extension: "elf", description: "Executable and Linkable Format" },
-]
+// const SUPPORTED_FORMATS = [
+//   { extension: "iso", description: "Imagem ISO" },
+//   { extension: "cso", description: "ISO Comprimido" },
+//   { extension: "chd", description: "Compressed Hunks of Data" },
+//   { extension: "isz", description: "Compressed ISO Image" },
+//   { extension: "bin", description: "Binary Image" },
+//   { extension: "elf", description: "Executable and Linkable Format" },
+// ]
 
 export default function SubmitGamePage() {
   const router = useRouter()
@@ -74,25 +61,29 @@ export default function SubmitGamePage() {
   const [activeTab, setActiveTab] = useState("details")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [isUploading, setIsUploading] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  // const [uploadProgress, setUploadProgress] = useState(0)
+  // const [isUploading, setIsUploading] = useState(false)
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [category, setCategory] = useState("")
-  const [tags, setTags] = useState("")
-  const [version, setVersion] = useState("1.0.0")
-  const [sizeMb, setSizeMb] = useState("")
-  const [content, setContent] = useState("")
-  const [coverImage, setCoverImage] = useState<string | null>(null)
-  const [screenshots, setScreenshots] = useState<string[]>([])
-  const [gameFile, setGameFile] = useState<File | null>(null)
+  const {
+    state,
+    setTitle,
+    setDescription,
+    setCategory,
+    setTags,
+    setVersion,
+    setSizeMb,
+    setContent,
+    setCoverImage,
+    addScreenshot,
+    removeScreenshot,
+    setGameLink,
+  } = useGameForm();
+
+  // const [gameFile, setGameFile] = useState<File | null>(null)
 
   const coverImageInputRef = useRef<HTMLInputElement>(null)
   const screenshotInputRef = useRef<HTMLInputElement>(null)
-  const gameFileInputRef = useRef<HTMLInputElement>(null)
-
-  const [gameLink, setGameLink] = useState<string>()
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -106,15 +97,15 @@ export default function SubmitGamePage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!title.trim()) newErrors.title = "Title is required"
-    if (!description.trim()) newErrors.description = "Description is required"
-    if (!category) newErrors.category = "Category is required"
-    if (!version.trim()) newErrors.version = "Version is required"
-    if (!sizeMb.trim()) newErrors.sizeMb = "File size is required"
-    if (!content.trim()) newErrors.content = "Content is required"
-    if (!coverImage) newErrors.coverImage = "Cover image is required"
-    if (screenshots.length === 0) newErrors.screenshots = "At least one screenshot is required"
-    if (!gameFile) newErrors.gameFile = "Game file is required"
+    if (!state.title.trim()) newErrors.title = "Título é obrigatório"
+    if (!state.excerpt.trim()) newErrors.description = "Descrição é obrigatório"
+    if (!state.categoryId) newErrors.category = "Categoria é obrigatório"
+    if (!state.version.trim()) newErrors.version = "Versão é obrigatório"
+    if (!state.fileSize) newErrors.sizeMb = "Tamanho do Arquivo é obrigatório"
+    if (!state.description.trim()) newErrors.content = "Conteúdo é obrigatório"
+    if (!state.coverImage) newErrors.coverImage = "Imagem de capa é obrigatório"
+    if (state.screenshots.length === 0) newErrors.screenshots = "Pelo menos uma screenshot é obrigatório"
+    if (!state.game_url) newErrors.gameLink = "Link de downLoad é obrigatório"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -124,11 +115,11 @@ export default function SubmitGamePage() {
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setErrors((prev) => ({ ...prev, coverImage: "Image must be less than 5MB" }))
+        setErrors((prev) => ({ ...prev, coverImage: "Image deve ter menos que 5MB" }))
         return
       }
 
-      setCoverImage("/placeholder.svg?height=720&width=1280")
+      setCoverImage(file)
       setErrors((prev) => ({ ...prev, coverImage: "" }))
     }
   }
@@ -138,131 +129,156 @@ export default function SubmitGamePage() {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: "File too large",
-          description: "Screenshot must be less than 5MB",
+          title: "Arquivo é muito grande",
+          description: "Screenshot deve ter menos que 5MB",
           variant: "destructive",
         })
         return
       }
 
-      setScreenshots((prev) => [...prev, "/placeholder.svg?height=720&width=1280"])
+      addScreenshot(file)
       setErrors((prev) => ({ ...prev, screenshots: "" }))
     }
   }
 
-  const handleGameFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 100 * 1024 * 1024) {
-        setErrors((prev) => ({ ...prev, gameFile: "File must be less than 100MB" }))
-        return
-      }
-
-      const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
-      const isValidFormat = SUPPORTED_FORMATS.some((format) => format.extension === fileExtension)
-
-      if (!isValidFormat) {
-        setErrors((prev) => ({
-          ...prev,
-          gameFile: `Invalid file format. Supported formats: ${SUPPORTED_FORMATS.map((f) => f.extension).join(", ")}`,
-        }))
-        return
-      }
-
-      setIsUploading(true)
-      setUploadProgress(0)
-
-      const interval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval)
-            setIsUploading(false)
-            setGameFile(file)
-            setSizeMb((file.size / (1024 * 1024)).toFixed(2))
-            setErrors((prev) => ({ ...prev, gameFile: "", sizeMb: "" }))
-            return 100
-          }
-          return prev + 5
-        })
-      }, 200)
-    }
-  }
-
-  const removeScreenshot = (index: number) => {
-    setScreenshots((prev) => prev.filter((_, i) => i !== index))
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
       toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form before submitting.",
+        title: "Erro de validação!",
+        description: "Por favor, corrija os erros no formulário",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      if (user) {
+        const formData = new FormData();
+        formData.append("title", state.title);
+        formData.append("excerpt", state.excerpt);
+        formData.append("version", state.version);
+        formData.append("fileSize", `${state.fileSize}`);
+        formData.append("description", state.description);
+        formData.append("coverImage", state.coverImage as File);
+        formData.append("game_url", state.game_url);
+        formData.append("creatorId", `${user.id}`);
+        formData.append("category_id", `${state.categoryId}`);
+
+        if (state.tags) {
+          formData.append("tags", state.tags.join(","));
+        }
+
+        if (state.screenshots && state.screenshots.length > 0) {
+          state.screenshots.forEach((screenshot) => {
+            formData.append("screenshots", screenshot);
+          });
+        }
+
+        const response = await gameService.create(formData, {
+          requiresAuth: true,
+          customHeaders: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.success === true) {
+          router.push('/games');
+          return
+        }
+
+        toast({
+          title: "Erro de envio!",
+          description: "Houve um erro ao enviar seu jogo. Por favor, tente novamente",
+          variant: "destructive",
+        });
+
+        return;
+      }
 
       toast({
-        title: "Game submitted successfully",
-        description: "Your game has been submitted and is pending review.",
-      })
+        title: "Jogo enviado com sucesso!",
+        description: "Seu jogo foi enviando e está aguardando revisão",
+      });
 
-      router.push("/games")
+      router.push("/games");
     } catch (error) {
-      console.error("Error submitting game:", error)
+      console.error("Error submitting game:", error);
       toast({
-        title: "Submission failed",
-        description: "There was an error submitting your game. Please try again.",
+        title: "Erro de envio!",
+        description: "Houve um erro ao enviar seu jogo. Por favor, tente novamente",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const parsedTags = tags
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0)
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-      },
-    },
-  }
 
   if (isLoadingUser) {
     return (
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
     )
   }
+
+  const fetchCategories = useCallback(async () => {
+    const response = await categoriesService.find({ requiresAuth: true })
+    setCategories(response.data.data)
+  }, [])
+
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
+
+
+  // const handleGameFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   if (file) {
+  //     if (file.size > 100 * 1024 * 1024) {
+  //       setErrors((prev) => ({ ...prev, gameFile: "File must be less than 100MB" }))
+  //       return
+  //     }
+
+  //     const fileExtension = file.name.split(".").pop()?.toLowerCase() || ""
+  //     const isValidFormat = SUPPORTED_FORMATS.some((format) => format.extension === fileExtension)
+
+  //     if (!isValidFormat) {
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         gameFile: `Invalid file format. Supported formats: ${SUPPORTED_FORMATS.map((f) => f.extension).join(", ")}`,
+  //       }))
+  //       return
+  //     }
+
+  //     setIsUploading(true)
+  //     setUploadProgress(0)
+
+  //     const interval = setInterval(() => {
+  //       setUploadProgress((prev) => {
+  //         if (prev >= 100) {
+  //           clearInterval(interval)
+  //           setIsUploading(false)
+  //           setGameFile(file)
+  //           setSizeMb((file.size / (1024 * 1024)).toFixed(2))
+  //           setErrors((prev) => ({ ...prev, gameFile: "", sizeMb: "" }))
+  //           return 100
+  //         }
+  //         return prev + 5
+  //       })
+  //     }, 200)
+  //   }
+  // }
+
+  // const parsedTags = tags
+  //   .split(",")
+  //   .map((tag) => tag.trim())
+  //   .filter((tag) => tag.length > 0)
 
   return (
     <div className="container py-8">
@@ -305,11 +321,11 @@ export default function SubmitGamePage() {
                 <CardDescription>É assim que o envio do jogo aparecerá para os usuários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {coverImage && (
+                {state.coverImage && (
                   <div className="relative h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden">
                     <Image
-                      src={coverImage || "/placeholder.svg"}
-                      alt={title || "Capa do jogo"}
+                      src={URL.createObjectURL(state.coverImage) || "/placeholder.svg"}
+                      alt={state.title || "Capa do jogo"}
                       fill
                       className="object-cover"
                     />
@@ -318,21 +334,21 @@ export default function SubmitGamePage() {
 
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-3 mb-3">
-                    {category && <Badge className="bg-primary">{category}</Badge>}
-                    {version && <Badge variant="outline">v{version}</Badge>}
+                    {state.categoryId && <Badge className="bg-primary">{state.categoryId}</Badge>}
+                    {state.version && <Badge variant="outline">v{state.version}</Badge>}
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Título do jogo"}</h1>
-                  <p className="text-xl text-muted-foreground">{description || "A descrição do jogo aparecerá aqui."}</p>
+                  <h1 className="text-3xl md:text-4xl font-bold">{state.title || "Título do jogo"}</h1>
+                  <p className="text-xl text-muted-foreground">{state.description || "A descrição do jogo aparecerá aqui."}</p>
                 </div>
 
-                {screenshots.length > 0 && (
+                {state.screenshots.length > 0 && (
                   <div className="space-y-4">
                     <h2 className="text-xl font-semibold">Screenshots</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {screenshots.map((screenshot, index) => (
+                      {state.screenshots.map((screenshot, index) => (
                         <div key={index} className="relative aspect-video rounded-md overflow-hidden">
                           <Image
-                            src={screenshot || "/placeholder.svg"}
+                            src={URL.createObjectURL(screenshot) || "/placeholder.svg"}
                             alt={`Screenshot ${index + 1}`}
                             fill
                             className="object-cover"
@@ -346,7 +362,7 @@ export default function SubmitGamePage() {
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Sobre esse jogo</h2>
                   <div className="prose dark:prose-invert max-w-none">
-                    <ReactMarkdown>{content || "O conteúdo do jogo aparecerá aqui."}</ReactMarkdown>
+                    <ReactMarkdown>{state.description || "O conteúdo do jogo aparecerá aqui."}</ReactMarkdown>
                   </div>
                 </div>
 
@@ -355,15 +371,15 @@ export default function SubmitGamePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Versão</p>
-                      <p className="font-medium">{version || "1.0.0"}</p>
+                      <p className="font-medium">{state.version || "1.0.0"}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Tamanho</p>
-                      <p className="font-medium">{sizeMb ? `${sizeMb} MB` : "Unknown"}</p>
+                      <p className="font-medium">{state.fileSize ? `${state.fileSize} MB` : "Unknown"}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Categoria</p>
-                      <p className="font-medium">{category || "Uncategorized"}</p>
+                      <p className="font-medium">{state.categoryId || "Uncategorized"}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-muted-foreground">Desenvolvedor</p>
@@ -372,7 +388,7 @@ export default function SubmitGamePage() {
                   </div>
                 </div>
 
-                {parsedTags.length > 0 && (
+                {/* {parsedTags.length > 0 && (
                   <div className="space-y-4">
                     <h2 className="text-xl font-semibold">Tags</h2>
                     <div className="flex flex-wrap gap-2">
@@ -383,12 +399,12 @@ export default function SubmitGamePage() {
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <div className="pt-4">
                   <Button className="w-full md:w-auto" size="lg" disabled>
                     <Download className="mr-2 h-5 w-5" />
-                    Download Game
+                    Baixar Jogo
                   </Button>
                 </div>
               </CardContent>
@@ -428,7 +444,7 @@ export default function SubmitGamePage() {
                         </Label>
                         <Input
                           id="title"
-                          value={title}
+                          value={state.title}
                           onChange={(e) => setTitle(e.target.value)}
                           placeholder="Digite o título do seu jogo"
                           className={errors.title ? "border-destructive" : ""}
@@ -442,7 +458,7 @@ export default function SubmitGamePage() {
                         </Label>
                         <Textarea
                           id="description"
-                          value={description}
+                          value={state.excerpt}
                           onChange={(e) => setDescription(e.target.value)}
                           placeholder="Forneça uma breve descrição do seu jogo (máximo de 200 caracteres)"
                           className={errors.description ? "border-destructive" : ""}
@@ -452,7 +468,7 @@ export default function SubmitGamePage() {
                           <p className="text-sm text-destructive">{errors.description}</p>
                         ) : (
                           <p className="text-xs text-muted-foreground text-right">
-                            {description.length}/200 Caracteres
+                            {state.excerpt.length}/200 Caracteres
                           </p>
                         )}
                       </div>
@@ -462,14 +478,14 @@ export default function SubmitGamePage() {
                           <Label htmlFor="category">
                             Categoria <span className="text-destructive">*</span>
                           </Label>
-                          <Select value={category} onValueChange={setCategory}>
+                          <Select value={`${state.categoryId}`} onValueChange={(value) => setCategory(Number(value))}>
                             <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
                               <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
-                              {GAME_CATEGORIES.map((cat) => (
-                                <SelectItem key={cat} value={cat}>
-                                  {cat}
+                              {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={`${cat.id}`}>
+                                  {cat.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -483,8 +499,8 @@ export default function SubmitGamePage() {
                             <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               id="tags"
-                              value={tags}
-                              onChange={(e) => setTags(e.target.value)}
+                              value={state.tags?.join(",")}
+                              onChange={(e) => setTags([e.target.value])}
                               placeholder="e.g. platformer, 2d, puzzle (comma separated)"
                               className="pl-10"
                             />
@@ -500,7 +516,7 @@ export default function SubmitGamePage() {
                           </Label>
                           <Input
                             id="version"
-                            value={version}
+                            value={state.version}
                             onChange={(e) => setVersion(e.target.value)}
                             placeholder="e.g. 1.0.0"
                             className={errors.version ? "border-destructive" : ""}
@@ -515,8 +531,8 @@ export default function SubmitGamePage() {
                           <Input
                             id="sizeMb"
                             type="number"
-                            value={sizeMb}
-                            onChange={(e) => setSizeMb(e.target.value)}
+                            value={state.fileSize}
+                            onChange={(e) => setSizeMb(Number(e.target.value))}
                             placeholder="e.g. 4.2"
                             className={errors.sizeMb ? "border-destructive" : ""}
                             min="0.1"
@@ -551,10 +567,10 @@ export default function SubmitGamePage() {
                             }`}
                           onClick={() => coverImageInputRef.current?.click()}
                         >
-                          {coverImage ? (
+                          {state.coverImage ? (
                             <div className="relative w-full aspect-video">
                               <Image
-                                src={coverImage || "/placeholder.svg"}
+                                src={URL.createObjectURL(state.coverImage) || "/placeholder.svg"}
                                 alt="Cover image"
                                 fill
                                 className="object-cover rounded-md"
@@ -597,10 +613,10 @@ export default function SubmitGamePage() {
                           Screenshots <span className="text-destructive">*</span>
                         </Label>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          {screenshots.map((screenshot, index) => (
+                          {state.screenshots.map((screenshot, index) => (
                             <div key={index} className="relative aspect-video rounded-md overflow-hidden border">
                               <Image
-                                src={screenshot || "/placeholder.svg"}
+                                src={URL.createObjectURL(screenshot) || "/placeholder.svg"}
                                 alt={`Screenshot ${index + 1}`}
                                 fill
                                 className="object-cover"
@@ -660,7 +676,7 @@ export default function SubmitGamePage() {
                         </Label>
                         <Textarea
                           id="content"
-                          value={content}
+                          value={state.description}
                           onChange={(e) => setContent(e.target.value)}
                           placeholder="# About My Game
 
@@ -723,7 +739,7 @@ List credits here."
                         </Label>
                         <Input
                           id="url"
-                          value={gameLink}
+                          value={state.game_url}
                           type="url"
                           onChange={(e) => setGameLink(e.target.value)}
                           placeholder="Informe a url de download do seu jogo"
@@ -795,7 +811,7 @@ List credits here."
                         )}
                       </div>
 
-                      <div className="rounded-lg bg-muted p-4">
+                      {/* <div className="rounded-lg bg-muted p-4">
                         <h3 className="text-sm font-medium mb-2">Informações de formato de arquivo</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
                           {SUPPORTED_FORMATS.map((format) => (
@@ -807,7 +823,7 @@ List credits here."
                             </div>
                           ))}
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="rounded-lg bg-muted p-4">
                         <h3 className="text-sm font-medium mb-2">Diretrizes de Submissão</h3>
@@ -824,7 +840,7 @@ List credits here."
                       <Button variant="ghost" type="button" onClick={() => setActiveTab("content")}>
                         Anterior: Conteúdo
                       </Button>
-                      <Button type="submit" disabled={isSubmitting || isUploading}>
+                      <Button type="submit" disabled={isSubmitting}>
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

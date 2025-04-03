@@ -28,7 +28,7 @@ export default function CallToActionSection() {
                 </Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <Link href="https://github.com/GibranKhalil/codeeasy-ps2" target="_blank" rel="noopener noreferrer">
                   <Github className="mr-2 h-4 w-4" />
                   Contribua no GitHub
                 </Link>

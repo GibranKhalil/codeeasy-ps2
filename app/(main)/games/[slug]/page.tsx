@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import { format } from "date-fns"
@@ -10,9 +10,12 @@ import { Badge } from "@/components/badge"
 import { Card, CardContent } from "@/components/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/carousel"
 import { mockGames } from "@/lib/mock-data"
-import type { Game } from "@/lib/types"
 import { ArrowLeft, Download, Clock, Share2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { gameService } from "@/data/services/games/game.service"
+import { AxiosResponse } from "axios"
+import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function GamePage() {
   const params = useParams()
@@ -20,13 +23,23 @@ export default function GamePage() {
   const [game, setGame] = useState<Game | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const { slug } = params
+
+  const fetchGameByPid = useCallback(async () => {
+    const response = await gameService.find({ subEndpoint: `/pid/${slug}` }) as unknown as AxiosResponse<Game>
+    setGame(response.data)
+  }, [slug])
+
+  const fetchGamesByCreator = useCallback(async () => {
+
+  }, [])
+
   useEffect(() => {
-    const foundGame = mockGames.find((g) => g.slug === params.slug)
-    setGame(foundGame || null)
+    fetchGameByPid()
     setLoading(false)
 
     return
-  }, [params.slug])
+  }, [fetchGameByPid])
 
   if (loading) {
     return (
@@ -59,11 +72,11 @@ export default function GamePage() {
         <div className="col-span-1 md:col-span-8">
           <div className="mb-6">
             <div className="flex flex-wrap gap-3 mb-3">
-              <Badge className="bg-primary">{game.category}</Badge>
+              <Badge className="bg-primary">{game.category.name}</Badge>
               <Badge variant="outline">v{game.version}</Badge>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold">{game.title}</h1>
-            <p className="text-xl text-muted-foreground mt-2">{game.description}</p>
+            <p className="text-xl text-muted-foreground mt-2">{game.excerpt}</p>
           </div>
 
           <Carousel className="mb-8">
@@ -86,17 +99,17 @@ export default function GamePage() {
           </Carousel>
 
           <div className="prose dark:prose-invert max-w-none">
-            <ReactMarkdown>{game.content}</ReactMarkdown>
+            <ReactMarkdown>{game.description}</ReactMarkdown>
           </div>
 
           <div className="flex items-center justify-between mt-8 pt-8 border-t">
             <div className="flex items-center">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={game.author.avatar_url} />
-                <AvatarFallback>{game.author.username.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={game.creator.avatarUrl} />
+                <AvatarFallback>{game.creator.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{game.author.username}</p>
+                <p className="font-medium">{game.creator.username}</p>
                 <p className="text-sm text-muted-foreground">Developer</p>
               </div>
             </div>
@@ -112,20 +125,20 @@ export default function GamePage() {
             <Card className="mb-6">
               <CardContent className="p-6">
                 <Button className="w-full mb-4" size="lg" asChild>
-                  <a href={game.download_url} target="_blank" rel="noopener noreferrer">
+                  <a href={game.game_url} target="_blank" rel="noopener noreferrer">
                     <Download className="mr-2 h-5 w-5" />
-                    Download ({game.size_mb}MB)
+                    Download ({game.fileSize}MB)
                   </a>
                 </Button>
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
                   <div className="flex items-center">
                     <Download className="mr-1 h-4 w-4" />
-                    {game.download_count.toLocaleString()} downloads
+                    {game.downloads.toLocaleString()} downloads
                   </div>
                   <div className="flex items-center">
                     <Clock className="mr-1 h-4 w-4" />
-                    {format(new Date(game.updated_at), "MMM dd, yyyy")}
+                    {format(new Date(game.updatedAt), "dd/MM/yyyy")}
                   </div>
                 </div>
 
@@ -134,7 +147,7 @@ export default function GamePage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Developer:</span>
-                      <span className="font-medium">{game.author.username}</span>
+                      <span className="font-medium">{game.creator.username}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Version:</span>
@@ -142,15 +155,15 @@ export default function GamePage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Release Date:</span>
-                      <span className="font-medium">{format(new Date(game.created_at), "MMM dd, yyyy")}</span>
+                      <span className="font-medium">{format(new Date(game.createdAt), "dd/MM/yyyy")}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Last Updated:</span>
-                      <span className="font-medium">{format(new Date(game.updated_at), "MMM dd, yyyy")}</span>
+                      <span className="font-medium">{format(new Date(game.updatedAt), "dd/MM/yyyy")}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">File Size:</span>
-                      <span className="font-medium">{game.size_mb} MB</span>
+                      <span className="font-medium">{game.fileSize} MB</span>
                     </div>
                   </div>
                 </div>
@@ -171,7 +184,7 @@ export default function GamePage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-medium mb-4">More From This Developer</h3>
-                <div className="space-y-4">
+                {/* <div className="space-y-4">
                   {mockGames
                     .filter((g) => g.id !== game.id && g.author.id === game.author.id)
                     .slice(0, 3)
@@ -198,7 +211,7 @@ export default function GamePage() {
                         </div>
                       </div>
                     ))}
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           </div>

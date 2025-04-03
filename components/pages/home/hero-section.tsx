@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Code, BookOpen, Github, Sparkles, ChevronRight } from "lucide-react"
+import { BookOpen, Sparkles, Joystick } from "lucide-react"
 import { Badge } from "../../badge"
 import { Button } from "../../button"
 import CodePreview from "@/components/codePreview"
@@ -56,9 +56,9 @@ export default function HeroSection({ snippetCode, snippetLanguage }: HeroSectio
             </motion.div>
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
               <Button asChild size="lg" className="h-12 px-6">
-                <Link href="/snippets/create">
-                  <Code className="mr-2 h-5 w-5" />
-                  Criar Snippet
+                <Link href="/games">
+                  <Joystick className="mr-2 h-5 w-5" />
+                  Ver Jogos
                 </Link>
               </Button>
               <Button variant="outline" asChild size="lg" className="h-12 px-6">

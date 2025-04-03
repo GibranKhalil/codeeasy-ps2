@@ -6,7 +6,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { format } from "date-fns"
-
 import { Button } from "@/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
@@ -30,9 +29,9 @@ import {
   Heart,
   Download,
   Linkedin,
-  ShieldEllipsis,
   FileCheck,
   ShieldCheck,
+  Bookmark,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
@@ -46,10 +45,12 @@ import { TutorialCard } from "@/components/trainingCard"
 import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
 import { snippetService } from "@/data/services/snippets/snippets.service"
 import { gameService } from "@/data/services/games/game.service"
-import { rolesService } from "@/data/services/roles/roles.service"
 import RolesManager from "@/components/admin/rolesManager"
 import SubmissionsManager from "@/components/admin/SubmissionsManager"
-import { Role } from "@/data/@types/models/roles/entities/role.entity"
+import { categoriesService } from "@/data/services/categories/categories.service"
+import { Category } from "@/data/@types/models/categories/entities/category.entity"
+import { Label } from "@/components/label"
+import { Input } from "@/components/input"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -60,6 +61,12 @@ export default function ProfilePage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [tutorials, setTutorials] = useState<Tutorial[]>([])
   const [games, setGames] = useState<Game[]>([])
+
+  const [newCategory, setNewCategory] = useState<string>()
+  const [newCategoryError, setNewCategoryError] = useState<string>()
+  const [isSubmittingCategory, setSubmittingCategory] = useState<boolean>(false)
+
+  const [categories, setCategories] = useState<Category[]>([])
 
   const [loadingProfile, setLoadingProfile] = useState<boolean>(true)
   const [activeTab, setActiveTab] = useState<string>("overview")
@@ -87,6 +94,15 @@ export default function ProfilePage() {
     }
   }, [user])
 
+  const fetchCategories = useCallback(async () => {
+    const response = await categoriesService.find()
+    setCategories(response.data.data)
+  }, [])
+
+  useEffect(() => {
+    fetchCategories()
+  }, [fetchCategories])
+
   useEffect(() => {
     if (user) {
       setLoadingProfile(false)
@@ -102,7 +118,6 @@ export default function ProfilePage() {
     return
   }, [fetchTutorialsByCreator, fetchTutorialsByCreator, fetchGamesByCreator])
 
-
   useEffect(() => {
     if (!Validator.required(user) && !isLoadingUser) {
       router.push("/login")
@@ -116,6 +131,31 @@ export default function ProfilePage() {
   const hasModeratorRole = useMemo(() => {
     return profile && profile.roles && (profile.roles.map((role) => role.name.toLowerCase()).includes("moderator") || profile.roles.map((role) => role.name.toLowerCase()).includes("admin"))
   }, [profile])
+
+  const handleSubmitCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    setSubmittingCategory(true)
+    if (newCategory && newCategory.trim() !== "") {
+      const response = await categoriesService.create({ name: newCategory }, { requiresAuth: true })
+
+      if (response.success === false) {
+        setNewCategoryError(response.message)
+        setSubmittingCategory(false)
+        return
+      }
+
+      setNewCategory('')
+      setNewCategoryError('')
+      setSubmittingCategory(false)
+      await fetchCategories()
+      return
+    }
+
+    setNewCategoryError("A Categoria precisa de uma descrição")
+    setSubmittingCategory(false)
+  }
+
 
   if (isLoadingUser || loadingProfile) {
     return (
@@ -278,6 +318,11 @@ export default function ProfilePage() {
                 <TabsTrigger value="admin-submissions" className="flex items-center gap-1.5">
                   <FileCheck className="h-4 w-4" />
                   Submissões
+                </TabsTrigger>}
+              {hasModeratorRole &&
+                <TabsTrigger value="admin-categories" className="flex items-center gap-1.5">
+                  <Bookmark className="h-4 w-4" />
+                  Categorias
                 </TabsTrigger>}
               {hasAdminRole &&
                 <TabsTrigger value="admin-roles" className="flex items-center gap-1.5">
@@ -613,6 +658,78 @@ export default function ProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <SubmissionsManager />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            }
+
+            {hasModeratorRole &&
+              <TabsContent value="admin-categories">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gerenciamento de categorias de conteúdo</CardTitle>
+                    <CardDescription>Crie, Edite e Apague categorias</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Criar Nova Categoria</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <form onSubmit={handleSubmitCategory} className="space-y-4">
+                            <div>
+                              <Label htmlFor="role-name">Descrição *</Label>
+                              <Input
+                                id="category-name"
+                                required
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                                placeholder="Descreva a categoria"
+                              />
+                              {newCategoryError && <p className="text-sm text-destructive">{newCategoryError}</p>}
+                            </div>
+                            <Button type="submit" className="w-full">
+                              Criar Categoria
+                            </Button>
+                          </form>
+                        </CardContent>
+                      </Card>
+
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Categorias Existentes</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {categories && categories.length > 0 ? (
+                            <div className="space-y-2">
+                              {categories.map((category) => {
+                                return category ? (
+                                  <div
+                                    key={category.id}
+                                    className="flex items-center justify-between p-3 rounded-md"
+                                  >
+                                    <div className="flex items-center space-x-3">
+                                      <p className="capitalize">{category.name}</p>
+                                    </div>
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                    >
+                                      Remover
+                                    </Button>
+                                  </div>
+                                ) : null;
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground text-center mt-2">
+                              Ainda não existe nenhuma categoria cadastrada
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
