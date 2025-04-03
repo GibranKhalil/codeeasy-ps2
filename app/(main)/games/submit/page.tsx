@@ -183,26 +183,26 @@ export default function SubmitGamePage() {
           customHeaders: { "Content-Type": "multipart/form-data" },
         });
 
-        if (response.success === true) {
-          router.push('/games');
+        if (response.success === false) {
+
+          toast({
+            title: "Erro de envio!",
+            description: `Houve um erro ao enviar seu jogo. ${response.message}`,
+            variant: "destructive",
+          });
           return
         }
 
         toast({
-          title: "Erro de envio!",
-          description: "Houve um erro ao enviar seu jogo. Por favor, tente novamente",
-          variant: "destructive",
+          title: "Jogo enviado com sucesso!",
+          description: "Seu jogo foi enviando e está aguardando revisão",
         });
+
+        router.push('/games');
 
         return;
       }
 
-      toast({
-        title: "Jogo enviado com sucesso!",
-        description: "Seu jogo foi enviando e está aguardando revisão",
-      });
-
-      router.push("/games");
     } catch (error) {
       console.error("Error submitting game:", error);
       toast({
@@ -633,20 +633,22 @@ export default function SubmitGamePage() {
                             </div>
                           ))}
 
-                          <div
-                            className="border-2 border-dashed rounded-lg aspect-video flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
-                            onClick={() => screenshotInputRef.current?.click()}
-                          >
-                            <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-                            <p className="text-sm text-muted-foreground">Adicionar Screenshot</p>
-                            <input
-                              ref={screenshotInputRef}
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleScreenshotChange}
-                            />
-                          </div>
+                          {state.screenshots.length < 5 && (
+                            <div
+                              className="border-2 border-dashed rounded-lg aspect-video flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
+                              onClick={() => screenshotInputRef.current?.click()}
+                            >
+                              <Plus className="h-8 w-8 text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">Adicionar Screenshot</p>
+                              <input
+                                ref={screenshotInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleScreenshotChange}
+                              />
+                            </div>
+                          )}
                         </div>
                         {errors.screenshots && <p className="text-sm text-destructive">{errors.screenshots}</p>}
                         <p className="text-xs text-muted-foreground">
