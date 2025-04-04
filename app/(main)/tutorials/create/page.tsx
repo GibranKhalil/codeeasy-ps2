@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -36,20 +36,10 @@ import {
 import ReactMarkdown from "react-markdown"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
-
-const TUTORIAL_CATEGORIES = [
-  "Beginner",
-  "Advanced",
-  "Graphics",
-  "Audio",
-  "Input",
-  "Networking",
-  "File I/O",
-  "Hardware",
-  "Optimization",
-  "Tools",
-  "Other",
-]
+import { Category } from "@/data/@types/models/categories/entities/category.entity"
+import { categoriesService } from "@/data/services/categories/categories.service"
+import { useTutorialForm } from "@/hooks/tutorials/use-createTutorial"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
 
 export default function CreateTutorialPage() {
   const router = useRouter()
@@ -60,18 +50,19 @@ export default function CreateTutorialPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [previewMode, setPreviewMode] = useState(false)
   const [isDraft, setIsDraft] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
 
-  const [title, setTitle] = useState("")
-  const [excerpt, setExcerpt] = useState("")
-  const [category, setCategory] = useState("")
-  const [tags, setTags] = useState("")
-  const [readTime, setReadTime] = useState("10")
-  const [content, setContent] = useState("")
-  const [coverImage, setCoverImage] = useState<string | null>(null)
+  const { setCategory, setContent, setCoverImage, setExcerpt, setReadTime, setTags, setTitle, state } = useTutorialForm()
 
   const coverImageInputRef = useRef<HTMLInputElement>(null)
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+
+  const fetchCategories = useCallback(async () => {
+    const response = await categoriesService.find()
+    setCategories(response.data.data)
+  }, [])
 
 
   useEffect(() => {
@@ -81,15 +72,20 @@ export default function CreateTutorialPage() {
     }
   }, [])
 
+  useEffect(() => {
+    fetchCategories()
+    return
+  }, [fetchCategories])
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!title.trim()) newErrors.title = "Title is required"
-    if (!excerpt.trim()) newErrors.excerpt = "Excerpt is required"
-    if (!category) newErrors.category = "Category is required"
-    if (!readTime.trim()) newErrors.readTime = "Read time is required"
-    if (!content.trim()) newErrors.content = "Content is required"
-    if (!coverImage) newErrors.coverImage = "Cover image is required"
+    if (!state.title.trim()) newErrors.title = "Título é obrigatório"
+    if (!state.excerpt.trim()) newErrors.excerpt = "Descrição é obrigatória"
+    if (!state.categoryId) newErrors.category = "Categoria é obrigatória"
+    if (!state.readTime) newErrors.readTime = "Tempo de leitura é obrigatório"
+    if (!state.content.trim()) newErrors.content = "Conteúdo é obrigatório"
+    if (!state.coverImage) newErrors.coverImage = "Imagem de capa é obrigatório"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -98,7 +94,7 @@ export default function CreateTutorialPage() {
   const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setCoverImage("/placeholder.svg?height=600&width=1200")
+      setCoverImage(file)
       setErrors((prev) => ({ ...prev, coverImage: "" }))
     }
   }
@@ -108,8 +104,8 @@ export default function CreateTutorialPage() {
 
     if (!validateForm()) {
       toast({
-        title: "Validation Error",
-        description: "Please fix the errors in the form before submitting.",
+        title: "ERRO",
+        description: "Por favor, resolva os erros antes de enviar novamente.",
         variant: "destructive",
       })
       return
@@ -119,32 +115,54 @@ export default function CreateTutorialPage() {
       setIsSubmitting(true)
       setIsDraft(saveAsDraft)
 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const formData = new FormData();
+
+      formData.append('title', state.title);
+      formData.append('excerpt', state.excerpt);
+      formData.append('categoryId', `${state.categoryId}`);
+      formData.append('readTime', `${state.readTime}`);
+      formData.append('content', state.content);
+      formData.append('creatorId', `${user?.id}`);
+      formData.append('coverImage', state.coverImage as File);
+
+      if (state.tags) {
+        formData.append("tags", state.tags.join(","));
+      }
+
+      const response = await tutorialsService.create(formData, {
+        requiresAuth: true,
+        customHeaders: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.success === false) {
+
+        toast({
+          title: "Erro de envio!",
+          description: `Houve um erro ao enviar seu tutorial: ${response.message}`,
+          variant: "destructive",
+        });
+        return
+      }
 
       toast({
-        title: saveAsDraft ? "Draft saved successfully" : "Tutorial published successfully",
+        title: saveAsDraft ? "Draft saved successfully" : "Tutorial publicado com sucesso",
         description: saveAsDraft
           ? "Your tutorial has been saved as a draft."
-          : "Your tutorial has been published and is now available to the community.",
+          : "Seu tutorial foi enviando e está aguardando revisão.",
       })
 
       router.push("/tutorials")
     } catch (error) {
       console.error("Error submitting tutorial:", error)
       toast({
-        title: "Submission failed",
-        description: "There was an error submitting your tutorial. Please try again.",
+        title: "ERRO no envio",
+        description: "Houve um erro ao enviar seu tutorial. Por favor tente novamente.",
         variant: "destructive",
       })
     } finally {
       setIsSubmitting(false)
     }
   }
-
-  const parsedTags = tags
-    .split(",")
-    .map((tag) => tag.trim())
-    .filter((tag) => tag.length > 0)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -172,7 +190,7 @@ export default function CreateTutorialPage() {
       <div className="container py-8 flex justify-center items-center min-h-[calc(100vh-16rem)]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
     )
@@ -219,11 +237,11 @@ export default function CreateTutorialPage() {
                 <CardDescription>Isto é como seu tutorial vai aparecer para os usuários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {coverImage && (
+                {state.coverImage && (
                   <div className="relative h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden">
                     <Image
-                      src={coverImage || "/placeholder.svg"}
-                      alt={title || "Tutorial cover"}
+                      src={URL.createObjectURL(state.coverImage) || "/placeholder.svg"}
+                      alt={state.title || "Tutorial cover"}
                       fill
                       className="object-cover"
                     />
@@ -232,19 +250,19 @@ export default function CreateTutorialPage() {
 
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-4 mb-3">
-                    {category && <Badge className="bg-primary">{category}</Badge>}
+                    {state.categoryId && <Badge className="bg-primary">{state.categoryId}</Badge>}
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Clock className="mr-1 h-4 w-4" />
-                      {readTime} minutos de leitura
+                      {state.readTime} minutos de leitura
                     </div>
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold">{title || "Título do Tutorial"}</h1>
-                  <p className="text-xl text-muted-foreground">{excerpt || "A descrição do tutorial vai aparecer aqui"}</p>
+                  <h1 className="text-3xl md:text-4xl font-bold">{state.title || "Título do Tutorial"}</h1>
+                  <p className="text-xl text-muted-foreground">{state.excerpt || "A descrição do tutorial vai aparecer aqui"}</p>
                 </div>
 
-                {parsedTags.length > 0 && (
+                {state.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {parsedTags.map((tag, index) => (
+                    {state.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary">
                         {tag}
                       </Badge>
@@ -255,7 +273,7 @@ export default function CreateTutorialPage() {
                 <Separator />
 
                 <div className="prose dark:prose-invert max-w-none">
-                  <ReactMarkdown>{content || "O conteúdo do tutorial aparecerá aqui"}</ReactMarkdown>
+                  <ReactMarkdown>{state.content || "O conteúdo do tutorial aparecerá aqui"}</ReactMarkdown>
                 </div>
 
                 <div className="flex items-center justify-between mt-8 pt-8 border-t">
@@ -302,9 +320,9 @@ export default function CreateTutorialPage() {
                         </Label>
                         <Input
                           id="title"
-                          value={title}
+                          value={state.title}
                           onChange={(e) => setTitle(e.target.value)}
-                          placeholder="Enter the title of your tutorial"
+                          placeholder="Título do tutorial"
                           className={errors.title ? "border-destructive" : ""}
                         />
                         {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
@@ -316,16 +334,16 @@ export default function CreateTutorialPage() {
                         </Label>
                         <Textarea
                           id="excerpt"
-                          value={excerpt}
+                          value={state.excerpt}
                           onChange={(e) => setExcerpt(e.target.value)}
-                          placeholder="Provide a brief summary of your tutorial (max 200 characters)"
+                          placeholder="Forneça um resumo do seu tutorial (max 200 characteres)"
                           className={errors.excerpt ? "border-destructive" : ""}
                           maxLength={200}
                         />
                         {errors.excerpt ? (
                           <p className="text-sm text-destructive">{errors.excerpt}</p>
                         ) : (
-                          <p className="text-xs text-muted-foreground text-right">{excerpt.length}/200 characters</p>
+                          <p className="text-xs text-muted-foreground text-right">{state.excerpt.length}/200 characters</p>
                         )}
                       </div>
 
@@ -334,14 +352,14 @@ export default function CreateTutorialPage() {
                           <Label htmlFor="category">
                             Categoria <span className="text-destructive">*</span>
                           </Label>
-                          <Select value={category} onValueChange={setCategory}>
+                          <Select value={`${state.categoryId}`} onValueChange={(e) => setCategory(Number(e))}>
                             <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
-                              <SelectValue placeholder="Select a category" />
+                              <SelectValue placeholder="Selecione uma categoria" />
                             </SelectTrigger>
                             <SelectContent>
-                              {TUTORIAL_CATEGORIES.map((cat) => (
-                                <SelectItem key={cat} value={cat}>
-                                  {cat}
+                              {categories.map((cat, index) => (
+                                <SelectItem key={index} value={`${cat.id}`}>
+                                  {cat.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -355,13 +373,13 @@ export default function CreateTutorialPage() {
                             <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                               id="tags"
-                              value={tags}
-                              onChange={(e) => setTags(e.target.value)}
+                              value={state.tags.join(',')}
+                              onChange={(e) => setTags([e.target.value])}
                               placeholder="e.g. graphics, beginner, ps2dev (comma separated)"
                               className="pl-10"
                             />
                           </div>
-                          <p className="text-xs text-muted-foreground">Separate tags with commas</p>
+                          <p className="text-xs text-muted-foreground">Separe as tags com vírgulas</p>
                         </div>
                       </div>
 
@@ -372,8 +390,8 @@ export default function CreateTutorialPage() {
                         <Input
                           id="readTime"
                           type="number"
-                          value={readTime}
-                          onChange={(e) => setReadTime(e.target.value)}
+                          value={state.readTime}
+                          onChange={(e) => setReadTime(Number(e.target.value))}
                           placeholder="e.g. 10"
                           className={errors.readTime ? "border-destructive" : ""}
                           min="1"
@@ -407,10 +425,10 @@ export default function CreateTutorialPage() {
                             }`}
                           onClick={() => coverImageInputRef.current?.click()}
                         >
-                          {coverImage ? (
+                          {state.coverImage ? (
                             <div className="relative w-full aspect-video">
                               <Image
-                                src={coverImage || "/placeholder.svg"}
+                                src={URL.createObjectURL(state.coverImage) || "/placeholder.svg"}
                                 alt="Cover image"
                                 fill
                                 className="object-cover rounded-md"
@@ -478,22 +496,22 @@ export default function CreateTutorialPage() {
                         </Label>
                         <Textarea
                           id="content"
-                          value={content}
+                          value={state.content}
                           onChange={(e) => setContent(e.target.value)}
-                          placeholder="# Getting Started with PS2 Development
+                          placeholder="# Introdução ao desenvolvimento do PS2
 
-## Introduction
+## Introdução
 
-Welcome to PS2 homebrew development! This tutorial will guide you through...
+Bem-vindo ao desenvolvimento homebrew do PS2! Este tutorial irá guiá-lo através de...
 
-## Prerequisites
+## Pré-requisitos
 
 - Item 1
 - Item 2
 
-## Step 1: Setting Up Your Environment
+## Etapa 1: Configurando seu ambiente
 
-Detailed instructions here..."
+Instruções detalhadas aqui..."
                           className={`min-h-[400px] font-mono ${errors.content ? "border-destructive" : ""}`}
                         />
                         {errors.content && <p className="text-sm text-destructive">{errors.content}</p>}

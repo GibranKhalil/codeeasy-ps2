@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import { format } from "date-fns"
@@ -19,8 +19,9 @@ export default function TutorialPage() {
   const [tutorial, setTutorial] = useState<Tutorial | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const { slug } = params
+
   useEffect(() => {
-    // Simulate loading data
     const timer = setTimeout(() => {
       const foundTutorial = mockTutorials.find((t) => t.slug === params.slug)
       setTutorial(foundTutorial || null)
@@ -45,7 +46,7 @@ export default function TutorialPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">Tutorial not found</h1>
+        <h1 className="text-2xl font-bold">Tutorial não encontrado</h1>
       </div>
     )
   }

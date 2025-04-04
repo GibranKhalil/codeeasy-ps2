@@ -633,7 +633,7 @@ export default function SubmitGamePage() {
                             </div>
                           ))}
 
-                          {state.screenshots.length < 5 && (
+                          {state.screenshots.length < 3 && (
                             <div
                               className="border-2 border-dashed rounded-lg aspect-video flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors"
                               onClick={() => screenshotInputRef.current?.click()}

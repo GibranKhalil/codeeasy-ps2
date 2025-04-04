@@ -6,6 +6,7 @@ export class CreateTutorialDto {
   readTime!: number;
   tags!: string[];
   content!: string;
-  creator!: User;
-  coverImage_url!: string;
+  categoryId!: number;
+  coverImage!: File | null;
+  creatorId!: number;
 }

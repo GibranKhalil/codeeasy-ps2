@@ -16,6 +16,8 @@ import Validator from "@/data/utils/validator.utils"
 import { useAuth } from "@/hooks/use-auth"
 import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
 import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
+import { Category } from "@/data/@types/models/categories/entities/category.entity"
+import { categoriesService } from "@/data/services/categories/categories.service"
 
 export default function TutorialsPage() {
   const router = useRouter()
@@ -25,19 +27,25 @@ export default function TutorialsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<Category[]>([])
 
   const { user } = useAuth()
-
-  const categories = ["all", ...Array.from(new Set(mockTutorials.map((tutorial) => tutorial.category)))]
 
 
   const fetchTutorials = useCallback(async () => {
     const response = await tutorialsService.find()
     setTutorials(response.data.data)
+    setFilteredTutorials(response.data.data)
+  }, [])
+
+  const fetchCategories = useCallback(async () => {
+    const response = await categoriesService.find()
+    setCategories(response.data.data)
   }, [])
 
   useEffect(() => {
     fetchTutorials()
+    fetchCategories()
     setLoading(false)
 
     return
@@ -78,9 +86,9 @@ export default function TutorialsPage() {
 
         <Tabs defaultValue="all" value={activeCategory} onValueChange={setActiveCategory}>
           <TabsList className="mb-4 flex h-auto flex-wrap justify-start">
-            {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className="mb-1">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+            {categories.map((category, index) => (
+              <TabsTrigger key={index} value={`${category.id}`} className="mb-1">
+                {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -131,7 +139,7 @@ export default function TutorialsPage() {
                         </Badge>
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Clock className="mr-1 h-4 w-4" />
-                          {tutorial.readTime} min read
+                          {tutorial.readTime} minutos de leitura
                         </div>
                       </div>
                       <CardTitle className="line-clamp-2 text-xl">{tutorial.title}</CardTitle>
@@ -139,7 +147,7 @@ export default function TutorialsPage() {
                     <CardContent className="p-4 pt-2">
                       <p className="text-muted-foreground line-clamp-3">{tutorial.excerpt}</p>
                       <div className="flex flex-wrap gap-2 mt-4">
-                        {tutorial.tags.slice(0, 3).map((tag, index) => (
+                        {tutorial.tags && tutorial.tags.slice && tutorial.tags.slice(0, 3).map((tag, index) => (
                           <Badge key={index} variant="secondary" className="text-xs">
                             {tag}
                           </Badge>
@@ -164,7 +172,7 @@ export default function TutorialsPage() {
                         <span className="text-sm">{tutorial.creator.username}</span>
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {format(new Date(tutorial.createdAt), "MMM dd, yyyy")}
+                        {format(new Date(tutorial.createdAt), "dd/MM/yyyy")}
                       </div>
                     </CardFooter>
                   </Card>
