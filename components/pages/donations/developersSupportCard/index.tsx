@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/card"
-import { mockFeaturedDevelopers } from "@/lib/mock-data"
 import { ArrowRight, ExternalLink, Heart } from "lucide-react"
 import Link from "next/link"
 
@@ -17,7 +16,7 @@ const DevelopersSupportCard = () => {
             <CardContent>
                 <h3 className="text-sm font-medium mb-4">Desenvolvedores em destaque</h3>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {mockFeaturedDevelopers.map((developer) => (
+                    {/* {mockFeaturedDevelopers.map((developer) => (
                         <Card key={developer.id} className="overflow-hidden">
                             <CardHeader className="pb-2">
                                 <div className="flex items-center space-x-3">
@@ -49,7 +48,7 @@ const DevelopersSupportCard = () => {
                                 </Button>
                             </CardFooter>
                         </Card>
-                    ))}
+                    ))} */}
                 </div>
             </CardContent>
             <CardFooter className="flex justify-center border-t pt-6">

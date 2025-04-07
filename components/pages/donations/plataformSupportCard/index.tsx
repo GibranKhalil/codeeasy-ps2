@@ -1,7 +1,6 @@
 import { Badge } from "@/components/badge"
 import { Button } from "@/components/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/card"
-import { mockDonationMethods } from "@/lib/mock-data"
 import { ArrowRight, Bitcoin, CreditCard, Github, Heart } from "lucide-react"
 import { useState } from "react"
 
@@ -52,7 +51,7 @@ const PlataformSupportCard = () => {
                 <div className="space-y-2">
                     <h3 className="text-sm font-medium">Métodos de pagamentos</h3>
                     <div className="grid gap-4">
-                        {mockDonationMethods.map((method) => (
+                        {/* {mockDonationMethods.map((method) => (
                             <Card key={method.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
                                 <CardContent className="p-4 flex items-center">
                                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
@@ -67,7 +66,7 @@ const PlataformSupportCard = () => {
                                     </Button>
                                 </CardContent>
                             </Card>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
             </CardContent>
