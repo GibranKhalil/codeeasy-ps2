@@ -10,7 +10,6 @@ import { Badge } from "@/components/badge"
 import { Input } from "@/components/input"
 import { Button } from "@/components/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
-import { mockTutorials } from "@/lib/mock-data"
 import { Search, Clock, Tag, PlusCircle } from "lucide-react"
 import Validator from "@/data/utils/validator.utils"
 import { useAuth } from "@/hooks/use-auth"
@@ -25,7 +24,7 @@ export default function TutorialsPage() {
   const [tutorials, setTutorials] = useState<Tutorial[]>([])
   const [filteredTutorials, setFilteredTutorials] = useState<Tutorial[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeCategory, setActiveCategory] = useState("all")
+  const [activeCategory, setActiveCategory] = useState(`0`)
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
 
@@ -33,10 +32,10 @@ export default function TutorialsPage() {
 
 
   const fetchTutorials = useCallback(async () => {
-    const response = await tutorialsService.find()
+    const response = await tutorialsService.find({ params: { category: activeCategory } })
     setTutorials(response.data.data)
     setFilteredTutorials(response.data.data)
-  }, [])
+  }, [activeCategory])
 
   const fetchCategories = useCallback(async () => {
     const response = await categoriesService.find()

@@ -6,14 +6,14 @@ import { User as UserEntity } from "@/data/@types/models/users/entities/user.ent
 import { userService } from "@/data/services/users/users.service"
 import { Label } from "@radix-ui/react-label"
 import { Separator } from "@radix-ui/react-separator"
-import { Github, Globe, Linkedin, Loader2, Mail, Save, User } from "lucide-react"
+import { CodeXml, CodeXmlIcon, Github, Globe, Linkedin, Loader2, Mail, Save, Twitter, User } from "lucide-react"
 import { useReducer, useState } from "react"
 
 interface SettingsPageProps {
     id: number,
     email: string,
     username: string,
-    profile: Pick<UserEntity, "bio"> & { website?: string, linkedin?: string, github?: string }
+    profile: Pick<UserEntity, "bio"> & { website?: string, linkedin?: string, github?: string, dailyDev?: string, twitter?: string }
 }
 
 export const SettingsPage = ({ id, email, profile, username }: SettingsPageProps) => {
@@ -62,45 +62,75 @@ export const SettingsPage = ({ id, email, profile, username }: SettingsPageProps
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
-                        <div className="relative">
-                            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                id="website"
-                                value={profileSettings.website || ""}
-                                onChange={(e) => setProfileSettings({ field: "website", type: "SET_FIELD", value: e.target.value })}
-                                className="pl-10"
-                                placeholder="https://example.com"
-                            />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="website">Website</Label>
+                            <div className="relative">
+                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="website"
+                                    value={profileSettings.website || ""}
+                                    onChange={(e) => setProfileSettings({ field: "website", type: "SET_FIELD", value: e.target.value })}
+                                    className="pl-10"
+                                    placeholder="https://example.com"
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="linkedin">LinkedIn</Label>
-                        <div className="relative">
-                            <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                id="linkedin"
-                                value={profileSettings.linkedin || ""}
-                                onChange={(e) => setProfileSettings({ field: "linkedin", type: "SET_FIELD", value: e.target.value })}
-                                className="pl-10"
-                                placeholder="https://www.linkedin.com/in/example"
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="linkedin">LinkedIn</Label>
+                            <div className="relative">
+                                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="linkedin"
+                                    value={profileSettings.linkedin || ""}
+                                    onChange={(e) => setProfileSettings({ field: "linkedin", type: "SET_FIELD", value: e.target.value })}
+                                    className="pl-10"
+                                    placeholder="https://www.linkedin.com/in/example"
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="github">GitHub</Label>
-                        <div className="relative">
-                            <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                id="github"
-                                value={profileSettings.github || ""}
-                                onChange={(e) => setProfileSettings({ field: "github", type: "SET_FIELD", value: e.target.value })}
-                                className="pl-10"
-                                placeholder="https://github.com/example"
-                            />
+                        <div className="space-y-2">
+                            <Label htmlFor="github">GitHub</Label>
+                            <div className="relative">
+                                <Github className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="github"
+                                    value={profileSettings.github || ""}
+                                    onChange={(e) => setProfileSettings({ field: "github", type: "SET_FIELD", value: e.target.value })}
+                                    className="pl-10"
+                                    placeholder="https://github.com/example"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="twitter">Twitter</Label>
+                            <div className="relative">
+                                <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="twitter"
+                                    value={profileSettings.twitter || ""}
+                                    onChange={(e) => setProfileSettings({ field: "twitter", type: "SET_FIELD", value: e.target.value })}
+                                    className="pl-10"
+                                    placeholder="https://x.com/example"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="dailyDev">Daily.Dev</Label>
+                            <div className="relative">
+                                <CodeXml className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="dailyDev"
+                                    value={profileSettings.dailyDev || ""}
+                                    onChange={(e) => setProfileSettings({ field: "dailyDev", type: "SET_FIELD", value: e.target.value })}
+                                    className="pl-10"
+                                    placeholder="https://app.daily.dev/example"
+                                />
+                            </div>
                         </div>
                     </div>
 

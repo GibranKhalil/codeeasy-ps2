@@ -17,4 +17,6 @@ export class User {
   createdAt!: Date;
   updatedAt!: Date;
   roles!: Role[];
+  dailyDev!: string;
+  twitter!: string;
 }

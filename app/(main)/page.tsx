@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { mockSnippets, mockTopContributors, mockTutorials, mockGames } from "@/lib/mock-data"
 import HeroSection from "@/components/pages/home/hero-section"
 import FeaturedContentTabs from "@/components/pages/home/featured-content-tabs"
 import TopContributorsSection from "@/components/pages/home/top-contributors-section"
@@ -16,7 +15,6 @@ import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entit
 
 export default function Home() {
   const [recentSnippets, setRecentSnippets] = useState<Snippet[]>([])
-  const [topContributors, setTopContributors] = useState<typeof mockTopContributors>([])
   const [featuredTutorials, setFeaturedTutorials] = useState<Tutorial[]>([])
   const [featuredGames, setFeaturedGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,7 +40,6 @@ export default function Home() {
     fetchFeaturedSnippets()
     fetchFeaturedGames()
     fetchFeaturedTutorials()
-    setTopContributors(mockTopContributors.slice(0, 5))
     setLoading(false)
 
     return
@@ -50,7 +47,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <HeroSection snippetCode={mockSnippets[0]?.code || ""} snippetLanguage={mockSnippets[0]?.language || "c"} />
+      <HeroSection />
       <FeaturedContentTabs
         recentSnippets={recentSnippets}
         featuredTutorials={featuredTutorials}

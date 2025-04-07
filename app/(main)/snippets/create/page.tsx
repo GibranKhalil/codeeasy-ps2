@@ -10,9 +10,8 @@ import { Input } from "@/components/input"
 import { Label } from "@/components/label"
 import { Textarea } from "@/components/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/select"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Tag } from "lucide-react"
 import { CreateSnippetDto } from "@/data/@types/models/snippet/dto/create-snippet.dto"
-import { User } from "@/data/@types/models/users/entities/user.entity"
 import { eSnippetLanguage, languageMap } from "@/data/@types/enums/eSnippetLanguage.enum"
 import { snippetService } from "@/data/services/snippets/snippets.service"
 import Validator from "@/data/utils/validator.utils"
@@ -25,7 +24,8 @@ const newSnippetInitialData: CreateSnippetDto = {
   description: '',
   language: eSnippetLanguage.Js,
   title: '',
-  engine: ''
+  engine: '',
+  tags: ''
 }
 
 type SnippetAction =
@@ -178,6 +178,21 @@ export default function CreateSnippetPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <div className="relative">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="tags"
+                  value={snippet.tags}
+                  onChange={(e) => setSnippet({ field: "tags", type: "SET_FIELD", value: e.target.value })}
+                  placeholder="e.g. graphics, beginner, ps2dev (separe por vírgula)"
+                  className="pl-10"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Separe as tags com vírgulas</p>
             </div>
 
             <div className="space-y-2">

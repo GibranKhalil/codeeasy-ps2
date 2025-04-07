@@ -9,17 +9,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
 import { Card, CardContent } from "@/components/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/carousel"
-import { mockGames } from "@/lib/mock-data"
 import { ArrowLeft, Download, Clock, Share2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
 import { gameService } from "@/data/services/games/game.service"
 import { AxiosResponse } from "axios"
 import { Game } from "@/data/@types/models/games/entities/game.entity"
+import { Interactions } from "@/data/@types/interactions.type"
 
 export default function GamePage() {
   const params = useParams()
   const router = useRouter()
   const [game, setGame] = useState<Game | null>(null)
+  const [creatorGames, setCreatorGames] = useState<Game[]>([])
   const [loading, setLoading] = useState(true)
 
   const { slug } = params
@@ -31,8 +32,16 @@ export default function GamePage() {
   }, [slug])
 
   const fetchGamesByCreator = useCallback(async () => {
+    setLoading(true)
+    if (game) {
+      const response = await gameService.find({ subEndpoint: `/creator/${game?.creator.id}`, params: { limit: 3, page: 1, pid: slug } })
+      setCreatorGames(response.data.data)
+    }
+  }, [slug, game])
 
-  }, [])
+  const interactWithGame = async (type: keyof Interactions) => {
+    await gameService.addInteraction(slug as string, { type })
+  }
 
   useEffect(() => {
     fetchGameByPid()
@@ -40,6 +49,16 @@ export default function GamePage() {
 
     return
   }, [fetchGameByPid])
+
+  useEffect(() => {
+    fetchGamesByCreator()
+    setLoading(false)
+    return
+  }, [fetchGamesByCreator])
+
+  useEffect(() => {
+    interactWithGame("views")
+  }, [slug])
 
   if (loading) {
     return (
@@ -124,7 +143,7 @@ export default function GamePage() {
           <div className="sticky top-24">
             <Card className="mb-6">
               <CardContent className="p-6">
-                <Button className="w-full mb-4" size="lg" asChild>
+                <Button onClick={() => interactWithGame("downloads")} className="w-full mb-4" size="lg" asChild>
                   <a href={game.game_url} target="_blank" rel="noopener noreferrer">
                     <Download className="mr-2 h-5 w-5" />
                     Download ({game.fileSize}MB)
@@ -181,39 +200,38 @@ export default function GamePage() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-medium mb-4">Mais Jogos do Desenvolvedor</h3>
-                {/* <div className="space-y-4">
-                  {mockGames
-                    .filter((g) => g.id !== game.id && g.author.id === game.author.id)
-                    .slice(0, 3)
-                    .map((relatedGame) => (
-                      <div
-                        key={relatedGame.id}
-                        className="flex items-start space-x-2 cursor-pointer"
-                        onClick={() => router.push(`/games/${relatedGame.slug}`)}
-                      >
-                        <div className="relative h-16 w-16 flex-shrink-0 rounded overflow-hidden">
-                          <Image
-                            src={relatedGame.coverImage || "/placeholder.svg"}
-                            alt={relatedGame.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium line-clamp-2">{relatedGame.title}</h4>
-                          <div className="flex items-center text-xs text-muted-foreground mt-1">
-                            <Download className="mr-1 h-3 w-3" />
-                            {relatedGame.download_count.toLocaleString()}
+            {creatorGames &&
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="font-medium mb-4">Mais Jogos do Desenvolvedor</h3>
+                  <div className="space-y-4">
+                    {creatorGames
+                      .map((relatedGame) => (
+                        <div
+                          key={relatedGame.id}
+                          className="flex items-start space-x-2 cursor-pointer"
+                          onClick={() => router.push(`/games/${relatedGame.pid}`)}
+                        >
+                          <div className="relative h-16 w-16 flex-shrink-0 rounded overflow-hidden">
+                            <Image
+                              src={relatedGame.coverImage_url || "/placeholder.svg"}
+                              alt={relatedGame.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium line-clamp-2">{relatedGame.title}</h4>
+                            <div className="flex items-center text-xs text-muted-foreground mt-1">
+                              <Download className="mr-1 h-3 w-3" />
+                              {relatedGame.downloads.toLocaleString()}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                </div> */}
-              </CardContent>
-            </Card>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>}
           </div>
         </div>
       </div>

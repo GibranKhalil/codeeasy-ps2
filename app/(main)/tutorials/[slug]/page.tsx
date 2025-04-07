@@ -7,29 +7,49 @@ import { format } from "date-fns"
 import { Button } from "@/components/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
-import { mockTutorials } from "@/lib/mock-data"
-import type { Tutorial } from "@/lib/types"
 import { ArrowLeft, Clock, Calendar, Share2 } from "lucide-react"
 import ReactMarkdown from "react-markdown"
+import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
+import { AxiosResponse } from "axios"
+import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
+import { ptBR } from "date-fns/locale"
+import { Interactions } from "@/data/@types/interactions.type"
 
 export default function TutorialPage() {
   const params = useParams()
   const router = useRouter()
 
   const [tutorial, setTutorial] = useState<Tutorial | null>(null)
+  const [similarTutorials, setSimilarTutorials] = useState<Tutorial[]>([])
   const [loading, setLoading] = useState(true)
 
   const { slug } = params
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const foundTutorial = mockTutorials.find((t) => t.slug === params.slug)
-      setTutorial(foundTutorial || null)
-      setLoading(false)
-    }, 1000)
+  const fetchTutorial = useCallback(async () => {
+    setLoading(true)
+    const response = await tutorialsService.find({ subEndpoint: `/pid/${slug}` }) as unknown as AxiosResponse<Tutorial>
+    setTutorial(response.data)
+    setLoading(false)
+  }, [slug])
 
-    return () => clearTimeout(timer)
-  }, [params.slug])
+  const fetchSimilarTutorials = useCallback(async () => {
+    const response = await tutorialsService.find({ subEndpoint: `/similar/${slug}`, params: { page: 1, limit: 3 } })
+    setSimilarTutorials(response.data.data)
+  }, [slug])
+
+  const interactWithTutorial = async (type: keyof Interactions) => {
+    await tutorialsService.addInteraction(slug as string, { type })
+  }
+
+  useEffect(() => {
+    interactWithTutorial("views")
+  }, [slug])
+
+  useEffect(() => {
+    fetchTutorial()
+    fetchSimilarTutorials()
+    return;
+  }, [fetchTutorial, fetchSimilarTutorials])
 
   if (loading) {
     return (
@@ -44,7 +64,7 @@ export default function TutorialPage() {
       <div className="container py-8">
         <Button variant="ghost" onClick={() => router.back()} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
+          Voltar
         </Button>
         <h1 className="text-2xl font-bold">Tutorial não encontrado</h1>
       </div>
@@ -55,11 +75,11 @@ export default function TutorialPage() {
     <div className="container py-8">
       <Button variant="ghost" onClick={() => router.back()} className="mb-4">
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
+        Voltar
       </Button>
 
       <div className="relative h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden mb-8">
-        <Image src={tutorial.coverImage || "/placeholder.svg"} alt={tutorial.title} fill className="object-cover" />
+        <Image src={tutorial.coverImage_url || "/placeholder.svg"} alt={tutorial.title} fill className="object-cover" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -72,13 +92,13 @@ export default function TutorialPage() {
           <div className="flex flex-wrap items-center gap-4 mb-8 text-muted-foreground text-sm">
             <div className="flex items-center">
               <Calendar className="mr-1 h-4 w-4" />
-              {format(new Date(tutorial.created_at), "MMMM dd, yyyy")}
+              {format(new Date(tutorial.createdAt), "dd/MM/yyyy", { locale: ptBR })}
             </div>
             <div className="flex items-center">
               <Clock className="mr-1 h-4 w-4" />
-              {tutorial.read_time} min read
+              {tutorial.readTime} minutos de leitura
             </div>
-            <Badge variant="outline">{tutorial.category}</Badge>
+            <Badge variant="outline">{tutorial.category.name}</Badge>
           </div>
 
           <div className="prose dark:prose-invert max-w-none">
@@ -88,17 +108,17 @@ export default function TutorialPage() {
           <div className="flex items-center justify-between mt-8 pt-8 border-t">
             <div className="flex items-center">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={tutorial.author.avatar_url} />
-                <AvatarFallback>{tutorial.author.username.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={tutorial.creator.avatarUrl} />
+                <AvatarFallback>{tutorial.creator.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{tutorial.author.username}</p>
-                <p className="text-sm text-muted-foreground">Author</p>
+                <p className="font-medium">{tutorial.creator.username}</p>
+                <p className="text-sm text-muted-foreground">Autor</p>
               </div>
             </div>
             <Button variant="outline" size="sm">
               <Share2 className="mr-2 h-4 w-4" />
-              Share
+              Compartilhar
             </Button>
           </div>
         </div>
@@ -117,20 +137,18 @@ export default function TutorialPage() {
             </div>
 
             <div className="rounded-lg border p-4">
-              <h3 className="font-medium mb-4">Related Tutorials</h3>
+              <h3 className="font-medium mb-4">Tutoriais Relacionados</h3>
               <div className="space-y-4">
-                {mockTutorials
-                  .filter((t) => t.id !== tutorial.id && t.category === tutorial.category)
-                  .slice(0, 3)
+                {similarTutorials
                   .map((relatedTutorial) => (
                     <div
                       key={relatedTutorial.id}
                       className="flex items-start space-x-2 cursor-pointer"
-                      onClick={() => router.push(`/tutorials/${relatedTutorial.slug}`)}
+                      onClick={() => router.push(`/tutorials/${relatedTutorial.pid}`)}
                     >
                       <div className="relative h-16 w-16 flex-shrink-0 rounded overflow-hidden">
                         <Image
-                          src={relatedTutorial.coverImage || "/placeholder.svg"}
+                          src={relatedTutorial.coverImage_url || "/placeholder.svg"}
                           alt={relatedTutorial.title}
                           fill
                           className="object-cover"
@@ -138,7 +156,7 @@ export default function TutorialPage() {
                       </div>
                       <div>
                         <h4 className="text-sm font-medium line-clamp-2">{relatedTutorial.title}</h4>
-                        <p className="text-xs text-muted-foreground mt-1">{relatedTutorial.read_time} min read</p>
+                        <p className="text-xs text-muted-foreground mt-1">{relatedTutorial.readTime} min</p>
                       </div>
                     </div>
                   ))}

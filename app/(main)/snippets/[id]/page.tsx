@@ -1,22 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
 import { Highlight, themes } from "prism-react-renderer"
-
-
 import { Button } from "@/components/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
-import { mockSnippets } from "@/lib/mock-data"
-
 import { Copy, Clock, ArrowLeft, Edit, Trash, Check, Maximize, Minimize } from "lucide-react"
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { useAuth } from "@/hooks/use-auth"
-import { Snippet } from "@/lib/types"
+import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
+import { snippetService } from "@/data/services/snippets/snippets.service"
+import { AxiosResponse } from "axios"
+import { Interactions } from "@/data/@types/interactions.type"
 
 export default function SnippetPage() {
   const params = useParams()
@@ -28,14 +25,28 @@ export default function SnippetPage() {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const { user } = useAuth()
+  const { id } = params
+
+  const fetchSnippet = useCallback(async () => {
+    const response = await snippetService.find({ subEndpoint: `/pid/${id}` }) as unknown as AxiosResponse<Snippet>
+    setSnippet(response.data || null)
+  }, [id])
+
+  const interactWithSnippet = async (type: keyof Interactions) => {
+    await snippetService.addInteraction(id as string, { type })
+  }
 
   useEffect(() => {
-    const foundSnippet = mockSnippets.find((s) => s.id === params.id)
-    setSnippet(foundSnippet || null)
+    interactWithSnippet("views")
+  }, [id])
+
+
+  useEffect(() => {
+    fetchSnippet()
     setLoading(false)
 
     return
-  }, [params.id])
+  }, [fetchSnippet])
 
   const handleCopyCode = () => {
     if (snippet?.code) {
@@ -46,7 +57,7 @@ export default function SnippetPage() {
   }
 
   const handleDelete = async () => {
-    if (!snippet || !user || user.id !== Number(snippet.user_id)) return
+    if (!snippet || !user || user.id !== Number(snippet.creator.id)) return
 
     if (window.confirm("Tem certeza que deseja excluir este snippet")) {
       console.log("Deleting snippet:", snippet.id)
@@ -98,7 +109,7 @@ export default function SnippetPage() {
   if (!snippet) {
     return (
       <div className="container py-8">
-        <h1 className="text-2xl font-bold">Snippet not found</h1>
+        <h1 className="text-2xl font-bold">Snippet não encontrado</h1>
       </div>
     )
   }
@@ -108,10 +119,10 @@ export default function SnippetPage() {
       <div className="flex items-center justify-between mb-6">
         <Button variant="ghost" onClick={() => router.back()} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Back
+          Voltar
         </Button>
         <div className="flex gap-2">
-          {user && user.id === Number(snippet.user_id) && (
+          {user && user.id === Number(snippet.creator.id) && (
             <>
               <Button variant="outline" asChild>
                 <a href={`/snippets/${snippet.id}/edit`}>
@@ -186,16 +197,16 @@ export default function SnippetPage() {
         <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t p-4">
           <div className="flex items-center">
             <Avatar className="h-8 w-8 mr-2">
-              <AvatarImage src={snippet.user?.avatar_url} />
-              <AvatarFallback>{snippet.user?.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+              <AvatarImage src={snippet.creator.avatarUrl} />
+              <AvatarFallback>{snippet.creator.username?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">{snippet.user?.username}</p>
+              <p className="text-sm font-medium">{snippet.creator.username}</p>
             </div>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <Clock className="h-4 w-4 mr-1" />
-            {formatDistanceToNow(new Date(snippet.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(snippet.createdAt), { addSuffix: true })}
           </div>
         </CardFooter>
       </Card>

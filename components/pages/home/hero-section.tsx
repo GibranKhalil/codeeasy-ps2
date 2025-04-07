@@ -5,15 +5,9 @@ import { motion } from "framer-motion"
 import { BookOpen, Sparkles, Joystick } from "lucide-react"
 import { Badge } from "../../badge"
 import { Button } from "../../button"
-import CodePreview from "@/components/codePreview"
 import PS2Logo3DModel from "../ps2Logo3DModel"
 
-interface HeroSectionProps {
-  snippetCode: string
-  snippetLanguage: string
-}
-
-export default function HeroSection({ snippetCode, snippetLanguage }: HeroSectionProps) {
+export default function HeroSection() {
 
   const heroVariants = {
     hidden: { opacity: 0, y: 20 },

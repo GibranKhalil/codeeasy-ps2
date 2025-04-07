@@ -32,6 +32,8 @@ import {
   FileCheck,
   ShieldCheck,
   Bookmark,
+  CodeXml,
+  TwitterIcon,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
@@ -434,10 +436,10 @@ export default function ProfilePage() {
                   {snippets.length > 0 && (
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>Recent Snippets</CardTitle>
+                        <CardTitle>Snippets Recentes</CardTitle>
                         <Button variant="ghost" size="sm" asChild>
                           <Link href="/snippets" className="gap-1">
-                            View All
+                            Ver Todos
                           </Link>
                         </Button>
                       </CardHeader>
@@ -500,6 +502,28 @@ export default function ProfilePage() {
                               >
                                 <Globe className="h-4 w-4 mr-2" />
                                 Website
+                              </Link>
+                            )}
+                            {profile && profile.dailyDev && (
+                              <Link
+                                href={profile.dailyDev}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center text-sm hover:text-primary transition-colors"
+                              >
+                                <CodeXml className="h-4 w-4 mr-2" />
+                                Daily.dev
+                              </Link>
+                            )}
+                            {profile && profile.twitter && (
+                              <Link
+                                href={profile.twitter}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center text-sm hover:text-primary transition-colors"
+                              >
+                                <TwitterIcon className="h-4 w-4 mr-2" />
+                                Twitter
                               </Link>
                             )}
                           </div>

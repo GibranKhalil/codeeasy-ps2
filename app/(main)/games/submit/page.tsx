@@ -501,7 +501,7 @@ export default function SubmitGamePage() {
                               id="tags"
                               value={state.tags?.join(",")}
                               onChange={(e) => setTags([e.target.value])}
-                              placeholder="e.g. platformer, 2d, puzzle (comma separated)"
+                              placeholder="e.g. platformer, 2d, puzzle (separe por vírgula)"
                               className="pl-10"
                             />
                           </div>

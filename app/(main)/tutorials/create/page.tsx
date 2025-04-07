@@ -375,7 +375,7 @@ export default function CreateTutorialPage() {
                               id="tags"
                               value={state.tags.join(',')}
                               onChange={(e) => setTags([e.target.value])}
-                              placeholder="e.g. graphics, beginner, ps2dev (comma separated)"
+                              placeholder="e.g. graphics, beginner, ps2dev (separe por vírgula)"
                               className="pl-10"
                             />
                           </div>

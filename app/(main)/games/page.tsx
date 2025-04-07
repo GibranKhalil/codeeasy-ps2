@@ -10,7 +10,6 @@ import { Badge } from "@/components/badge"
 import { Button } from "@/components/button"
 import { Input } from "@/components/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs"
-import { mockGames } from "@/lib/mock-data"
 import { Search, Download, User, Clock } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
@@ -23,16 +22,16 @@ export default function GamesPage() {
   const router = useRouter()
   const [filteredGames, setFilteredGames] = useState<Game[]>([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeCategory, setActiveCategory] = useState("all")
+  const [activeCategory, setActiveCategory] = useState("0")
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
 
   const { user } = useAuth()
 
   const fetchGames = useCallback(async () => {
-    const response = await gameService.find();
+    const response = await gameService.find({ params: { category: activeCategory } });
     setFilteredGames(response.data.data)
-  }, [])
+  }, [activeCategory])
 
   const fetchCategories = useCallback(async () => {
     const response = await categoriesService.find()

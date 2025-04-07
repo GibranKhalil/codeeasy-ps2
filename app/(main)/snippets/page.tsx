@@ -13,21 +13,21 @@ import { useAuth } from "@/hooks/use-auth"
 import Validator from "@/data/utils/validator.utils"
 import { snippetService } from "@/data/services/snippets/snippets.service"
 import { Snippet } from "@/data/@types/models/snippet/entities/snippet.entity"
+import { useFilters } from "@/hooks/use-filters"
+
 
 export default function SnippetsPage() {
   const [snippets, setSnippets] = useState<Snippet[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [languageFilter, setLanguageFilter] = useState("")
-  const [engineFilter, setEngineFilter] = useState("")
+  const { engineFilter, languageFilter, setEngineFilter, searchQuery, setLanguageFilter, setSearchQuery } = useFilters()
   const { user } = useAuth()
 
   const fetchSnippets = useCallback(async () => {
-    const response = await snippetService.find()
+    const response = await snippetService.find({ params: { engine: engineFilter, language: languageFilter, search: searchQuery } })
     setSnippets(response.data.data)
 
     setLoading(false)
-  }, [])
+  }, [engineFilter, languageFilter, searchQuery])
 
   useEffect(() => {
     fetchSnippets()
@@ -74,6 +74,7 @@ export default function SnippetsPage() {
               />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="ALL">Todas</SelectItem>
               {Object.values(eSnippetLanguage).map((lang, index) => (
                 <SelectItem key={index} value={lang}>
                   {languageMap.get(lang)}
@@ -95,6 +96,7 @@ export default function SnippetsPage() {
               />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={`ALL`}>Todas</SelectItem>
               {Object.values(eSnippetEngine).map((eng, index) => (
                 <SelectItem key={index} value={eng}>
                   {enginesMap.get(eng)}
