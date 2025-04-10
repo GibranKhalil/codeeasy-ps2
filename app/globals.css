@@ -94,10 +94,17 @@ body {
 }
 
 .code-snippet {
-  font-family: "Fira Code", monospace;
+  font-family: 'Fira Code', monospace;
 }
 
 .snippet-card-gradient {
-  background: linear-gradient(to bottom right, rgba(79, 70, 229, 0.1), transparent);
+  background: linear-gradient(
+    to bottom right,
+    rgba(79, 70, 229, 0.1),
+    transparent
+  );
 }
 
+.markdown > * {
+  all: revert;
+}

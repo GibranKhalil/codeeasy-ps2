@@ -272,7 +272,7 @@ export default function CreateTutorialPage() {
 
                 <Separator />
 
-                <div className="prose dark:prose-invert max-w-none">
+                <div className="markdown max-w-none">
                   <ReactMarkdown>{state.content || "O conteúdo do tutorial aparecerá aqui"}</ReactMarkdown>
                 </div>
 

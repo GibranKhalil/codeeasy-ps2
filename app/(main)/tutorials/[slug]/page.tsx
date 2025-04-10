@@ -7,13 +7,14 @@ import { format } from "date-fns"
 import { Button } from "@/components/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar"
 import { Badge } from "@/components/badge"
-import { ArrowLeft, Clock, Calendar, Share2 } from "lucide-react"
-import ReactMarkdown from "react-markdown"
+import { ArrowLeft, Clock, Calendar, Share2, Edit, Trash } from "lucide-react"
 import { tutorialsService } from "@/data/services/tutorials/tutorials.service"
 import { AxiosResponse } from "axios"
 import { Tutorial } from "@/data/@types/models/tutorials/entities/tutorial.entity"
 import { ptBR } from "date-fns/locale"
 import { Interactions } from "@/data/@types/interactions.type"
+import { useAuth } from "@/hooks/use-auth"
+import ReactMarkdown from 'react-markdown'
 
 export default function TutorialPage() {
   const params = useParams()
@@ -23,12 +24,15 @@ export default function TutorialPage() {
   const [similarTutorials, setSimilarTutorials] = useState<Tutorial[]>([])
   const [loading, setLoading] = useState(true)
 
+  const { user } = useAuth()
+
   const { slug } = params
 
   const fetchTutorial = useCallback(async () => {
     setLoading(true)
     const response = await tutorialsService.find({ subEndpoint: `/pid/${slug}` }) as unknown as AxiosResponse<Tutorial>
     setTutorial(response.data)
+    console.log(response.data)
     setLoading(false)
   }, [slug])
 
@@ -73,10 +77,23 @@ export default function TutorialPage() {
 
   return (
     <div className="container py-8">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Voltar
-      </Button>
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Voltar
+        </Button>
+
+        {Number(user?.id) === Number(tutorial.creator.id) &&
+          <div className="flex gap-2 items-center">
+            <Button onClick={() => router.push(`/tutorials/edit/${tutorial.pid}`)} variant={"outline"}>
+              <Edit />
+            </Button>
+            <Button variant={"destructive"}>
+              <Trash />
+            </Button>
+          </div>
+        }
+      </div>
 
       <div className="relative h-64 sm:h-80 md:h-96 w-full rounded-lg overflow-hidden mb-8">
         <Image src={tutorial.coverImage_url || "/placeholder.svg"} alt={tutorial.title} fill className="object-cover" />
@@ -101,8 +118,8 @@ export default function TutorialPage() {
             <Badge variant="outline">{tutorial.category.name}</Badge>
           </div>
 
-          <div className="prose dark:prose-invert max-w-none">
-            <ReactMarkdown>{tutorial.content}</ReactMarkdown>
+          <div className="markdown max-w-none">
+            <ReactMarkdown children={tutorial.content} />
           </div>
 
           <div className="flex items-center justify-between mt-8 pt-8 border-t">

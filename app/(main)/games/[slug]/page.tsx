@@ -117,7 +117,7 @@ export default function GamePage() {
             <CarouselNext className="right-2" />
           </Carousel>
 
-          <div className="prose dark:prose-invert max-w-none">
+          <div className="markdown max-w-none">
             <ReactMarkdown>{game.description}</ReactMarkdown>
           </div>
 

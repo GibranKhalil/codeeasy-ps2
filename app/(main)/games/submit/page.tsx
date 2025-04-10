@@ -361,7 +361,7 @@ export default function SubmitGamePage() {
 
                 <div className="space-y-4">
                   <h2 className="text-xl font-semibold">Sobre esse jogo</h2>
-                  <div className="prose dark:prose-invert max-w-none">
+                  <div className="markdown max-w-none">
                     <ReactMarkdown>{state.description || "O conteúdo do jogo aparecerá aqui."}</ReactMarkdown>
                   </div>
                 </div>
