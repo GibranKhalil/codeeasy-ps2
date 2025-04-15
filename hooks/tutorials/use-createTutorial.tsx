@@ -9,7 +9,9 @@ export type TutorialFormAction =
     | { type: 'SET_READ_TIME'; payload: number }
     | { type: 'SET_CONTENT'; payload: string }
     | { type: 'SET_COVER_IMAGE'; payload: File | null }
-    | { type: 'RESET_FORM' };
+    | { type: 'RESET_FORM' }
+    | { type: 'SET_FORM'; payload: CreateTutorialDto };
+
 
 export const initialTutorialFormState: CreateTutorialDto = {
     categoryId: 0,
@@ -22,7 +24,6 @@ export const initialTutorialFormState: CreateTutorialDto = {
     title: ""
 };
 
-// Função reducer
 export function tutorialFormReducer(state: CreateTutorialDto, action: TutorialFormAction): CreateTutorialDto {
     switch (action.type) {
         case 'SET_TITLE':
@@ -39,6 +40,8 @@ export function tutorialFormReducer(state: CreateTutorialDto, action: TutorialFo
             return { ...state, content: action.payload };
         case 'SET_COVER_IMAGE':
             return { ...state, coverImage: action.payload };
+        case 'SET_FORM':
+            return { ...state, ...action.payload };
         case 'RESET_FORM':
             return initialTutorialFormState;
         default:
@@ -58,6 +61,7 @@ export function useTutorialForm() {
         setReadTime: (readTime: number) => dispatch({ type: 'SET_READ_TIME', payload: readTime }),
         setContent: (content: string) => dispatch({ type: 'SET_CONTENT', payload: content }),
         setCoverImage: (coverImage: File | null) => dispatch({ type: 'SET_COVER_IMAGE', payload: coverImage }),
-        resetForm: () => dispatch({ type: 'RESET_FORM' })
+        resetForm: () => dispatch({ type: 'RESET_FORM' }),
+        setForm: (form: CreateTutorialDto) => dispatch({ type: 'SET_FORM', payload: form })
     };
 }
